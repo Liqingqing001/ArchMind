@@ -1,3 +1,4 @@
+import { buildKnowledgeNavigation, entityVendor } from "../knowledgeNavigation.ts";
 /** Browser-only implementation of the existing API contract. Never calls a model or crawler. */
 type Row = Record<string, any>;
 export type DemoState = Record<string, any> & {
@@ -103,6 +104,7 @@ export function createDemoStore(initial: Row) {
     model_resources: Row | null;
   } => ({
     ...e,
+    vendor_name: entityVendor(e,state.entities,state.relations),
     category_ids: state.links
       .filter((l) => l.entity_id === e.id)
       .map((l) => l.category_id),
@@ -390,6 +392,7 @@ export function createDemoStore(initial: Row) {
       path = parsed.pathname,
       params = parsed.searchParams;
     let match: RegExpMatchArray | null;
+    if (method === "GET" && path === "/knowledge/navigation") return buildKnowledgeNavigation(state.entities.map(entityView),state.categories);
     if (method === "GET" && path === "/config")
       return {
         auth_enabled: false,

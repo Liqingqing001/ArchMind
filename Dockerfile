@@ -16,6 +16,7 @@ RUN --mount=type=secret,id=proxy_ca \
     pip install --no-cache-dir -r requirements.txt
 RUN useradd --create-home --uid 10001 knowledge
 COPY --chown=knowledge:knowledge backend/app ./app
+COPY --chown=knowledge:knowledge backend/data ./data
 COPY --chown=knowledge:knowledge backend/examples ./examples
 COPY --chown=knowledge:knowledge backend/migrations ./migrations
 COPY --chown=knowledge:knowledge backend/alembic.ini ./
