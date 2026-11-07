@@ -98,7 +98,7 @@ def test_chat_combines_web_with_facts_freezes_citations_and_never_publishes_web(
 def test_researched_infrastructure_import_and_hierarchy(client,db):
     data=json.loads((Path(__file__).parent.parent/'data/infrastructure-knowledge-2026-11-07.json').read_text())
     stats=import_curated(db,data);db.commit()
-    assert stats=={'entities':23,'facts':90,'pending':0}
+    assert stats=={'entities':23,'facts':93,'pending':0}
     assert import_curated(db,data)=={'entities':0,'facts':0,'pending':0}
     tree=client.get('/api/knowledge/navigation').json()
     node=next(n for n in tree['nodes'] if n['path']==['工具与平台','云服务与 API','GPU租赁与算力'])

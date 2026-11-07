@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "batch_id": "video-workflow-2026-11-07",
+  "batch_id": "comfyui-full-audit-2026-11-07",
   "checked_on": "2026-11-07",
   "sources": [
     {
@@ -12,11 +12,16 @@
         "It integrates seamlessly into production pipelines with our API endpoints.",
         "Audio and video generation",
         "MiniMax H3 and LTX-AV.",
-        "Use `--offline` to disable the optional paid"
+        "Use `--offline` to disable the optional paid",
+        "{\"repository\":\"Comfy-Org/ComfyUI\",\"tag_name\":\"v0.44.0\",\"published_at\":\"2026-11-04T01:12:27Z\"}"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "github_read_public_readme",
-      "note": "通过 GitHub 读取官方 README 的短摘录；兼容列举不代表模型权重开放，不证明具体硬件或每次调用价格。"
+      "note": "通过 GitHub 读取官方 README 的短摘录；兼容列举不代表模型权重开放，不证明具体硬件或每次调用价格。 本轮附官方 GitHub Release 元数据摘录；发布版本不代表本项目已实测兼容。",
+      "additional_urls": [
+        "https://api.github.com/repos/Comfy-Org/ComfyUI/releases/latest",
+        "https://github.com/Comfy-Org/ComfyUI/releases/tag/v0.44.0"
+      ]
     }
   ],
   "entities": [
@@ -26,8 +31,14 @@
       "description": "可复用的图像、视频与音频节点工作流工具；可编排本地计算及可选付费远程节点，具体接入需核对。",
       "source": "comfy-readme",
       "categories": [
-        ["开源项目", "工作流工具"],
-        ["技术框架", "内容创作工作流"]
+        [
+          "开源项目",
+          "工作流工具"
+        ],
+        [
+          "技术框架",
+          "内容创作工作流"
+        ]
       ],
       "facts": [
         {
@@ -49,6 +60,11 @@
           "key": "运行边界",
           "value": "存在可选付费 API 节点，离线选项可禁用；远程节点费用与本地计算成本应分别核算。",
           "evidence": 4
+        },
+        {
+          "key": "软件发布版本",
+          "value": "本轮核对发布标签 v0.44.0（2026-11-04）；https://github.com/Comfy-Org/ComfyUI/releases/tag/v0.44.0。升级前核对变更和依赖。",
+          "evidence": 5
         }
       ]
     }

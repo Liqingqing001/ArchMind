@@ -23,7 +23,7 @@ assert.deepEqual(
   ["生成类", "理解类", "检索与表征", "工具与平台", "其他知识"],
 );
 assert.equal(node(["生成类", "大语言模型", "OpenAI"]).entity_ids.length, 3);
-assert.equal(node(["生成类", "大语言模型", "阿里云"]).entity_ids.length, 5);
+assert.equal(node(["生成类", "大语言模型", "阿里云"]).entity_ids.length, 8);
 assert.ok(names(node(["生成类", "大语言模型", "阿里云"])).includes("Qwen3-8B"));
 assert.ok(
   names(node(["理解类", "理解图片", "阿里云"])).includes(
@@ -33,10 +33,10 @@ assert.ok(
 assert.ok(
   !names(node(["理解类", "理解文字"])).includes("Qwen3-Embedding-0.6B"),
 );
-assert.equal(node(["理解类", "理解视频"]).entity_ids.length, 0);
+assert.equal(node(["理解类", "理解视频"]).entity_ids.length, 10);
 assert.equal(
   new Set(navigation.nodes.flatMap((n) => n.direct_entity_ids)).size,
-  141,
+  167,
 );
 for (const n of navigation.nodes) {
   assert.equal(new Set(n.entity_ids).size, n.entity_ids.length);

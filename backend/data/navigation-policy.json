@@ -150,6 +150,15 @@
         ]
       ],
       "exclusive": true
+    },
+    {
+      "category": "声音理解",
+      "paths": [
+        [
+          "理解类",
+          "理解声音"
+        ]
+      ]
     }
   ],
   "kind_paths": {
