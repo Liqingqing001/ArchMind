@@ -7,7 +7,7 @@ export function DemoBanner() {
     <aside className="pages-demo-banner" aria-label="公开体验模式">
       <div>
         <b>GitHub Pages 体验版</b>
-        <span>公开资料快照 · 对话为静态演示 · 操作仅在此浏览器，不上传</span>
+        <span>公开资料快照 · 可自带 API 直连模型 · 配置与对话保存在本地浏览器</span>
       </div>
       <div>
         <a

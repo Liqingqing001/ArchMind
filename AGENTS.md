@@ -9,5 +9,5 @@ The user develops this repository locally while another session works in the clo
 - Merge only the tested changes. A non-fast-forward or lease rejection is evidence of new work: inspect it instead of forcing an update.
 - Report the final branch, commit/PR and verification outcome. Local users should pull main before starting another feature; simultaneous work belongs on separate branches.
 - Keep the current conversation workspace, model settings, knowledge taxonomy and source datasets. Avoid broad frontend rewrites for deployment tasks.
-- GitHub Pages is an explicitly labelled static demo. Do not put model keys, administrator tokens, private database dumps or personal conversation history in its assets.
-- The demo exports only checked-in public knowledge. Actual FastAPI/PostgreSQL/model-provider behavior remains in the normal build.
+- GitHub Pages serves public knowledge and optional browser-owned model connections. Do not embed model keys, administrator tokens, private database dumps or personal conversation history in its assets. User API settings may be saved separately in their own browser localStorage, as explicitly requested; never copy credentials into conversations, traces or logs.
+- The Pages build exports only checked-in public knowledge. With a user-configured API, the browser calls only the selected HTTPS model endpoint; CORS failures must be explicit and must never fall back silently to a simulated reply. The normal build continues to use FastAPI/PostgreSQL.

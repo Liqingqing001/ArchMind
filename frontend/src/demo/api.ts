@@ -1,4 +1,11 @@
 import { createDemoStore } from "./store";
+import { upgradeDemoState } from "./stateUpgrade";
+import {
+  completeBrowser,
+  testBrowserConnection,
+  groundedMessages,
+  groundedResult,
+} from "../browserModel";
 const STORAGE = "archmind-pages-state-v1";
 let initial: Promise<Record<string, any>> | undefined;
 let memory: ReturnType<typeof createDemoStore> | undefined;
@@ -6,7 +13,7 @@ let serial: Promise<unknown> = Promise.resolve();
 const seed = () =>
   (initial ||= fetch(`${import.meta.env.BASE_URL}demo/knowledge.json`).then(
     async (response) => {
-      if (!response.ok) throw new Error("演示资料加载失败，请刷新页面");
+      if (!response.ok) throw new Error("公开资料加载失败，请刷新页面");
       return response.json();
     },
   ));
@@ -14,31 +21,29 @@ export function resetDemo() {
   try {
     localStorage.removeItem(STORAGE);
   } catch {
-    /* session memory is also reset by reload */
+    /* reload also clears memory */
   }
   window.location.reload();
 }
-export function demoApi<T>(
-  path: string,
-  options: RequestInit = {},
+function transaction<T>(
+  run: (engine: ReturnType<typeof createDemoStore>) => T,
 ): Promise<T> {
   const task = serial.then(async () => {
     const base = await seed();
     let engine = memory;
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE) || "null");
-      if (
-        saved?.fingerprint === base.metadata.fingerprint &&
-        saved.state?.metadata?.schema_version === 1
-      )
-        engine = createDemoStore(saved.state);
+      if (saved?.state?.metadata?.schema_version === 1)
+        engine = createDemoStore(
+          saved.fingerprint === base.metadata.fingerprint
+            ? saved.state
+            : upgradeDemoState(saved.state, base),
+        );
     } catch {
-      /* private browsing or damaged demo state: use the in-memory snapshot */
+      /* damaged or unavailable browser storage: use session memory */
     }
     engine ||= createDemoStore(base);
-    const body =
-      typeof options.body === "string" ? JSON.parse(options.body) : undefined;
-    const result = engine.request(options.method || "GET", path, body);
+    const result = run(engine);
     memory = engine;
     try {
       localStorage.setItem(
@@ -49,10 +54,50 @@ export function demoApi<T>(
         }),
       );
     } catch {
-      /* demo still works in session memory when browser storage is unavailable */
+      /* session still works without persistence */
     }
-    return result as T;
+    return result;
   });
   serial = task.catch(() => undefined);
   return task;
+}
+export async function demoApi<T>(
+  path: string,
+  options: RequestInit = {},
+): Promise<T> {
+  const body =
+    typeof options.body === "string" ? JSON.parse(options.body) : undefined;
+  if (path === "/agent/test" && options.method === "POST")
+    return (await testBrowserConnection(body)) as T;
+  if (
+    path === "/agent/chat" &&
+    options.method === "POST" &&
+    body?.connection?.api_key?.trim()
+  ) {
+    // Persist only trace context, then release the queue while the provider responds.
+    const call = {
+      conversation_id: body.conversation_id,
+      revision: body.revision,
+      messages: body.messages,
+    };
+    const context = await transaction((engine) =>
+      engine.prepareBrowserChat(call),
+    );
+    const reply = await completeBrowser(
+      body.connection,
+      groundedMessages(context),
+    );
+    const result = groundedResult(
+      reply.answer,
+      reply.finish,
+      context,
+      reply.connection.model,
+    );
+    return (await transaction((engine) =>
+      engine.commitBrowserChat(call, result),
+    )) as T;
+  }
+  return transaction((engine) =>
+    engine.request(options.method || "GET", path, body),
+  ) as Promise<T>;
 }
