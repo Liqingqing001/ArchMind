@@ -27,7 +27,7 @@ def selection_context(workflow):
     allowed=[r['id'] for r in POLICY['routes'] if r['id'] not in denied and (not explicit or re.search('无偏好|不限|随意',cleaned) or r['id'] in explicit)]
     offline=bool(re.search('不出网|不上网|完全离线|数据不外传|禁止出网|不得出网',fields.get('requirements',{}).get('value','')))
     if offline:allowed=[r for r in allowed if r=='local']
-    return dict(purpose='模型、项目与成本方向选型',capabilities=[dict(id=c['id'],label=c['label']) for c in capabilities],routes=[{**r,**(dict(name='本地离线部署',cost='本地硬件、电费与维护；数据不得出网，不使用云GPU、远程API或在线平台。') if offline else {})} for r in POLICY['routes'] if r['id'] in allowed],needs_website='code_generation' in [c['id'] for c in capabilities],offline=offline,candidate_note='下列是按能力与路线匹配的候选，不是效果、最低价、硬件兼容或账户可用性的保证。',output='先主推一句，再比较适用路线：模型/项目、费用结构、关键代价、官方链接。')
+    return dict(purpose='模型、项目与成本方向选型',capabilities=[dict(id=c['id'],label=c['label']) for c in capabilities],routes=[{**r,**(dict(name='本地离线部署',cost='本地硬件、电费与维护；数据不得出网，不使用云GPU、远程API或在线平台。') if offline else {})} for r in POLICY['routes'] if r['id'] in allowed],needs_website=bool(re.search(r'网站|网页|建站|站点|\bweb\b',intent)),offline=offline,candidate_note='下列是按能力与路线匹配的候选，不是效果、最低价、硬件兼容或账户可用性的保证。',output='先主推一句，再比较适用路线：模型/项目、费用结构、关键代价、官方链接。')
 
 
 def rank_recommendations(rows,entities,categories,links,workflow,prompt):

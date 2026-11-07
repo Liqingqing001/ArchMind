@@ -42,6 +42,7 @@ for (const c of cases) {
       w,
       "生成简版方案",
     );
+  if(c.needs_website!==undefined)assert.equal(context.needs_website,c.needs_website);
   assert.deepEqual(
     context.capabilities.map((c) => c.id),
     c.caps,

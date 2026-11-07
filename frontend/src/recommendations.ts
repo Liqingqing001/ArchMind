@@ -63,7 +63,7 @@ export function selectionContext(workflow?: Row) {
             }
           : r,
       ),
-    needs_website: capabilities.some((c) => c.id === "code_generation"),
+    needs_website: /网站|网页|建站|站点|\bweb\b/.test(intent),
     offline,
     candidate_note:
       "下列是按能力与路线匹配的候选，不是效果、最低价、硬件兼容或账户可用性的保证。",

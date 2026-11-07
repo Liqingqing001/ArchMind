@@ -18,6 +18,7 @@ def test_server_uses_same_capability_and_route_cases(db):
     for c in cases:
         w=empty_workflow();w['fields']={k:{'value':c[k],'evidence':c[k]} for k in ['goal','delivery','requirements']}
         context=selection_context(w)
+        if 'needs_website' in c:assert context['needs_website']==c['needs_website']
         assert [r['id'] for r in context['capabilities']]==c['caps'],c['id']
         assert [r['id'] for r in context['routes']]==c['routes'],c['id']
         rows,_=agent.retrieve_context(db,[agent.Message(role='user',content='生成简版方案')],w)

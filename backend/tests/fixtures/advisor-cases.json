@@ -323,5 +323,26 @@
       "Qwen3-8B",
       "whisper-large-v3"
     ]
+  },
+  {
+    "id": "code_without_website",
+    "goal": "编程写Python脚本",
+    "delivery": "只用API",
+    "requirements": "低成本",
+    "caps": [
+      "code_generation"
+    ],
+    "routes": [
+      "api"
+    ],
+    "include": [
+      "DeepSeek-V4.1-Flash-1017"
+    ],
+    "exclude": [
+      "Cloudflare Workers",
+      "v0",
+      "Qwen3-8B"
+    ],
+    "needs_website": false
   }
 ]
