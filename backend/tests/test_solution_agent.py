@@ -2,7 +2,8 @@ import json
 import httpx
 import pytest
 from app import agent
-from app.models import Trace
+from app.models import Trace, Conversation
+from app.solution_flow import empty_workflow
 from test_governance import setup_source, candidate, approve
 
 
@@ -11,13 +12,28 @@ CONNECTION = {"base_url": "https://example.com/v1", "api_key": "private-test-key
 
 def test_generic_download_words_do_not_match_unrelated_models():
     tokens = agent.terms("给出 Qwen3 和 bge-m3 模型的官方下载入口")
-    assert {"qwen3", "bge-m3"} <= tokens
-    assert not {"官方", "下载", "入口", "模型"} & tokens
+    assert {"qwen3", "bge-m3"} <= set(tokens)
+    assert not {"官方", "下载", "入口", "模型"} & set(tokens)
+
+
+def ready_conversation(client,db,goal='上下文窗口'):
+    row=client.post('/api/conversations',json={'title':'新对话'}).json()
+    workflow=empty_workflow()
+    workflow.update(phase='ready',missing=[],fields={key:{'value':goal if key=='goal' else '用户明确表示暂不确定','evidence':'用户明确表示暂不确定'} for key in workflow['missing']})
+    saved=db.get(Conversation,row['id'])
+    saved.messages=[{'role':'user','content':goal},{'role':'assistant','content':'需求摘要，确认生成吗？','result':{'workflow':workflow}}]
+    db.commit()
+    return saved
 
 
 def request(client, text="帮我比较模型的上下文窗口", **kwargs):
     return client.post('/api/agent/chat', json={"connection": CONNECTION,
         "messages": [{"role": "user", "content": text}], **kwargs})
+
+
+def generate(client,db,text='生成方案'):
+    row=ready_conversation(client,db)
+    return request(client,text,conversation_id=row.id,revision=0,action='generate')
 
 
 def test_solution_uses_current_published_facts_and_citations(client, db, monkeypatch):
@@ -28,11 +44,12 @@ def test_solution_uses_current_published_facts_and_citations(client, db, monkeyp
         seen['messages'] = messages
         return '建议先验证上下文窗口。[K1]', 'stop'
     monkeypatch.setattr(agent, 'complete', completion)
-    response = request(client)
+    response = generate(client,db)
     assert response.status_code == 200
     data = response.json()
     assert data['citations'][0]['snapshot_id'] == snapshot.id
     assert data['citations'][0]['value'] == '64K tokens'
+    assert data['conversation']['messages'][-1]['result']['citations']==data['citations']
     assert '64K tokens' in seen['messages'][-1]['content']
     trace = db.get(Trace, data['trace_id'])
     assert trace.caller == 'agent'
@@ -44,7 +61,7 @@ def test_demo_and_pending_excluded_and_unknown_citations_marked(client, db, monk
     entity, _, snapshot = setup_source(db)
     candidate(client, entity, snapshot)
     monkeypatch.setattr(agent, 'complete', lambda *a, **k: ('建议 [K999]', 'stop'))
-    data = request(client).json()
+    data = generate(client,db).json()
     assert data['retrieved'] == []
     assert data['citations'] == []
     assert '[K999]' not in data['answer']
@@ -55,17 +72,23 @@ def test_demo_and_pending_excluded_and_unknown_citations_marked(client, db, monk
     approve(client, change['id'])
     entity.is_demo = True
     db.commit()
-    assert request(client).json()['retrieved'] == []
+    assert generate(client,db).json()['retrieved'] == []
 
 
-def test_followup_retrieves_previous_user_requirements(client, db, monkeypatch):
-    entity, _, snapshot = setup_source(db)
-    approve(client, candidate(client, entity, snapshot).json()['id'])
-    monkeypatch.setattr(agent, 'complete', lambda *a, **k: ('继续方案 [K1]', 'length'))
-    data = request(client, messages=[{'role':'user','content':'上下文窗口是多少'},
-        {'role':'assistant','content':'先参考模型文档'}, {'role':'user','content':'再详细一点'}]).json()
-    assert data['retrieved']
-    assert any('长度上限' in w for w in data['warnings'])
+def test_continuation_reuses_frozen_evidence_and_keeps_requirements(client,db,monkeypatch):
+    entity,_,snapshot=setup_source(db)
+    approve(client,candidate(client,entity,snapshot).json()['id'])
+    monkeypatch.setattr(agent,'complete',lambda *a,**k:('部分方案 [K1]','length'))
+    first=generate(client,db).json()
+    assert first['retrieved'] and first['finish_reason']=='length'
+    assert any('输出上限' in w for w in first['warnings'])
+    c=first['conversation']
+    monkeypatch.setattr(agent,'complete',lambda *a,**k:('补完 [K1]','stop'))
+    second=request(client,'续写',conversation_id=c['id'],revision=c['revision'],action='continue').json()
+    assert second['retrieved']==first['retrieved']
+    assert second['trace_id']==first['trace_id']
+    assert second['workflow']['fields']==first['workflow']['fields']
+    assert request(client,'续写',conversation_id=c['id'],revision=second['conversation']['revision'],action='continue').status_code==409
 
 
 def test_validation_and_auth_never_echo_key(client, monkeypatch):

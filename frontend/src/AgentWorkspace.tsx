@@ -7,17 +7,19 @@ import { api, post } from "./api";
 import { isDemo } from "./demo/mode";
 import { ModelSettings } from "./ModelSettings";
 import { loadModelSettings, saveModelSettings, clearModelSettings, MODEL_SETTINGS_KEY, MODEL_SETTINGS_EVENT } from "./browserModel";
+import { solutionPolicy } from "./solutionFlow";
+import type { Workflow } from "./solutionFlow";
 import { Connection, presetConnection } from "./modelProviders";
 
 type Citation = { citation_id: string; entity_name: string; key: string; value: string; snapshot_id: string; source_url: string; version: number };
-type Answer = { answer: string; citations: Citation[]; retrieved: Citation[]; warnings: string[]; trace_id: string; model: string };
+type Answer = { answer: string; citations: Citation[]; retrieved: Citation[]; warnings: string[]; trace_id: string; model: string; workflow?:Workflow; finish_reason?:string; diagnostics?:Record<string,any> };
 type Turn = { id: string; role: "user" | "assistant"; content: string; result?: Answer };
 type Summary = { id: string; title: string; revision: number; updated_at: string; message_count: number; preview: string };
 type Conversation = Summary & { messages: Turn[] };
 const suggestions = [
-  { title: "企业知识问答", text: "为 50 人团队设计一个本地部署的中文文档知识库问答方案，请说明模型选型、实现步骤和验收方法。" },
+  { title: "企业知识问答", text: "为 50 人团队设计一个本地部署的中文文档知识库问答方案，请先帮我确认预算和部署约束。" },
   { title: "开源模型选型", text: "我想使用开源模型做中文对话和文档检索，请结合知识库比较技术路线，并给出官方下载入口。" },
-  { title: "AI 应用方案", text: "我想搭建一个 AI 数据分析助手，帮我梳理需求、架构、实施步骤和风险。" },
+  { title: "AI 视频短剧", text: "我想做 AI 视频短剧，先帮我确认需求，再决定适合哪条路线。" },
 ];
 function Reply({ turn, openSnapshot }: { turn: Turn; openSnapshot: (id: string) => void }) {
   const [copied, setCopied] = useState(false);
@@ -31,13 +33,14 @@ function Reply({ turn, openSnapshot }: { turn: Turn; openSnapshot: (id: string) 
       table: ({ children }) => <div className="answer-table"><table>{children}</table></div>,
     }}>{turn.content}</Markdown></div>}
     {turn.result && <>
-      {turn.result.warnings.map(w => <p className="chat-warning" key={w}>{w}</p>)}
-      <div className="reply-actions"><button onClick={copy}>{copied ? <Check size={14} /> : <Copy size={14} />}{copied ? "已复制" : "复制回答"}</button><span>{turn.result.citations.length} 条引用 · {turn.result.retrieved.length} 条检索资料</span></div>
+      {(turn.result.warnings||[]).map(w => <p className="chat-warning" key={w}>{w}</p>)}
+      <div className="reply-actions"><button onClick={copy}>{copied ? <Check size={14} /> : <Copy size={14} />}{copied ? "已复制" : "复制回答"}</button>{turn.result.trace_id&&<span>{turn.result.citations.length} 条引用 · {turn.result.retrieved.length} 条检索资料</span>}</div>
       {copyError && <p role="status">{copyError}</p>}
-      <details className="reply-sources"><summary><BookOpen size={14} />查看知识来源</summary>
+      {!!turn.result.trace_id && <details className="reply-sources"><summary><BookOpen size={14} />查看知识来源</summary>
         {turn.result.citations.map(c => <button className="citation-row" key={c.citation_id} onClick={() => openSnapshot(c.snapshot_id)}><b>[{c.citation_id}] {c.entity_name}</b><span>{c.key}：{c.value}</span><small>事实 v{c.version} · 查看证据</small></button>)}
         <details><summary>全部检索资料（{turn.result.retrieved.length}）</summary>{turn.result.retrieved.map(c => <p key={c.citation_id}><b>[{c.citation_id}] {c.entity_name}</b> · {c.key}：{c.value}<br /><a href={c.source_url} target="_blank" rel="noreferrer">官方资料 ↗</a></p>)}<small>检索记录：{turn.result.trace_id}</small></details>
-      </details>
+      </details>}
+      {turn.result.diagnostics && turn.result.workflow?.phase==="generated" && <details className="reply-status"><summary>回复状态</summary><p>停止原因：{turn.result.finish_reason==="length"?"达到输出上限":turn.result.finish_reason==="content_filter"?"服务商限制输出":"正常结束"} · 输出上限：{turn.result.diagnostics.output_limit||"未记录"} tokens</p><p>服务商用量：{Object.entries(turn.result.diagnostics.usage||{}).map(([key,value])=>`${key}: ${value}`).join(" · ")||"未返回"}</p></details>}
     </>}
   </article>;
 }
@@ -138,9 +141,9 @@ export function AgentWorkspace({ visible, openSnapshot }: { visible: boolean; op
     try { const conversation = await post(`/conversations/${deleted.id}/restore`); putConversation(conversation); setActiveId(conversation.id); setDeleted(null); }
     catch (e) { setHistoryError((e as Error).message); }
   };
-  const send = async (event: React.FormEvent) => {
+  const send = async (event: {preventDefault:()=>void}, action="message", override?:string) => {
     event.preventDefault();
-    const content = draft.trim();
+    const content = (override||draft).trim();
     if (!content || pending || creating || !configured || loadingId === activeId || (activeId && !current)) return;
     let conversation = current;
     let id = activeId || "new";
@@ -153,7 +156,7 @@ export function AgentWorkspace({ visible, openSnapshot }: { visible: boolean; op
       }
       nearBottom.current = true;
       setDrafts(v => ({ ...v, [id]: "" })); setErrors(v => ({ ...v, [id]: "" }));
-      const result = await post("/agent/chat", { connection, conversation_id: id, revision: conversation.revision, messages: [{ role: "user", content }] });
+      const result = await post("/agent/chat", { connection, action, conversation_id: id, revision: conversation.revision, messages: [{ role: "user", content }] });
       putConversation(result.conversation);
     } catch (e) { setErrors(v => ({ ...v, [id]: (e as Error).message })); setDrafts(v => ({ ...v, [id]: content })); }
     finally { setPending(null); }
@@ -185,10 +188,13 @@ export function AgentWorkspace({ visible, openSnapshot }: { visible: boolean; op
           <button className="model-switch" onClick={() => setSettingsOpen(true)}><span className={configured ? "model-ready-dot" : "model-empty-dot"} /><span>{hasConnection ? connection.model : "连接模型"}</span><Settings2 size={16} /></button>
         </div>
       </header>
+      {current?.messages.at(-1)?.result?.workflow && <details className="requirements-summary"><summary>{({collecting:"正在澄清需求",ready:"需求已整理，等待确认",generated:"已生成方案"})[current.messages.at(-1)!.result!.workflow!.phase]} · 已记录 {Object.keys(current.messages.at(-1)!.result!.workflow!.fields).length} 项条件<span>查看需求摘要</span></summary><dl>{solutionPolicy.slots.map(slot=>{const field=current.messages.at(-1)!.result!.workflow!.fields[slot.id];return field?<div key={slot.id}><dt>{slot.label}</dt><dd>{field.value}</dd></div>:null;})}</dl><p>直接在聊天中修改条件，修改后会再次请你确认。</p></details>}
       <div className="conversation-scroll" ref={scrollRef} onScroll={e => { const el = e.currentTarget; nearBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 180; setShowLatest(!nearBottom.current); }}>
         {loadingId === activeId && !current ? <div className="conversation-loading"><Loader2 className="spin" />读取对话…</div> : <>
           {!current?.messages.length && pending?.id !== draftKey && <div className="chat-start"><span className="start-icon"><Sparkles size={25} /></span><h2>把想法，变成可执行的方案。</h2><p>{isDemo ? "可直接体验资料与引用；连接自己的 API 后，使用真实模型生成方案。" : "说说目标、预算与限制，我会参考知识库与你一起完善。"}</p><div className="start-suggestions">{suggestions.map(s => <button key={s.title} onClick={() => setDrafts(v => ({ ...v, [draftKey]: s.text }))}><MessageSquare size={16} />{s.title}<ArrowUp size={14} /></button>)}</div></div>}
-          <div className="conversation">{current?.messages.map(turn => <Reply key={turn.id} turn={turn} openSnapshot={openSnapshot} />)}{pending?.id === draftKey && <><article className="chat-message user"><header>你</header><p className="user-text">{pending.content}</p></article><div className="chat-progress" role="status"><Loader2 className="spin" size={18} />正在参考知识库，生成方案…<span>{elapsed}s</span></div></>}</div>
+          <div className="conversation">{current?.messages.map(turn => <Reply key={turn.id} turn={turn} openSnapshot={openSnapshot} />)}{pending?.id === draftKey && <><article className="chat-message user"><header>你</header><p className="user-text">{pending.content}</p></article><div className="chat-progress" role="status"><Loader2 className="spin" size={18} />正在整理需求与回复…<span>{elapsed}s</span></div></>}</div>
+          {!pending && current?.messages.at(-1)?.result?.workflow?.phase==='ready' && <div className="workflow-actions"><button className="button primary" onClick={e=>send(e,'generate','生成简版方案')}>确认需求，生成简版方案</button><span>也可以继续聊天修改条件</span></div>}
+          {!pending && current?.messages.at(-1)?.result?.workflow?.phase==='generated' && current.messages.at(-1)?.result?.finish_reason==='length' && <div className="workflow-actions"><button className="button" onClick={e=>send(e,'continue','请续写上一条剩余内容，不重复已写部分')}>续写剩余内容</button><button className="text-button" onClick={()=>setSettingsOpen(true)}>调整输出上限</button></div>}
         </>}
       </div>
       <div className="composer-dock">

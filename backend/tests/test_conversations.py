@@ -35,25 +35,25 @@ def test_conversation_lifecycle_and_validation(client):
     assert client.get(path).json()["messages"] == []
 
 
-def test_server_history_isolated_and_citations_persist(client, db, monkeypatch):
+def test_server_history_isolated_and_requirements_persist(client, db, monkeypatch):
     entity, _, snapshot = setup_source(db)
     approve(client, candidate(client, entity, snapshot).json()["id"])
     seen = []
     def complete(connection, messages, **kwargs):
         seen.append(messages)
-        return "窗口建议 [K1]", "stop"
+        return json.dumps({"updates":{"goal":{"value":json.loads(messages[-1]["content"])["USER_INPUT"],"evidence":json.loads(messages[-1]["content"])["USER_INPUT"]}}}), "stop"
     monkeypatch.setattr(agent, "complete", complete)
     first, second = create(client), create(client)
     first_reply = send(client, first, "甲会话上下文窗口").json()
     first = first_reply["conversation"]
     assert first["revision"] == 1 and len(first["messages"]) == 2
     assert first["title"] == "甲会话上下文窗口"
-    assert first["messages"][1]["result"]["citations"][0]["snapshot_id"] == snapshot.id
+    assert first["messages"][1]["result"]["workflow"]["fields"]["goal"]["value"] == "甲会话上下文窗口"
+    assert first["messages"][1]["result"]["citations"] == []
     second = send(client, second, "乙会话独立需求").json()["conversation"]
     assert "甲会话" not in json.dumps(seen[-1], ensure_ascii=False)
     final = send(client, first, "继续展开").json()["conversation"]
-    assert seen[-1][1]["content"] == "甲会话上下文窗口"
-    assert seen[-1][2]["content"] == "窗口建议 [K1]"
+    assert "甲会话上下文窗口" in seen[-1][-1]["content"]
     assert "乙会话" not in json.dumps(seen[-1], ensure_ascii=False)
     assert len(final["messages"]) == 4 and final["revision"] == 2
     db.expire_all()
@@ -71,7 +71,7 @@ def test_failed_reply_and_stale_revision_leave_history_unchanged(client, monkeyp
     monkeypatch.setattr(agent, "complete", failed)
     assert send(client, row).status_code == 504
     assert client.get("/api/conversations/" + row["id"]).json()["messages"] == []
-    monkeypatch.setattr(agent, "complete", lambda *a, **k: ("回答", "stop"))
+    monkeypatch.setattr(agent, "complete", lambda *a, **k: ('{"updates":{}}', "stop"))
     assert send(client, row).status_code == 200
     def unexpected(*args, **kwargs):
         pytest.fail("stale request must not invoke provider")
@@ -92,7 +92,7 @@ def test_mutations_during_generation_do_not_overwrite(client, db, monkeypatch, o
             values = {"revision": 1, "messages": [{"role": "user", "content": "并发已保存"}]}
         db.execute(update(Conversation).where(Conversation.id == row["id"]).values(**values))
         db.commit()
-        return "新回复", "stop"
+        return '{"updates":{}}', "stop"
     monkeypatch.setattr(agent, "complete", complete)
     response = send(client, row)
     if operation == "rename":

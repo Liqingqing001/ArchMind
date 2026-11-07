@@ -208,11 +208,9 @@ test("real provider preparation shares knowledge, keeps history and never stores
     connection,
   };
   const context = db.prepareBrowserChat(body);
-  assert.ok(context.retrieved.length);
+  assert.equal(context.retrieved.length,0);
+  assert.equal(context.previous.phase,"collecting");
   assert.equal(context.history.length, 0);
-  const trace = db.request("GET", "/traces/" + context.trace_id);
-  assert.equal(trace.request_context.simulated, false);
-  assert.equal(trace.request_context.purpose, "browser_solution_chat");
   const result = groundedResult("方案 [K1]", "stop", context, connection.model);
   db.commitBrowserChat(body, result);
   const second = {
@@ -238,7 +236,7 @@ test("one real category contains all open-weight models without losing capabilit
   const models = db.request("GET", "/entities?category_id=" + open.id);
   assert.equal(models.length, 20);
   assert.ok(models.every((e) => e.category_ids.length >= 2));
-  assert.equal(db.request("GET", "/entities").length, 117);
+  assert.equal(db.request("GET", "/entities").length, 118);
   const qwen = models.find((e) => e.name === "Qwen3-8B");
   assert.ok(qwen.model_resources);
   assert.ok(qwen.category_ids.some((id) => id !== open.id));
@@ -262,7 +260,7 @@ test("new category data preserves existing browser history, traces and review ed
   });
   const next = createDemoStore(upgradeDemoState(db.exportState(), seed));
   assert.equal(next.request("GET", "/conversations/" + c.id).message_count, 2);
-  assert.ok(next.request("GET", "/traces").length);
+  assert.equal(next.request("GET", "/conversations/"+c.id).messages[1].result.workflow.phase,"collecting");
   assert.equal(
     next.request("GET", "/entities?category_id=" + category.id).length,
     20,

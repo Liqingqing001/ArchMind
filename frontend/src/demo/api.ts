@@ -1,3 +1,9 @@
+import {
+  extractionMessages,
+  applyExtraction,
+  isConfirmation,
+  clarification,
+} from "../solutionFlow";
 import { createDemoStore } from "./store";
 import { upgradeDemoState } from "./stateUpgrade";
 import {
@@ -79,20 +85,69 @@ export async function demoApi<T>(
       conversation_id: body.conversation_id,
       revision: body.revision,
       messages: body.messages,
+      action: body.action,
     };
     const context = await transaction((engine) =>
       engine.prepareBrowserChat(call),
     );
-    const reply = await completeBrowser(
-      body.connection,
-      groundedMessages(context),
+    let workflow = context.previous;
+    if (
+      isConfirmation(workflow, context.prompt, body.action) ||
+      body.action === "continue"
+    )
+      workflow = { ...workflow, phase: "generated" };
+    else {
+      const extraction = await completeBrowser(
+        body.connection,
+        extractionMessages(
+          workflow,
+          context.extractionInput,
+          context.lastQuestion,
+        ),
+        body.connection.max_output_tokens,
+      );
+      if (extraction.finish === "length")
+        throw Error(
+          "需求识别达到输出上限，请提高输出上限后重试；尚未生成方案。",
+        );
+      workflow = applyExtraction(
+        workflow,
+        extraction.answer,
+        context.extractionInput,
+      );
+    }
+    const prepared = await transaction((engine) =>
+      engine.prepareBrowserChat(call, workflow),
     );
-    const result = groundedResult(
-      reply.answer,
-      reply.finish,
-      context,
-      reply.connection.model,
-    );
+    let result;
+    if (workflow.phase !== "generated")
+      result = {
+        answer: clarification(workflow),
+        citations: [],
+        retrieved: [],
+        trace_id: "",
+        warnings: [],
+        model: body.connection.model,
+        workflow,
+        finish_reason: "stop",
+        diagnostics: { stage: "requirements" },
+      };
+    else {
+      const reply = await completeBrowser(
+        body.connection,
+        groundedMessages(prepared),
+      );
+      result = {
+        ...groundedResult(
+          reply.answer,
+          reply.finish,
+          prepared,
+          reply.connection.model,
+        ),
+        workflow,
+        diagnostics: reply.diagnostics,
+      };
+    }
     return (await transaction((engine) =>
       engine.commitBrowserChat(call, result),
     )) as T;

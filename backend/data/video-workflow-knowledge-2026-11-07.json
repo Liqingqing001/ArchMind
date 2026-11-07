@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "batch_id": "video-workflow-2026-11-07",
+  "checked_on": "2026-11-07",
+  "sources": [
+    {
+      "id": "comfy-readme",
+      "title": "ComfyUI 官方 README",
+      "url": "https://github.com/Comfy-Org/ComfyUI/blob/master/README.md",
+      "excerpts": [
+        "A visual node graph for building and reusing image, video, audio, 3D, and text workflows without code.",
+        "It integrates seamlessly into production pipelines with our API endpoints.",
+        "Audio and video generation",
+        "MiniMax H3 and LTX-AV.",
+        "Use `--offline` to disable the optional paid"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "github_read_public_readme",
+      "note": "通过 GitHub 读取官方 README 的短摘录；兼容列举不代表模型权重开放，不证明具体硬件或每次调用价格。"
+    }
+  ],
+  "entities": [
+    {
+      "name": "ComfyUI",
+      "kind": "project",
+      "description": "可复用的图像、视频与音频节点工作流工具；可编排本地计算及可选付费远程节点，具体接入需核对。",
+      "source": "comfy-readme",
+      "categories": [
+        ["开源项目", "工作流工具"],
+        ["技术框架", "内容创作工作流"]
+      ],
+      "facts": [
+        {
+          "key": "工作流能力",
+          "value": "以可视化节点构建和复用图像、视频、音频、3D 与文本工作流。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "提供用于集成生产管线的 API 端点。",
+          "evidence": 1
+        },
+        {
+          "key": "兼容列举",
+          "value": "官方 README 的音视频生成支持清单列有 MiniMax H3 和 LTX-AV；此列举不等同于权重下载或本地部署许可。",
+          "evidence": 3
+        },
+        {
+          "key": "运行边界",
+          "value": "存在可选付费 API 节点，离线选项可禁用；远程节点费用与本地计算成本应分别核算。",
+          "evidence": 4
+        }
+      ]
+    }
+  ]
+}
