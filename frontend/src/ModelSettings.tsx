@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Loader2, X } from "lucide-react";
+import { isDemo } from "./demo/mode";
 import { post } from "./api";
 import { Connection, presets, presetConnection } from "./modelProviders";
 
@@ -24,6 +25,11 @@ export function ModelSettings({ connection, provider, onSave, onClose }: {
     } catch (e) { setError((e as Error).message); }
     finally { setTesting(false); }
   };
+  if (isDemo) return <dialog ref={dialog} className="model-settings-dialog" onCancel={e => { e.preventDefault(); onClose(); }}>
+    <header><div><h2>公开体验模式</h2><p>无需模型密钥，也不会连接模型供应商。</p></div><button className="icon-button" aria-label="关闭模型设置" onClick={onClose}><X size={20}/></button></header>
+    <p className="provider-note">这里使用公开资料快照和固定模板演示知识检索、引用与对话历史，未调用大模型。体验站不接收 API Key。真实多服务商对话、数据库和自动采集可以在完整后端版运行。</p>
+    <footer><a className="button" href="https://github.com/Liqingqing001/ArchMind#readme" target="_blank" rel="noreferrer">查看完整部署说明</a><button className="button primary" onClick={onClose}>继续体验</button></footer>
+  </dialog>;
   return <dialog ref={dialog} className="model-settings-dialog" onCancel={e => { e.preventDefault(); if (!testing) onClose(); }}>
     <header><div><h2>连接模型</h2><p>选择服务商，使用自己的 API。</p></div><button className="icon-button" aria-label="关闭模型设置" disabled={testing} onClick={onClose}><X size={20} /></button></header>
     <form onSubmit={e => { e.preventDefault(); onSave(normalized(), selected); }}>

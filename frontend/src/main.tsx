@@ -37,6 +37,9 @@ import {
 } from "lucide-react";
 import { api, post, setToken, kinds, states, time } from "./api";
 import "./styles.css";
+import { isDemo } from "./demo/mode";
+import { DemoBanner } from "./demo/DemoBanner";
+import "./demo/demo.css";
 import "./workspace.css";
 import "./chat.css";
 import { fieldTemplates } from "./knowledge";
@@ -391,7 +394,7 @@ function App() {
   };
 
   return (
-    <div className={`app-shell ${page === "chat" ? "chat-shell" : ""}`}>
+    <div className={`app-shell ${page === "chat" ? "chat-shell" : ""} ${isDemo ? "demo-mode" : ""}`}>
       <aside className="sidebar">
         <a
           className="brand"
@@ -417,6 +420,7 @@ function App() {
         <div id="conversation-history-slot" hidden={page !== "chat"} />
       </aside>
       <main className="main">
+        {isDemo && <DemoBanner/>}
         {page !== "chat" && <header className="topbar">
           <div>
             <span>工作空间</span>

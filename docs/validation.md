@@ -54,3 +54,13 @@ API 集成测试在受限沙箱内的 TestClient 事件循环阻塞，使用获�
 - 仓库 docs/screenshots 保存首页与 Agent 检索截图，README 可直接展示。其余截图随对话交付。
 
 这不等同于完整的跨浏览器、移动端或无障碍验收；截图使用的是明确标注的虚构演示事实，不代表实时模型资料。
+
+
+## 基于本地更新 3b0aef3 的 Pages 体验版
+
+- 开工前云端工作区干净，fetch 后快进到 3b0aef3，无冲突；随后在 cloud/github-pages-demo 分支开发。保留新的方案对话、模型供应商设置、持久化会话、官方资料和界面。
+- 普通生产构建及 Pages 子路径构建均通过。普通构建继续调用真实 API，演示适配器不介入。
+- 新增 8 项演示行为测试通过：公开快照/模型下载、同库检索、发布版本与历史 trace、证据归属/并发过期、会话与引用/凭据隔离、访客状态隔离、联网操作限制、分类后代与多分类。
+- 最新后端回归测试：60 项通过，1 项 PostgreSQL 专用测试跳过（后续 GitHub CI 同时验证 PostgreSQL）。
+- Chromium 在完全没有后端的静态 HTTP 服务上完成真实验证：/ArchMind/ 资源路径、免密对话、引用快照、刷新恢复、模型下载入口、审核后检索 v2、访客隔离、390px 移动端无横向溢出、重置演示。浏览器无 pageerror，零 /api/ 网络请求。
+- 本次 API 启用 GitHub Pages 返回 403 Resource not accessible by integration；项目所有者可在 Settings/Pages 选择 GitHub Actions 完成配置，不需要提供任何密钥。部署工作流亦会尝试自动启用，实际发布状态以 Actions 和公开 URL 验证为准。
