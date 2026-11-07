@@ -67,7 +67,8 @@ def knowledge_navigation(db):
                 rules = [rule for rule in rules if rule.get('exclusive')]
             paths = [path + [vendor] for rule in rules for path in rule['paths']] or [['其他知识', '待整理模型', vendor]]
         else:
-            paths = [POLICY['kind_paths'].get(entity.kind, ['其他知识', '待整理模型']) + [vendor]]
+            services=[r for r in POLICY.get('service_rules',[]) if r['category'] in tags]
+            paths=[r['path']+[vendor] for r in services] if services else [POLICY['kind_paths'].get(entity.kind, ['其他知识', '待整理模型']) + [vendor]]
         for path in paths:
             for i in range(len(path)):
                 node = ensure(path[:i+1])

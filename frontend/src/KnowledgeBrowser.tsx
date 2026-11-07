@@ -242,9 +242,9 @@ export function KnowledgeBrowser({
             <p>
               {current?.description ||
                 (current?.path.length === 2 && childNodes.length
-                  ? "同一厂家集中展示，选择厂家后查看具体模型。"
-                  : current?.path.length === 3
-                    ? "点击模型查看事实、版本、来源与下载资料。"
+                  ? "按子类与服务商逐层查看具体条目。"
+                  : current?.direct_entity_ids.length
+                    ? "打开条目查看事实、版本、来源与资料。"
                     : "先选生成或理解，再按类型和厂家逐层浏览。")}
             </p>
           </div>
@@ -311,7 +311,7 @@ export function KnowledgeBrowser({
                   className={`knowledge-group-card ${!entries.length ? "is-empty" : ""}`}
                   onClick={() => select(node)}
                 >
-                  {node.path.length === 3 ? (
+                  {!hasChildren ? (
                     <Building2 size={23} />
                   ) : (
                     <FolderTree size={23} />

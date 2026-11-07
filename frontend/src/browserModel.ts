@@ -1,3 +1,5 @@
+import { disabledSearch, searchPolicy, searchWarnings } from "./webSearch.ts";
+import type { WebSearch } from "./webSearch.ts";
 import { solutionPolicy, editorialGuide } from "./solutionFlow.ts";
 import type { Workflow } from "./solutionFlow.ts";
 import type { Connection } from "./modelProviders.ts";
@@ -287,32 +289,34 @@ export function groundedMessages(context: {
   retrieved: unknown[];
   workflow?: Workflow;
   continuing?: boolean;
+  web_search?:WebSearch;
 }): ModelMessage[] {
   return [
     {
       role: "system",
-      content: solutionPolicy.answer_prompt+(context.continuing?'\n'+solutionPolicy.continue_prompt:''),
+      content: solutionPolicy.answer_prompt+'\n'+searchPolicy.prompt+(context.continuing?'\n'+solutionPolicy.continue_prompt:''),
     },
     ...context.history,
     {
       role: "user",
-      content:JSON.stringify({BRIEF:context.workflow?.fields||{},EDITORIAL_GUIDE:editorialGuide(context.workflow),EVIDENCE_JSON:context.retrieved,USER_INPUT:context.prompt}),
+      content:JSON.stringify({BRIEF:context.workflow?.fields||{},EDITORIAL_GUIDE:editorialGuide(context.workflow),EVIDENCE_JSON:context.retrieved,WEB_EVIDENCE_JSON:context.web_search?.results||[],WEB_SEARCH:{...context.web_search,results:undefined},USER_INPUT:context.prompt}),
     },
   ];
 }
 export function groundedResult(
   answer: string,
   finish: string,
-  context: { retrieved: any[]; trace_id: string },
+  context: { retrieved: any[]; trace_id: string; web_search?:WebSearch },
   model: string,
 ) {
   const requested = new Set(
-    [...answer.matchAll(/\[(K\d+)\]/g)].map((m) => m[1]),
+    [...answer.matchAll(/\[([KW]\d+)\]/g)].map((m) => m[1]),
   );
-  const valid = new Set(context.retrieved.map((r) => r.citation_id));
-  const warnings: string[] = [];
+  const web=context.web_search||disabledSearch();
+  const valid = new Set([...context.retrieved,...web.results].map((r) => r.citation_id));
+  const warnings: string[] = searchWarnings(web);
   if ([...requested].some((c) => !valid.has(c))) {
-    answer = answer.replace(/\[(K\d+)\]/g, (whole, key) =>
+    answer = answer.replace(/\[([KW]\d+)\]/g, (whole, key) =>
       valid.has(key) ? whole : "[引用待核验]",
     );
     warnings.push("模型返回了未知引用编号，已标记为待核验。");
@@ -320,9 +324,10 @@ export function groundedResult(
   const citations = context.retrieved.filter((r) =>
     requested.has(r.citation_id),
   );
-  if (!context.retrieved.length)
+  const web_citations=web.results.filter(r=>requested.has(r.citation_id));
+  if (!context.retrieved.length&&!web.results.length)
     warnings.push("本轮没有匹配的已发布知识，产品结论需要进一步核验。");
-  else if (!citations.length)
+  else if (!citations.length&&!web_citations.length)
     warnings.push("已检索资料，但模型没有标注有效引用，请核对来源。");
   if (finish === "length")
     warnings.push("模型因输出上限停止，当前回复不完整。可点击“续写剩余内容”；若仍截断，请提高输出上限。");
@@ -335,5 +340,6 @@ export function groundedResult(
     warnings,
     model,
     finish_reason:finish,
+    web_search:web,web_citations,
   };
 }

@@ -18,7 +18,7 @@
 
 backend/data/solution-policy.json 是 Python 和 TypeScript 的共享规则：流程提示、字段问题、确认词、场景任务、路线指南、分词扩展和停用词。两端使用相同排名算法，测试共用 backend/tests/fixtures/solution-parity.json。
 
-检索读取各自当前已发布事实，不另建 Agent 私库。以确认后的完整目标和关键要求检索，排除演示和厂商组织简介；按任务分配证据，每个实体最多两条、总计十二条，补充资料保留原文、版本与来源。现成平台路线排除工作流、算力及仅下载权重的条目；算力仅在用户明确选择本地／GPU／自部署时进入候选。已标记 Legacy 或停止服务的实体默认不用于推荐。当前仍是场景约束的关键词检索，没有宣称实现向量检索、实时搜索或准确报价。
+检索读取各自当前已发布事实，不另建 Agent 私库。以确认后的完整目标和关键要求检索，排除演示和厂商组织简介；按任务分配证据，每个实体最多两条、总计十二条，补充资料保留原文、版本与来源。现成平台路线排除工作流、算力及仅下载权重的条目；算力仅在用户明确选择本地／GPU／自部署时进入候选。已标记 Legacy 或停止服务的实体默认不用于推荐。当前仍是场景约束的关键词检索，不宣称实现向量检索或准确报价；可选联网检索详见 [联网检索](web-search.md)。
 
 视频短剧路线分为现成平台、API 与工作流、云 GPU 自部署。知识页显示各自适用条件、任务链和缺口。指南是编辑建议，尚未通过真实作品跑通和计费验证；不能作为产品事实引用，也不能保证角色一致性、硬件规格或预算。价格、商用、地域库存及具体节点版本仍需核验。
 
@@ -29,8 +29,8 @@ backend/data/solution-policy.json 是 Python 和 TypeScript 的共享规则：�
 ```bash
 cd backend
 # 先完成现有 alembic upgrade head
-python -m app.curated          # 预览，事务回滚
-python -m app.curated --apply  # 导入仓库中已核验的 ComfyUI 短摘录
+python -m app.curated --dataset video-workflow-knowledge-2026-11-07.json          # 预览，事务回滚
+python -m app.curated --dataset video-workflow-knowledge-2026-11-07.json --apply  # 导入 ComfyUI 短摘录
 ```
 
 已有事实不同值进入待审核，不覆盖已发布值；重复导入不新增同一事实或待审核变更。未自动变更服务器数据库。README 的 MiniMax H3 支持列举不证明权重开放、本地部署许可或某个节点在用户环境可用。

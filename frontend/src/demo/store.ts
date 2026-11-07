@@ -1,3 +1,5 @@
+import { disabledSearch } from "../webSearch.ts";
+import type { WebSearch } from "../webSearch.ts";
 import { previousWorkflow, applyExtraction, previewExtraction, isConfirmation, clarification, rankKnowledge, solutionPolicy } from "../solutionFlow.ts";
 import type { Workflow } from "../solutionFlow.ts";
 import { buildKnowledgeNavigation, entityVendor } from "../knowledgeNavigation.ts";
@@ -287,7 +289,7 @@ export function createDemoStore(initial: Row) {
       history = history.slice(2);
     const legacy=c.messages.filter((m:Row)=>m.role==='user').map((m:Row)=>m.content).join("\n");
     const extractionInput=Object.keys(previous.fields).length||!legacy?prompt:legacy.slice(0,16000)+"\n"+legacy.slice(-16000)+"\n本轮："+prompt;
-    return { prompt, extractionInput, retrieved, trace_id: t.id, history, previous, workflow, continuing, lastQuestion:c.messages.at(-1)?.content||"" };
+    return { web_search:continuing?latest.web_search||disabledSearch():disabledSearch(), prompt, extractionInput, retrieved, trace_id: t.id, history, previous, workflow, continuing, lastQuestion:c.messages.at(-1)?.content||"" };
   };
   const commitChat = (body: Row, result: Row) => {
     const c = conversation(body.conversation_id);
@@ -317,7 +319,7 @@ export function createDemoStore(initial: Row) {
     const citations=ready.retrieved.filter((r:Row)=>r.task==='视频生成'||!scene).slice(0,2);
     const route=scene?.routes[/现成|免部署|一站式/.test(workflow.fields.delivery?.value||'')?0:/API|api|工作流/.test(workflow.fields.delivery?.value||'')?1:0]||scene?.routes[0];
     const answer=workflow.phase!=='generated'?clarification(workflow):`> 交互演示：未调用大模型，以下是编辑路线建议，不是实测案例。\n\n推荐先采用「${route?.name||'小范围验证'}」。${route?.steps||'用一小批样本验证目标，再扩充。'}\n\n理由：先按已确认的预算、操作经验和使用方式验证效果。\n\n费用边界：${route?.boundary||'当前资料不足以核算价格，需核验实际用量与报价。'}\n\n下一步：先做一个小样，再决定是否扩充。${citations.length?'\n\n可核对的资料：'+citations.map((r:Row)=>`${r.entity_name} · ${r.key} [${r.citation_id}]`).join('；'):''}`;
-    return commitChat(body,{answer,citations:workflow.phase==='generated'?citations:[],retrieved:ready.retrieved,trace_id:ready.trace_id,warnings:[],model:'本地交互演示',workflow,finish_reason:'stop'});
+    return commitChat(body,{answer,citations:workflow.phase==='generated'?citations:[],retrieved:ready.retrieved,trace_id:ready.trace_id,warnings:body.search_requested&&workflow.phase==='generated'?['当前为交互演示，未调用联网；连接文本模型后可结合网页生成真实回答。']:[],model:'本地交互演示',workflow,finish_reason:'stop'});
   };
   const request = (method: string, input: string, body: Row = {}): any => {
     const parsed = new URL(input, "https://demo.invalid"),
@@ -620,6 +622,9 @@ export function createDemoStore(initial: Row) {
       }
     },
     prepareBrowserChat: (body: Row, workflow?: Workflow) => copy(prepareChat(body, true, workflow)),
+    attachWebTrace:(traceId:string,web:WebSearch)=>{
+      const t=find('traces',traceId);t.request_context={...t.request_context,web_search:copy(web)};
+    },
     commitBrowserChat: (body: Row, result: Row) =>
       copy(commitChat(body, result)),
     exportState: () => copy(state),

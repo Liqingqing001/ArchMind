@@ -11,6 +11,7 @@ from .models import Entity, Fact, Snapshot, Source, Trace, Category, EntityCateg
 from .collector import validate_url
 from .provider_protocols import request_parts, response_text
 from .conversations import get_conversation, summary
+from .web_search import SearchConnection, search_web, disabled_search, search_warnings, POLICY as SEARCH_POLICY, request_json as search_request_json, parse_results as parse_search_results
 from .solution_flow import POLICY, terms, rank_knowledge, previous_workflow, extraction_messages, apply_extraction, is_confirmation, clarification, editorial_guide
 
 router = APIRouter(prefix="/api/agent", tags=["solution-agent"])
@@ -68,6 +69,7 @@ class ChatRequest(BaseModel):
     conversation_id: str | None = Field(default=None, max_length=36)
     revision: int | None = Field(default=None, ge=0)
     action: Literal["message", "generate", "continue"] = "message"
+    web_search: SearchConnection | None = None
 
     @model_validator(mode="after")
     def conversation(self):
@@ -143,6 +145,17 @@ def test_connection(connection: ModelConnection):
     return {"ok": True, "model": connection.model, "protocol": connection.protocol, "base_url": connection.base_url}
 
 
+@router.post('/search/test')
+def test_search(connection:SearchConnection):
+    if not connection.api_key.get_secret_value():
+        raise HTTPException(422,'测试检索需要搜索 API Key')
+    try:
+        rows=parse_search_results(connection.provider,search_request_json(connection,'GPU 云服务器 官方文档'),now(),[connection.api_key.get_secret_value()])
+    except (ValueError,TypeError):
+        raise HTTPException(502,'检索测试失败，请检查搜索 Key、额度和网络')
+    return {'ok':True,'count':len(rows),'provider':connection.provider}
+
+
 @router.post("/chat")
 def chat(body: ChatRequest, db=Depends(get_db)):
     conversation = None
@@ -187,26 +200,30 @@ def chat(body: ChatRequest, db=Depends(get_db)):
             evidence,trace_id = latest.get('retrieved',[]),latest.get('trace_id','')
         else:
             evidence,trace_id = retrieve_context(db,messages,workflow)
+        web=latest.get('web_search') or disabled_search() if continuing else search_web(body.web_search,workflow,user,[body.connection.api_key.get_secret_value()])
+        if not continuing:
+            trace=db.get(Trace,trace_id);trace.request_context={**trace.request_context,'web_search':web};db.commit()
         scene = editorial_guide(workflow)
-        prompt = [{'role':'system','content':POLICY['answer_prompt']+('\n'+POLICY['continue_prompt'] if continuing else '')}]
+        prompt = [{'role':'system','content':POLICY['answer_prompt']+'\n'+SEARCH_POLICY['prompt']+('\n'+POLICY['continue_prompt'] if continuing else '')}]
         prompt.extend(m.model_dump() for m in messages[:-1])
-        prompt.append({'role':'user','content':json.dumps({'BRIEF':workflow['fields'],'EDITORIAL_GUIDE':scene,'EVIDENCE_JSON':evidence,'USER_INPUT':user},ensure_ascii=False)})
+        prompt.append({'role':'user','content':json.dumps({'BRIEF':workflow['fields'],'EDITORIAL_GUIDE':scene,'EVIDENCE_JSON':evidence,'WEB_EVIDENCE_JSON':web['results'],'WEB_SEARCH':{k:v for k,v in web.items() if k!='results'},'USER_INPUT':user},ensure_ascii=False)})
         completion = complete(body.connection,prompt)
         answer,finish = completion
-        requested = set(re.findall(r'\[(K\d+)\]',answer));valid = {e['citation_id'] for e in evidence};warnings = []
+        requested = set(re.findall(r'\[([KW]\d+)\]',answer));valid = {e['citation_id'] for e in evidence+web['results']};warnings = search_warnings(web)
         if requested-valid:
-            answer = re.sub(r'\[(K\d+)\]',lambda m:m.group(0) if m.group(1) in valid else '[引用待核验]',answer)
+            answer = re.sub(r'\[([KW]\d+)\]',lambda m:m.group(0) if m.group(1) in valid else '[引用待核验]',answer)
             warnings.append('模型返回了未知引用编号，已标记为待核验。')
         citations = [e for e in evidence if e['citation_id'] in requested]
-        if not evidence:
+        web_citations=[e for e in web['results'] if e['citation_id'] in requested]
+        if not evidence and not web['results']:
             warnings.append('本轮没有匹配的已发布知识，产品结论需要进一步核验。')
-        elif not citations:
+        elif not citations and not web_citations:
             warnings.append('已检索资料，但模型没有标注有效引用，请核对来源。')
         if finish=='content_filter':
             warnings.append('模型服务限制了本轮输出，请调整请求；这不是长度截断。')
         if finish=='length':
             warnings.append('模型因输出上限停止，当前回复不完整。可点击“续写剩余内容”；若仍截断，请提高输出上限。')
-        result = dict(answer=answer,citations=citations,retrieved=evidence,trace_id=trace_id,warnings=warnings,model=body.connection.model,workflow=workflow,finish_reason=finish,diagnostics=getattr(completion,'diagnostics',{'finish_reason':finish,'output_limit':body.connection.max_output_tokens}))
+        result = dict(web_search=web,web_citations=web_citations,answer=answer,citations=citations,retrieved=evidence,trace_id=trace_id,warnings=warnings,model=body.connection.model,workflow=workflow,finish_reason=finish,diagnostics=getattr(completion,'diagnostics',{'finish_reason':finish,'output_limit':body.connection.max_output_tokens}))
     if conversation:
         stamp = now()
         turns = previous_turns + [

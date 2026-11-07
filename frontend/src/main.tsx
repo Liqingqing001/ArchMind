@@ -1,3 +1,4 @@
+import { WebEvidence } from "./WebEvidence";
 import React, { useState, useEffect, useCallback } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -1296,6 +1297,7 @@ function App() {
                         )}
                         <span>固定引用 · 查询时版本</span>
                       </div>
+                      <WebEvidence web={results.request_context?.web_search}/>
                       <div className="search-results">
                         {results.results.length ? (
                           results.results.map((r: Row) => (
