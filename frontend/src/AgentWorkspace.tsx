@@ -307,10 +307,17 @@ export function AgentWorkspace({
   const activeRef = useRef(activeId);
   activeRef.current = activeId;
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const nearBottom = useRef(true);
   const current = activeId ? documents[activeId] : undefined;
   const draftKey = activeId || "new";
   const draft = drafts[draftKey] || "";
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!visible || !input) return;
+    input.style.height = "auto";
+    input.style.height = `${Math.min(Math.max(input.scrollHeight, 32), 128)}px`;
+  }, [draft, visible]);
   const hasConnection =
     !!connection.api_key.trim() && !!connection.model.trim();
   const configured = isDemo || hasConnection;
@@ -955,8 +962,9 @@ export function AgentWorkspace({
             </label>
             <textarea
               id="solution-prompt"
-              rows={3}
-              placeholder="描述你的需求，或继续追问…"
+              ref={inputRef}
+              rows={1}
+              placeholder="描述需求，继续追问…"
               maxLength={6000}
               disabled={pending?.id === draftKey}
               value={draft}
@@ -975,11 +983,11 @@ export function AgentWorkspace({
               }}
             />
             <div>
-              <span>
-                {pending && pending.id !== draftKey
-                  ? "另一段对话正在生成，完成后可发送"
-                  : "Ctrl + Enter 发送 · Enter 换行"}
-              </span>
+              {pending && pending.id !== draftKey && (
+                <span className="composer-busy" role="status">
+                  另一段对话正在生成
+                </span>
+              )}
               {configured ? (
                 <button
                   className="button primary"
@@ -1007,11 +1015,16 @@ export function AgentWorkspace({
           </form>
           <p className="composer-caption">
             <BookOpen size={12} />
-            {isDemo
-              ? hasConnection
-                ? "浏览器直连你的模型 · 使用当前本地知识与引用"
-                : "尚未配置 API，本轮使用静态演示 · 可在右上角连接模型"
-              : "基于已发布知识回答 · 重要结论请核对引用来源"}
+            <span>
+              {isDemo
+                ? hasConnection
+                  ? "浏览器直连你的模型 · 使用当前本地知识与引用"
+                  : "尚未配置 API，本轮使用静态演示 · 可在右上角连接模型"
+                : "基于已发布知识回答 · 重要结论请核对引用来源"}
+            </span>
+            <span className="composer-keyboard-hint">
+              Ctrl + Enter 发送 · Enter 换行
+            </span>
           </p>
         </div>
       </section>

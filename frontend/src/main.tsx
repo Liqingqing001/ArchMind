@@ -42,6 +42,7 @@ import { DemoBanner } from "./demo/DemoBanner";
 import "./demo/demo.css";
 import "./workspace.css";
 import "./chat.css";
+import "./layout.css";
 import { fieldTemplates } from "./knowledge";
 import { AgentWorkspace } from "./AgentWorkspace";
 import { ModelDownloads } from "./ModelDownloads";
@@ -337,28 +338,32 @@ function App() {
 
   return (
     <div className={`app-shell ${page === "chat" ? "chat-shell" : ""} ${isDemo ? "demo-mode" : ""}`}>
-      <aside className="sidebar">
+      <header className="app-header">
+        <nav className="primary-nav" aria-label="主导航">
+          {([
+            { id: "chat", label: "方案对话", icon: MessageSquare },
+            { id: "entities", label: "知识库", icon: BookOpen },
+            { id: "overview", label: "知识管理", icon: Settings2 },
+          ] as const).map(({ id, label, icon: Icon }) => {
+            const active = page === id || (id === "overview" && !["chat", "entities"].includes(page));
+            return (
+              <button key={id} className={active ? "active" : ""} aria-current={active ? "page" : undefined} onClick={() => go(id)}>
+                <Icon size={16} />{label}
+              </button>
+            );
+          })}
+        </nav>
         <a
           className="brand"
           aria-label="ArchMind 方案对话"
           href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            go("chat");
-          }}
+          onClick={(e) => { e.preventDefault(); go("chat"); }}
         >
-          <span className="brand-icon">
-            <span aria-hidden="true">♛</span>
-          </span>
-          <span>
-            ArchMind<span className="brand-en">THE KNOWLEDGE ATELIER</span>
-          </span>
+          <span className="brand-name">ArchMind</span>
+          <span className="brand-icon"><span aria-hidden="true">♛</span></span>
         </a>
-        <nav className="primary-nav" aria-label="主导航">
-          {([{ id: "chat", label: "方案对话", icon: MessageSquare }, { id: "entities", label: "知识库", icon: BookOpen }, { id: "overview", label: "知识管理", icon: Settings2 }] as const).map(({ id, label, icon: Icon }) => (
-            <button key={id} className={(page === id || (id === "overview" && !["chat", "entities"].includes(page))) ? "active" : ""} onClick={() => go(id)}><Icon size={18} />{label}</button>
-          ))}
-        </nav>
+      </header>
+      <aside className="sidebar" hidden={page !== "chat"}>
         <div id="conversation-history-slot" hidden={page !== "chat"} />
       </aside>
       <main className="main">
