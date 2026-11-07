@@ -1,3 +1,4 @@
+import { SceneKnowledge } from "./SceneKnowledge";
 import { useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
@@ -27,6 +28,7 @@ export function KnowledgeBrowser({
   onClearKind: () => void;
   onOpen: (id: string) => void;
 }) {
+  const [view,setView]=useState<"scene"|"capability">("scene");
   const [selected, setSelected] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const [query, setQuery] = useState("");
@@ -166,7 +168,7 @@ export function KnowledgeBrowser({
       grouped.set(vendor, [...(grouped.get(vendor) || []), e]);
     }
   return (
-    <div className="hierarchy-browser">
+    <><div className="knowledge-view-tabs" aria-label="知识浏览方式"><button className={view==="scene"&&!kind?"active":""} onClick={()=>{onClearKind();setView("scene");}}>按场景查看</button><button className={view==="capability"||kind?"active":""} onClick={()=>setView("capability")}>按能力浏览</button></div>{view==="scene"&&!kind?<SceneKnowledge entities={entities} navigation={navigation} onOpen={onOpen}/>:<div className="hierarchy-browser">
       <aside className="panel knowledge-tree-panel">
         <div className="knowledge-tree-heading">
           <b>
@@ -349,6 +351,6 @@ export function KnowledgeBrowser({
           </div>
         )}
       </section>
-    </div>
+    </div>}</>
   );
 }

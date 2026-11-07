@@ -18,8 +18,8 @@ const snapshot = seed.snapshots.find(
 );
 
 test("public export contains the updated catalog with traceable excerpts and model downloads", () => {
-  assert.equal(seed.entities.filter((e) => !e.is_demo).length, 116);
-  assert.equal(seed.facts.filter((f) => f.entity_id !== atlas.id).length, 211);
+  assert.equal(seed.entities.filter((e) => !e.is_demo).length, 117);
+  assert.equal(seed.facts.filter((f) => f.entity_id !== atlas.id).length, 215);
   for (const f of seed.facts)
     assert.ok(
       seed.snapshots
@@ -129,7 +129,7 @@ test("evidence ownership, duplicate proposals and stale candidate conflicts are 
   );
 });
 
-test("conversation demo has citations, persists through reconstruction, and never saves provider keys", () => {
+test("conversation starts by clarifying, persists through reconstruction, and never saves provider keys", () => {
   let db = setup();
   const c = db.request("POST", "/conversations", { title: "新对话" });
   const result = db.request("POST", "/agent/chat", {
@@ -138,8 +138,9 @@ test("conversation demo has citations, persists through reconstruction, and neve
     messages: [{ role: "user", content: "企业知识问答 RAG 本地部署" }],
     connection: { api_key: "must-never-be-saved" },
   });
-  assert.match(result.answer, /未调用大模型/);
-  assert.ok(result.citations.length > 0);
+  assert.equal(result.workflow.phase,"collecting");
+  assert.equal(result.citations.length,0);
+  assert.match(result.answer,/预算/);
   for (const citation of result.citations)
     assert.match(
       result.answer,

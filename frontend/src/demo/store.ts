@@ -1,3 +1,5 @@
+import { previousWorkflow, applyExtraction, previewExtraction, isConfirmation, clarification, rankKnowledge, solutionPolicy } from "../solutionFlow.ts";
+import type { Workflow } from "../solutionFlow.ts";
 import { buildKnowledgeNavigation, entityVendor } from "../knowledgeNavigation.ts";
 /** Browser-only implementation of the existing API contract. Never calls a model or crawler. */
 type Row = Record<string, any>;
@@ -264,85 +266,28 @@ export function createDemoStore(initial: Row) {
     ...summary(c),
     messages: c.messages,
   });
-  const prepareChat = (body: Row, browser = false) => {
+  const prepareChat = (body: Row, browser = false, override?: Workflow) => {
     const c = conversation(body.conversation_id);
     if (c.revision !== body.revision)
       fail("对话已在另一页面更新，请重新打开后发送");
     const prompt = text(body.messages?.at(-1)?.content, 6000);
-    const inputs = [
-      ...c.messages
-        .filter((m: Row) => m.role === "user")
-        .map((m: Row) => m.content),
-      prompt,
-    ]
-      .slice(-4)
-      .join(" ")
-      .toLowerCase();
-    const tokens = new Set(
-      inputs.match(/[a-z][a-z0-9_.-]{1,}|[\u3400-\u9fff]{2,}/g) || [],
-    );
-    for (const keyword of [
-      "rag",
-      "检索",
-      "知识",
-      "问答",
-      "中文",
-      "文档",
-      "本地",
-      "部署",
-      "开源",
-      "对话",
-      "图像",
-      "视频",
-      "语音",
-      "数据分析",
-      "向量",
-    ])
-      if (inputs.includes(keyword)) tokens.add(keyword);
-    const counts: Record<string, number> = {};
-    const retrieved = state.facts
-      .filter((f) => !f.valid_to)
-      .map(citation)
-      .filter((r) => !r.is_demo)
-      .map((r) => {
-        const entity = find("entities", r.entity_id),
-          haystack =
-            `${r.entity_name} ${entity.description} ${r.key} ${r.value}`.toLowerCase();
-        return {
-          row: r,
-          score: [...tokens].reduce(
-            (n, t) =>
-              n +
-              (haystack.includes(t) ? 3 : 0) +
-              (r.entity_name.toLowerCase().includes(t) ? 4 : 0),
-            0,
-          ),
-        };
-      })
-      .filter((r) => r.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .filter(({ row }) => {
-        counts[row.entity_id] = (counts[row.entity_id] || 0) + 1;
-        return counts[row.entity_id] <= 3;
-      })
-      .slice(0, 12)
-      .map(({ row }, i) => ({ ...row, citation_id: `K${i + 1}` }));
-    const t = trace(prompt, retrieved, "agent", {
-      purpose: browser ? "browser_solution_chat" : "demo_solution_chat",
-      simulated: !browser,
-      method: "ranked_keyword",
-      include_demo: false,
-      request_id: c.id,
-    });
+    const previous = previousWorkflow(c.messages),workflow=override||previous;
+    const latest=[...c.messages].reverse().find((m:Row)=>m.role==='assistant')?.result||{};
+    const continuing=body.action==='continue';
+    if(continuing&&(previous.phase!=='generated'||latest.finish_reason!=='length'))fail('当前没有需要续写的已确认方案');
+    const retrieved = continuing?latest.retrieved||[]:workflow.phase==='generated'?rankKnowledge(state.facts.filter(f=>!f.valid_to).map(citation),state.entities,state.categories,state.links,workflow,prompt):[];
+    const t = continuing?{id:latest.trace_id}:workflow.phase==='generated'?trace(prompt,retrieved,'agent',{purpose:browser?'browser_solution_chat':'demo_solution_chat',simulated:!browser,method:'scenario_keyword_v2',include_demo:false,request_id:c.id,goal:workflow.fields.goal?.value,scene:workflow.scene}):{id:''};
     let history = c.messages
       .slice(-18)
-      .map((m: Row) => ({ role: m.role, content: m.content }));
+      .map((m: Row) => ({ role: m.role, content: continuing?m.content.slice(-12000):m.content }));
     while (
       history.length &&
       history.reduce((n: number, m: Row) => n + m.content.length, 0) > 34000
     )
       history = history.slice(2);
-    return { prompt, retrieved, trace_id: t.id, history };
+    const legacy=c.messages.filter((m:Row)=>m.role==='user').map((m:Row)=>m.content).join("\n");
+    const extractionInput=Object.keys(previous.fields).length||!legacy?prompt:legacy.slice(0,16000)+"\n"+legacy.slice(-16000)+"\n本轮："+prompt;
+    return { prompt, extractionInput, retrieved, trace_id: t.id, history, previous, workflow, continuing, lastQuestion:c.messages.at(-1)?.content||"" };
   };
   const commitChat = (body: Row, result: Row) => {
     const c = conversation(body.conversation_id);
@@ -366,26 +311,13 @@ export function createDemoStore(initial: Row) {
     return { ...result, conversation: conversationView(c) };
   };
   const chat = (body: Row) => {
-    const { prompt, retrieved, trace_id } = prepareChat(body);
-    const citations = retrieved.slice(0, 6);
-    const facts = citations
-      .map(
-        (r) =>
-          `- **${r.entity_name} · ${r.key}**：${r.value} [${r.citation_id}]`,
-      )
-      .join("\n");
-    const answer = `> 静态体验模式：未调用大模型。以下内容由已发布资料与固定讲解模板组装，用于体验检索、引用和对话历史。\n\n## 你的需求\n\n${prompt.replace(/[<>]/g, "")}\n\n## 本轮检索到的知识\n\n${facts || "没有找到匹配的已发布事实。可以尝试“企业知识问答”“开源模型”“文档检索”等关键词。"}\n\n## 实施路径（演示建议）\n\n1. 确定数据范围、隐私要求、部署位置与验收问题。\n2. 从上方资料中选择候选组件，打开来源核对版本、许可证与下载条件。\n3. 连接你的 API 或运行完整后端版，验证检索覆盖率、引用准确性与回答质量。\n4. 采集新资料后先审核再发布，保留方案使用的事实版本。\n\n## 下一步\n\n可以继续追问，或打开“查看知识来源”，再到知识管理的检索记录核对本轮证据。价格、硬件需求和性能仍需依据最新官方资料核验。`;
-    const result = {
-      answer,
-      citations,
-      retrieved,
-      trace_id,
-      warnings: [
-        "未配置 API，本轮使用静态演示；点击右上角连接模型后可发起真实调用。",
-      ],
-      model: "静态演示 · 未调用大模型",
-    };
-    return commitChat(body, result);
+    const context=prepareChat(body),previous=context.previous;
+    const workflow=isConfirmation(previous,context.prompt,body.action)?{...previous,phase:'generated' as const}:applyExtraction(previous,previewExtraction(context.extractionInput,previous),context.extractionInput);
+    const ready=prepareChat(body,false,workflow),scene=solutionPolicy.scenes.find(s=>s.id===workflow.scene);
+    const citations=ready.retrieved.filter((r:Row)=>r.task==='视频生成'||!scene).slice(0,2);
+    const route=scene?.routes[/现成|免部署|一站式/.test(workflow.fields.delivery?.value||'')?0:/API|api|工作流/.test(workflow.fields.delivery?.value||'')?1:0]||scene?.routes[0];
+    const answer=workflow.phase!=='generated'?clarification(workflow):`> 交互演示：未调用大模型，以下是编辑路线建议，不是实测案例。\n\n推荐先采用「${route?.name||'小范围验证'}」。${route?.steps||'用一小批样本验证目标，再扩充。'}\n\n理由：先按已确认的预算、操作经验和使用方式验证效果。\n\n费用边界：${route?.boundary||'当前资料不足以核算价格，需核验实际用量与报价。'}\n\n下一步：先做一个小样，再决定是否扩充。${citations.length?'\n\n可核对的资料：'+citations.map((r:Row)=>`${r.entity_name} · ${r.key} [${r.citation_id}]`).join('；'):''}`;
+    return commitChat(body,{answer,citations:workflow.phase==='generated'?citations:[],retrieved:ready.retrieved,trace_id:ready.trace_id,warnings:[],model:'本地交互演示',workflow,finish_reason:'stop'});
   };
   const request = (method: string, input: string, body: Row = {}): any => {
     const parsed = new URL(input, "https://demo.invalid"),
@@ -687,7 +619,7 @@ export function createDemoStore(initial: Row) {
         throw error;
       }
     },
-    prepareBrowserChat: (body: Row) => copy(prepareChat(body, true)),
+    prepareBrowserChat: (body: Row, workflow?: Workflow) => copy(prepareChat(body, true, workflow)),
     commitBrowserChat: (body: Row, result: Row) =>
       copy(commitChat(body, result)),
     exportState: () => copy(state),

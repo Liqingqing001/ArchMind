@@ -26,7 +26,7 @@ def response_text(protocol, data):
     elif protocol == "responses":
         answer = "\n".join(c["text"] for item in data["output"] if item.get("type") == "message"
             for c in item.get("content", []) if c.get("type") == "output_text")
-        finish = "length" if data.get("status") == "incomplete" else "stop"
+        finish = ("content_filter" if (data.get("incomplete_details") or {}).get("reason")=="content_filter" else "length") if data.get("status") == "incomplete" else "stop"
     else:
         answer = data["choices"][0]["message"]["content"]
         if isinstance(answer, list):
