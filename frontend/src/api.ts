@@ -18,7 +18,9 @@ export async function api<T = any>(
     window.dispatchEvent(new Event("unauthorized"));
     throw new Error("需要有效的管理口令");
   }
-  const body = await response.json();
+  if (response.status === 404 && path.startsWith("/agent/"))
+    throw new Error("当前后端没有模型对话接口，请重启本项目后端服务并刷新页面；这不是 API Key 无效。");
+  const body = await response.json().catch(() => ({ detail: response.status >= 500 ? "本地后端服务不可用，请检查后端是否已启动。" : "服务返回格式错误，请检查前后端连接。" }));
   if (!response.ok)
     throw new Error(
       typeof body.detail === "string"

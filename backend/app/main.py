@@ -12,6 +12,11 @@ from .models import Category, Entity, EntityCategory, Relation, Source, Snapshot
 from .schemas import CategoryInput, EntityInput, SourceInput, SourcePatch, ChangeInput, ReviewInput, RelationInput, RetrievalInput
 from .collector import collect, propose
 from .knowledge import retrieve
+from .agent import router as agent_router
+from .conversations import router as conversations_router
+from .model_resources import model_resources
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 
 def auth(request: Request):
@@ -29,6 +34,16 @@ def auth(request: Request):
 
 
 app = FastAPI(title="ArchMind · AI Knowledge API", version="0.1.0", dependencies=[Depends(auth)])
+app.include_router(agent_router)
+app.include_router(conversations_router)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(request: Request, exc: RequestValidationError):
+    # Pydantic error objects can echo input, including a submitted API key.
+    if request.url.path.startswith("/api/agent/"):
+        return JSONResponse(status_code=422, content={"detail": "配置或对话格式无效，请检查 HTTPS 地址、API Key、模型名称和消息长度"})
+    return JSONResponse(status_code=422, content={"detail": "输入无效，请检查必填字段和格式"})
 
 
 def data(row):
@@ -57,7 +72,7 @@ def health():
 
 @app.get("/api/config")
 def config():
-    return {"auth_enabled": bool(os.getenv("ADMIN_TOKEN")), "search": "keyword", "llm_configured": False, "version": "0.1.0", "agent_retrieval": True, "knowledge_token_configured": bool(os.getenv("KNOWLEDGE_TOKEN"))}
+    return {"auth_enabled": bool(os.getenv("ADMIN_TOKEN")), "search": "keyword", "llm_configured": False, "chat_available": True, "model_configuration": "per_request", "version": "0.2.0", "agent_retrieval": True, "knowledge_token_configured": bool(os.getenv("KNOWLEDGE_TOKEN"))}
 
 
 @app.get("/api/overview")
@@ -105,7 +120,8 @@ def entities(q: str = "", category_id: str = "", kind: str = "", db: DBSession =
     rows = list(db.scalars(query.order_by(Entity.name).limit(500)))
     links = list(db.scalars(select(EntityCategory)))
     facts = list(db.scalars(select(Fact).where(Fact.valid_to.is_(None))))
-    return [{**data(r), "category_ids": [l.category_id for l in links if l.entity_id == r.id], "fact_count": sum(f.entity_id == r.id for f in facts)} for r in rows]
+    downloads = model_resources(db, [r.id for r in rows])
+    return [{**data(r), "model_resources": downloads.get(r.id), "category_ids": [l.category_id for l in links if l.entity_id == r.id], "fact_count": sum(f.entity_id == r.id for f in facts)} for r in rows]
 
 
 @app.post("/api/entities", status_code=201)
@@ -138,7 +154,7 @@ def update_entity(id: str, body: EntityInput, db: DBSession = Depends(get_db)):
 @app.get("/api/entities/{id}")
 def entity_detail(id: str, db: DBSession = Depends(get_db)):
     row = get(db, Entity, id)
-    return {**data(row), "category_ids": list(db.scalars(select(EntityCategory.category_id).where(EntityCategory.entity_id == id))), "facts": [data(f) for f in db.scalars(select(Fact).where(Fact.entity_id == id).order_by(Fact.key, Fact.version.desc()))], "sources": [data(s) for s in db.scalars(select(Source).where(Source.entity_id == id))], "changes": [data(c) for c in db.scalars(select(Change).where(Change.entity_id == id).order_by(Change.created_at.desc()))], "relations": [data(r) for r in db.scalars(select(Relation).where(or_(Relation.from_id == id, Relation.to_id == id)))]}
+    return {**data(row), "model_resources": model_resources(db, [id]).get(id), "category_ids": list(db.scalars(select(EntityCategory.category_id).where(EntityCategory.entity_id == id))), "facts": [data(f) for f in db.scalars(select(Fact).where(Fact.entity_id == id).order_by(Fact.key, Fact.version.desc()))], "sources": [data(s) for s in db.scalars(select(Source).where(Source.entity_id == id))], "changes": [data(c) for c in db.scalars(select(Change).where(Change.entity_id == id).order_by(Change.created_at.desc()))], "relations": [data(r) for r in db.scalars(select(Relation).where(or_(Relation.from_id == id, Relation.to_id == id)))]}
 
 
 @app.post("/api/relations", status_code=201)

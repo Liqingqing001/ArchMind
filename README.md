@@ -1,16 +1,16 @@
 # ArchMind · AI 技术知识平台
 
-ArchMind 是以知识库为产品的 AI 解决方案平台。你在后台看到和审核的知识库，就是 Agent 实际检索的同一套数据。当前版本交付第一阶段：个人知识库后台，以及“来源 → 巡检 → 快照 → 证据候选 → 审核 → 事实版本 → 检索追踪”的完整工作流。
+ArchMind 是通过对话生成解决方案的 AI 知识平台。用户配置自己的模型 API，描述需求后，Agent 从后台同一套已发布知识中检索资料，生成带来源引用的方案，并支持连续追问。后台保留“来源 → 巡检 → 快照 → 证据候选 → 审核 → 事实版本 → 检索追踪”的工作流。
 
 技术栈：Python 3.12 / FastAPI / SQLAlchemy / Alembic，React 19 / TypeScript / Vite，PostgreSQL 16；SQLite 可用于轻量本地体验。
 
 ## 实际运行截图
 
-以下截图来自本地实际启动的 FastAPI + React 应用，使用明确标注的演示数据。不是设计稿；当前尚未发布 GitHub Pages 演示站。
+以下截图来自 2026-11-07 本地实际运行的统一知识浏览界面。当前尚未发布 GitHub Pages 演示站。
 
-![ArchMind 知识总览](docs/screenshots/overview.png)
+![ArchMind 知识浏览中的模型资料与下载](docs/screenshots/knowledge-models-20261107.jpg)
 
-![Agent 检索记录与证据追溯](docs/screenshots/agent-retrieval.png)
+早期演示数据验收截图仍保存在 `docs/screenshots/`。
 
 GitHub Pages 的展示方案见 [面试演示部署说明](docs/github-pages.md)。
 
@@ -23,15 +23,17 @@ cd ArchMind
 
 ## 本地快速启动
 
-需要 Python 3.12+、uv、Node.js 22+。打开三个终端：
+需要 Python 3.12+、Node.js 22+。以下命令适用于 Windows PowerShell，打开三个终端：
 
-```bash
+```powershell
 # 终端一：迁移、可选演示数据、启动 API
 cd backend
-uv sync --frozen
-uv run alembic upgrade head
-uv run python -m app.seed  # 可选：只向空库写入明确标识的演示数据
-uv run uvicorn app.main:app --host 127.0.0.1 --port 8000
+py -3.12 -m venv .venv
+$env:VIRTUAL_ENV = (Resolve-Path .venv).Path
+py -m pip install -e . pytest
+py -m alembic upgrade head
+py -m app.seed  # 可选：只向空库写入明确标识的演示数据
+py -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 ```bash
@@ -41,13 +43,18 @@ npm ci
 npm run dev
 ```
 
-```bash
+```powershell
 # 终端三：自动巡检（只启动一个实例）
 cd backend
-uv run python -m app.worker
+$env:VIRTUAL_ENV = (Resolve-Path .venv).Path
+py -m app.worker
 ```
 
 默认使用 backend/knowledge.db。API 文档：http://127.0.0.1:8000/docs 。前端通过 Vite 代理访问 API。未配置口令时仅用于本机；生产使用 Docker 的管理口令模式。
+
+首页为“方案对话”；点击右上角“连接模型”，在弹窗中选择服务商、填写 API Key 与模型 ID，测试后保存。支持 Chat Completions、Responses、Claude Messages 三种协议和 9 个服务商预设，也可填写自定义公开 HTTPS 地址。侧栏只保留对话、知识库、知识管理三个入口；新建、搜索、切换、重命名、删除与撤销对话在历史列表完成。对话与引用保存在项目数据库，刷新后恢复；密钥只在页面内存中保存，刷新后重新填写，不写入会话或检索记录。20 个开源与开放权重模型统一纳入“知识总览”和“知识浏览”；在知识范围中筛选后，按现有分类树浏览，实体详情提供官方权重、许可证与下载命令。详细说明见 [对话与模型知识](docs/solution-workspace.md)。
+
+开发前端统一代理到 `http://127.0.0.1:8000`，避免多个前端端口连接到新旧不同的后端。模型配置出现“Not Found”时，需确认已重启新版后端；开发模式的 `--reload` 会自动加载代码更新。补充官方知识的导入命令见 [知识目录](docs/knowledge-catalog.md)。
 
 本地切换 PostgreSQL：在 API、迁移、worker 的终端中设置同一个 `DATABASE_URL=postgresql+psycopg://用户名:密码@地址:5432/数据库`。本地 API 使用 `ADMIN_TOKEN` 环境变量启用口令；前端收到 401 后显示登录入口，不将口令写入磁盘或 localStorage。
 
@@ -56,7 +63,7 @@ uv run python -m app.worker
 ```bash
 cp .env.example .env
 # 编辑 .env：分别填写 POSTGRES_PASSWORD 与 ADMIN_TOKEN；接入 Agent 时另设 KNOWLEDGE_TOKEN
-# 各口令使用不同的随机十六进制字符串：python -c "import secrets; print(secrets.token_hex(32))"
+# 各口令使用不同的随机十六进制字符串：py -c "import secrets; print(secrets.token_hex(32))"
 docker compose up --build -d
 # 可选：导入演示数据。已有实体时跳过。
 docker compose --profile demo run --rm seed
@@ -99,29 +106,33 @@ facts 最多 100 条，必须另有独立 documentation 原文；自动候选的
 
 ## 检查与测试
 
-```bash
+```powershell
 cd backend
-uv run pytest -q
-uv run alembic check
+$env:VIRTUAL_ENV = (Resolve-Path .venv).Path
+py -m pytest -q
+py -m alembic check
 cd ../frontend
 npm run build
 ```
 
 PostgreSQL 集成测试必须用**独立的空测试库**，测试会清空其应用表：
 
-```bash
+```powershell
 cd backend
-TEST_DATABASE_URL=postgresql+psycopg://.../knowledge_test uv run pytest -q
+$env:TEST_DATABASE_URL = 'postgresql+psycopg://.../knowledge_test'
+py -m pytest -q
 ```
 
 CI 同时运行 SQLite / PostgreSQL 后端测试及 TypeScript / 前端生产构建。
 
 ## 文档与后续范围
 
+- [联网补充的真实知识目录（116 个条目、211 条事实）](docs/knowledge-catalog.md)
+- [本次界面调整、知识分类细化与后续完善清单](docs/improvements.md)
 - [Agent 与可见知识库的连接](docs/agent-knowledge.md)
 - [需求与验收](docs/requirements.md)
 - [架构和技术决策](docs/architecture.md)
 - [运维与恢复](docs/operations.md)
 - [交付验证记录](docs/validation.md)
 
-本期已经提供共享检索服务、Agent 只读工具接口与可见检索记录；没有接入 LLM、Embedding、pgvector、聊天顾问、成本计算或报告导出，后台会如实显示状态。下一期先确定模型供应商与预算，再实现文档切片、向量检索、Agent 工具与逐项引用。当前没有多租户和多级审核，不应当作面向外部客户的 SaaS 直接发布。
+当前已接入用户自选 LLM、多会话历史、连续追问、关键词知识检索和逐项来源引用，支持 Markdown 对话导出；未实现 Embedding、pgvector、精确成本计算、PDF/Word 报告导出和多租户权限。后续优先建立检索评测集，再完善文档切片与混合检索。

@@ -1,0 +1,949 @@
+{
+  "schema_version": 1,
+  "batch_id": "official-open-models-2026-11-07",
+  "checked_on": "2026-11-07",
+  "sources": [
+    {
+      "id": "Qwen/Qwen3-8B",
+      "title": "Qwen3-8B 官方模型卡",
+      "url": "https://huggingface.co/Qwen/Qwen3-8B",
+      "excerpts": [
+        "Qwen/Qwen3-8B",
+        "License: Apache-2.0"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+      "title": "Qwen2.5-Coder-7B-Instruct 官方模型卡",
+      "url": "https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct",
+      "excerpts": [
+        "Qwen/Qwen2.5-Coder-7B-Instruct",
+        "License: Apache-2.0"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "Qwen/Qwen2.5-VL-7B-Instruct",
+      "title": "Qwen2.5-VL-7B-Instruct 官方模型卡",
+      "url": "https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct",
+      "excerpts": [
+        "Qwen/Qwen2.5-VL-7B-Instruct",
+        "License: Apache-2.0"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "Qwen/Qwen3-Embedding-0.6B",
+      "title": "Qwen3-Embedding-0.6B 官方模型卡",
+      "url": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B",
+      "excerpts": [
+        "Qwen/Qwen3-Embedding-0.6B",
+        "License: Apache-2.0"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "Qwen/Qwen3-Reranker-0.6B",
+      "title": "Qwen3-Reranker-0.6B 官方模型卡",
+      "url": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B",
+      "excerpts": [
+        "Qwen/Qwen3-Reranker-0.6B",
+        "License: Apache-2.0"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "Qwen/Qwen-Image",
+      "title": "Qwen-Image 官方模型卡",
+      "url": "https://huggingface.co/Qwen/Qwen-Image",
+      "excerpts": [
+        "Qwen/Qwen-Image",
+        "License: Apache-2.0"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "title": "DeepSeek-R1-Distill-Qwen-7B 官方模型卡",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "excerpts": [
+        "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+        "License: MIT"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "mistralai/Mistral-7B-Instruct-v0.3",
+      "title": "Mistral-7B-Instruct-v0.3 官方模型卡",
+      "url": "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3",
+      "excerpts": [
+        "mistralai/Mistral-7B-Instruct-v0.3",
+        "License: Apache-2.0"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "microsoft/phi-4",
+      "title": "phi-4 官方模型卡",
+      "url": "https://huggingface.co/microsoft/phi-4",
+      "excerpts": [
+        "microsoft/phi-4",
+        "License: MIT"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "meta-llama/Llama-3.1-8B-Instruct",
+      "title": "Llama-3.1-8B-Instruct 官方模型卡",
+      "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
+      "excerpts": [
+        "meta-llama/Llama-3.1-8B-Instruct",
+        "License: Llama 3.1 Community License"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "google/gemma-3-4b-it",
+      "title": "gemma-3-4b-it 官方模型卡",
+      "url": "https://huggingface.co/google/gemma-3-4b-it",
+      "excerpts": [
+        "google/gemma-3-4b-it",
+        "License: Gemma Terms"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "black-forest-labs/FLUX.1-schnell",
+      "title": "FLUX.1-schnell 官方模型卡",
+      "url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell",
+      "excerpts": [
+        "black-forest-labs/FLUX.1-schnell",
+        "License: Apache-2.0"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "black-forest-labs/FLUX.1-dev",
+      "title": "FLUX.1-dev 官方模型卡",
+      "url": "https://huggingface.co/black-forest-labs/FLUX.1-dev",
+      "excerpts": [
+        "black-forest-labs/FLUX.1-dev",
+        "License: FLUX.1 Dev Non-Commercial"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "stabilityai/stable-diffusion-3.5-medium",
+      "title": "stable-diffusion-3.5-medium 官方模型卡",
+      "url": "https://huggingface.co/stabilityai/stable-diffusion-3.5-medium",
+      "excerpts": [
+        "stabilityai/stable-diffusion-3.5-medium",
+        "License: Stability AI Community License"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "Wan-AI/Wan2.1-T2V-1.3B",
+      "title": "Wan2.1-T2V-1.3B 官方模型卡",
+      "url": "https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B",
+      "excerpts": [
+        "Wan-AI/Wan2.1-T2V-1.3B",
+        "License: Apache-2.0"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "Wan-AI/Wan2.1-I2V-14B-480P",
+      "title": "Wan2.1-I2V-14B-480P 官方模型卡",
+      "url": "https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P",
+      "excerpts": [
+        "Wan-AI/Wan2.1-I2V-14B-480P",
+        "License: Apache-2.0"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "openai/whisper-large-v3",
+      "title": "whisper-large-v3 官方模型卡",
+      "url": "https://huggingface.co/openai/whisper-large-v3",
+      "excerpts": [
+        "openai/whisper-large-v3",
+        "License: Apache-2.0（HF 模型卡）"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "FunAudioLLM/CosyVoice2-0.5B",
+      "title": "CosyVoice2-0.5B 官方模型卡",
+      "url": "https://huggingface.co/FunAudioLLM/CosyVoice2-0.5B",
+      "excerpts": [
+        "FunAudioLLM/CosyVoice2-0.5B",
+        "License: Apache-2.0"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "BAAI/bge-m3",
+      "title": "bge-m3 官方模型卡",
+      "url": "https://huggingface.co/BAAI/bge-m3",
+      "excerpts": [
+        "BAAI/bge-m3",
+        "License: MIT"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    },
+    {
+      "id": "BAAI/bge-reranker-v2-m3",
+      "title": "bge-reranker-v2-m3 官方模型卡",
+      "url": "https://huggingface.co/BAAI/bge-reranker-v2-m3",
+      "excerpts": [
+        "BAAI/bge-reranker-v2-m3",
+        "License: Apache-2.0"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "web_tool_official_model_card",
+      "note": "模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。"
+    }
+  ],
+  "entities": [
+    {
+      "name": "Qwen3-8B",
+      "kind": "model",
+      "source": "Qwen/Qwen3-8B",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "通用对话"
+        ]
+      ],
+      "description": "Qwen · 开放权重模型 · 通用对话与推理",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "通用对话与推理",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Apache-2.0；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/Qwen/Qwen3-8B/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/Qwen/Qwen3-8B",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "Qwen2.5-Coder-7B-Instruct",
+      "kind": "model",
+      "source": "Qwen/Qwen2.5-Coder-7B-Instruct",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "代码生成"
+        ]
+      ],
+      "description": "Qwen · 开放权重模型 · 代码生成与编程辅助",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "代码生成与编程辅助",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Apache-2.0；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "Qwen2.5-VL-7B-Instruct",
+      "kind": "model",
+      "source": "Qwen/Qwen2.5-VL-7B-Instruct",
+      "categories": [
+        [
+          "AI 模型",
+          "多模态模型",
+          "视觉理解"
+        ]
+      ],
+      "description": "Qwen · 开放权重模型 · 图像与文档理解",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "图像与文档理解",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Apache-2.0；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "Qwen3-Embedding-0.6B",
+      "kind": "model",
+      "source": "Qwen/Qwen3-Embedding-0.6B",
+      "categories": [
+        [
+          "AI 模型",
+          "向量与排序模型",
+          "文本嵌入"
+        ]
+      ],
+      "description": "Qwen · 开放权重模型 · 文本向量与语义检索",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "文本向量与语义检索",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Apache-2.0；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "Qwen3-Reranker-0.6B",
+      "kind": "model",
+      "source": "Qwen/Qwen3-Reranker-0.6B",
+      "categories": [
+        [
+          "AI 模型",
+          "向量与排序模型",
+          "重排序"
+        ]
+      ],
+      "description": "Qwen · 开放权重模型 · 对检索候选进行相关性重排序",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "对检索候选进行相关性重排序",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Apache-2.0；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "Qwen-Image",
+      "kind": "model",
+      "source": "Qwen/Qwen-Image",
+      "categories": [
+        [
+          "AI 模型",
+          "图像生成模型",
+          "文生图"
+        ]
+      ],
+      "description": "Qwen · 开放权重模型 · 文本到图像生成",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "文本到图像生成",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Apache-2.0；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/Qwen/Qwen-Image/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/Qwen/Qwen-Image",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "DeepSeek-R1-Distill-Qwen-7B",
+      "kind": "model",
+      "source": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "推理与数学"
+        ]
+      ],
+      "description": "DeepSeek · 开放权重模型 · 基于 Qwen 的推理蒸馏模型",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "基于 Qwen 的推理蒸馏模型",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "MIT；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "Mistral-7B-Instruct-v0.3",
+      "kind": "model",
+      "source": "mistralai/Mistral-7B-Instruct-v0.3",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "通用对话"
+        ]
+      ],
+      "description": "Mistral · 开放权重模型 · 指令对话与工具调用",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "指令对话与工具调用",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Apache-2.0；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "phi-4",
+      "kind": "model",
+      "source": "microsoft/phi-4",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "通用对话"
+        ]
+      ],
+      "description": "Microsoft · 开放权重模型 · 通用语言与推理任务",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "通用语言与推理任务",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "MIT；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/microsoft/phi-4/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/microsoft/phi-4",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "Llama-3.1-8B-Instruct",
+      "kind": "model",
+      "source": "meta-llama/Llama-3.1-8B-Instruct",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "通用对话"
+        ]
+      ],
+      "description": "Meta · 开放权重模型 · 多语言指令对话",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "多语言指令对话",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Llama 3.1 Community License；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "gemma-3-4b-it",
+      "kind": "model",
+      "source": "google/gemma-3-4b-it",
+      "categories": [
+        [
+          "AI 模型",
+          "多模态模型",
+          "视觉理解"
+        ]
+      ],
+      "description": "Google · 开放权重模型 · 图像和文本输入的多模态模型",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "图像和文本输入的多模态模型",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Gemma Terms；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/google/gemma-3-4b-it/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/google/gemma-3-4b-it",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "FLUX.1-schnell",
+      "kind": "model",
+      "source": "black-forest-labs/FLUX.1-schnell",
+      "categories": [
+        [
+          "AI 模型",
+          "图像生成模型",
+          "文生图"
+        ]
+      ],
+      "description": "Black Forest Labs · 开放权重模型 · 快速文本到图像生成",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "快速文本到图像生成",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Apache-2.0；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/black-forest-labs/FLUX.1-schnell/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/black-forest-labs/FLUX.1-schnell",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "FLUX.1-dev",
+      "kind": "model",
+      "source": "black-forest-labs/FLUX.1-dev",
+      "categories": [
+        [
+          "AI 模型",
+          "图像生成模型",
+          "文生图"
+        ]
+      ],
+      "description": "Black Forest Labs · 开放权重模型 · 文本到图像生成；模型使用有非商用限制",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "文本到图像生成；模型使用有非商用限制",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "FLUX.1 Dev Non-Commercial；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/black-forest-labs/FLUX.1-dev/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/black-forest-labs/FLUX.1-dev",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "stable-diffusion-3.5-medium",
+      "kind": "model",
+      "source": "stabilityai/stable-diffusion-3.5-medium",
+      "categories": [
+        [
+          "AI 模型",
+          "图像生成模型",
+          "文生图"
+        ]
+      ],
+      "description": "Stability AI · 开放权重模型 · 文本到图像生成；商业使用需核对协议条件",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "文本到图像生成；商业使用需核对协议条件",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Stability AI Community License；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/stabilityai/stable-diffusion-3.5-medium/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/stabilityai/stable-diffusion-3.5-medium",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "Wan2.1-T2V-1.3B",
+      "kind": "model",
+      "source": "Wan-AI/Wan2.1-T2V-1.3B",
+      "categories": [
+        [
+          "AI 模型",
+          "视频生成模型",
+          "文生视频"
+        ]
+      ],
+      "description": "Wan · 开放权重模型 · 文本到视频生成",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "文本到视频生成",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Apache-2.0；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "Wan2.1-I2V-14B-480P",
+      "kind": "model",
+      "source": "Wan-AI/Wan2.1-I2V-14B-480P",
+      "categories": [
+        [
+          "AI 模型",
+          "视频生成模型",
+          "图生视频"
+        ]
+      ],
+      "description": "Wan · 开放权重模型 · 图像到视频生成，480P 版本",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "图像到视频生成，480P 版本",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Apache-2.0；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "whisper-large-v3",
+      "kind": "model",
+      "source": "openai/whisper-large-v3",
+      "categories": [
+        [
+          "AI 模型",
+          "语音与音频",
+          "语音识别"
+        ]
+      ],
+      "description": "OpenAI · 开放权重模型 · 自动语音识别与语音翻译",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "自动语音识别与语音翻译",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Apache-2.0（HF 模型卡）；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/openai/whisper-large-v3/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/openai/whisper-large-v3",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "CosyVoice2-0.5B",
+      "kind": "model",
+      "source": "FunAudioLLM/CosyVoice2-0.5B",
+      "categories": [
+        [
+          "AI 模型",
+          "语音与音频",
+          "语音合成"
+        ]
+      ],
+      "description": "FunAudioLLM · 开放权重模型 · 多语言语音合成",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "多语言语音合成",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Apache-2.0；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/FunAudioLLM/CosyVoice2-0.5B/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/FunAudioLLM/CosyVoice2-0.5B",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "bge-m3",
+      "kind": "model",
+      "source": "BAAI/bge-m3",
+      "categories": [
+        [
+          "AI 模型",
+          "向量与排序模型",
+          "文本嵌入"
+        ]
+      ],
+      "description": "BAAI · 开放权重模型 · 稠密、多向量与稀疏检索",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "稠密、多向量与稀疏检索",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "MIT；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/BAAI/bge-m3/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/BAAI/bge-m3",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "bge-reranker-v2-m3",
+      "kind": "model",
+      "source": "BAAI/bge-reranker-v2-m3",
+      "categories": [
+        [
+          "AI 模型",
+          "向量与排序模型",
+          "重排序"
+        ]
+      ],
+      "description": "BAAI · 开放权重模型 · 多语言相关性重排序",
+      "facts": [
+        {
+          "key": "模型用途",
+          "value": "多语言相关性重排序",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "Apache-2.0；使用前以官方模型卡及完整协议为准。",
+          "evidence": 1
+        },
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/BAAI/bge-reranker-v2-m3/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/BAAI/bge-reranker-v2-m3",
+          "evidence": 0
+        }
+      ]
+    }
+  ]
+}

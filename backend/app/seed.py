@@ -3,6 +3,7 @@ import hashlib
 from sqlalchemy import select
 from .db import Session, now
 from .models import Category, Entity, EntityCategory, Relation, Source, Snapshot, Fact, Change, Run
+from .taxonomy import refine_taxonomy
 
 
 def seed(db):
@@ -51,6 +52,7 @@ def seed(db):
     db.add(Change(entity_id=e.id, snapshot_id=snapshot.id, key="上下文窗口", old_value="64K tokens", new_value="128K tokens", base_version=1, evidence="新版上下文窗口：128K tokens"))
     db.add(Change(entity_id=e.id, snapshot_id=snapshot.id, key="示例价格", new_value="每百万输入 tokens 2 元（虚构）", base_version=0, risk="high", evidence="示例价格：每百万输入 tokens 2 元（虚构）。"))
     db.add(Run(source_id=source.id, status="changed", finished_at=now(), snapshot_id=snapshot.id, message="演示巡检记录：已保存快照，2 条变更等待人工审核。未执行网络请求。"))
+    refine_taxonomy(db)
     db.commit()
     return True
 

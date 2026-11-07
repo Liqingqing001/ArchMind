@@ -114,6 +114,17 @@ class Change(Base):
     reviewed_at: Mapped[str | None] = mapped_column(String(40), nullable=True)
 
 
+class Conversation(Base):
+    __tablename__ = "conversations"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    title: Mapped[str] = mapped_column(String(120), default="新对话")
+    messages: Mapped[list] = mapped_column(JSON, default=list)
+    revision: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[str] = mapped_column(String(40), default=now)
+    updated_at: Mapped[str] = mapped_column(String(40), default=now, index=True)
+    deleted_at: Mapped[str | None] = mapped_column(String(40), nullable=True)
+
+
 class Trace(Base):
     __tablename__ = "retrieval_traces"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)

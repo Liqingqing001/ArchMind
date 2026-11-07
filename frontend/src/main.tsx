@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import {
   Activity,
   ArrowRight,
+  ArrowUp,
+  MessageSquare,
   ArrowUpRight,
   BookOpen,
   Boxes,
@@ -11,6 +13,7 @@ import {
   ChevronRight,
   Clock3,
   Database,
+  Download,
   ExternalLink,
   FileCheck2,
   FileText,
@@ -21,7 +24,6 @@ import {
   Layers3,
   Link2,
   Loader2,
-  MoreHorizontal,
   Pause,
   Play,
   Plus,
@@ -35,9 +37,15 @@ import {
 } from "lucide-react";
 import { api, post, setToken, kinds, states, time } from "./api";
 import "./styles.css";
+import "./workspace.css";
+import "./chat.css";
+import { fieldTemplates } from "./knowledge";
+import { AgentWorkspace } from "./AgentWorkspace";
+import { ModelDownloads } from "./ModelDownloads";
 
 type Row = Record<string, any>;
 type Page =
+  | "chat"
   | "overview"
   | "entities"
   | "sources"
@@ -46,6 +54,7 @@ type Page =
   | "search"
   | "settings";
 const nav = [
+  { id: "chat", label: "方案对话", icon: MessageSquare },
   { id: "overview", label: "知识总览", icon: Layers3 },
   { id: "entities", label: "知识浏览", icon: BookOpen },
   { id: "sources", label: "数据来源", icon: Globe2 },
@@ -54,6 +63,7 @@ const nav = [
   { id: "search", label: "检索调试", icon: Terminal },
 ] as const;
 const title: Record<Page, string> = {
+  chat: "方案对话",
   overview: "知识总览",
   entities: "知识浏览",
   sources: "数据来源",
@@ -63,6 +73,7 @@ const title: Record<Page, string> = {
   settings: "系统设置",
 };
 const subtitle: Record<Page, string> = {
+  chat: "从你的需求出发，参考可信知识，生成可执行的解决方案。",
   overview: "让每一份技术知识，都有据可循。",
   entities: "从分类到实体，构建相互连接的 AI 技术知识。",
   sources: "连接可靠的信息源，让知识保持更新。",
@@ -102,7 +113,21 @@ function Empty({
   );
 }
 function App() {
-  const [page, setPage] = useState<Page>("overview");
+  const [page, setPage] = useState<Page>("chat");
+  const [showTop, setShowTop] = useState(false);
+  const toTop = () => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 360);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.altKey && event.key === "ArrowUp" && !(event.target instanceof HTMLElement && (event.target.matches("input, textarea, select") || event.target.isContentEditable))) {
+        event.preventDefault(); toTop();
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("keydown", onKey);
+    onScroll();
+    return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("keydown", onKey); };
+  }, []);
   const [overview, setOverview] = useState<Row>({});
   const [entities, setEntities] = useState<Row[]>([]);
   const [categories, setCategories] = useState<Row[]>([]);
@@ -118,6 +143,7 @@ function App() {
   const [filter, setFilter] = useState("");
   const [category, setCategory] = useState("");
   const [kind, setKind] = useState("");
+  const [openOnly, setOpenOnly] = useState(false);
   const [detail, setDetail] = useState<Row | null>(null);
   const [detailTab, setDetailTab] = useState("facts");
   const [snapshot, setSnapshot] = useState<Row | null>(null);
@@ -214,9 +240,11 @@ function App() {
     sources.find((s) => s.id === id)?.name || "未知来源";
   const go = (p: Page) => {
     setPage(p);
+    window.scrollTo({ top: 0, behavior: "instant" });
     setFilter("");
     setCategory("");
     setKind("");
+    setOpenOnly(false);
   };
   const openForm = async (type: string, initial: Row = {}) => {
     setForm(
@@ -295,7 +323,14 @@ function App() {
       .filter((c) => c.parent_id === id)
       .flatMap((c) => descendants(c.id)),
   ];
-  const filtered = entities.filter(
+  const openModels = entities.filter(e => e.model_resources);
+  const scopedEntities = openOnly ? openModels : entities;
+  const modelCategory = categories.find(c => c.name === "AI 模型" && !c.parent_id);
+  const modelBranches = categories.filter(c => c.parent_id === modelCategory?.id);
+  const browseOpenModels = (categoryId = "") => {
+    go("entities"); setOpenOnly(true); setKind("model"); setCategory(categoryId);
+  };
+  const filtered = scopedEntities.filter(
     (e) =>
       (!filter ||
         `${e.name} ${e.description}`
@@ -312,7 +347,7 @@ function App() {
     depth = 0,
   ): React.ReactNode =>
     categories
-      .filter((c) => c.parent_id === parent)
+      .filter((c) => c.parent_id === parent && (!openOnly || openModels.some(e => e.category_ids.some((id: string) => descendants(c.id).includes(id)))))
       .map((c) => (
         <React.Fragment key={c.id}>
           <button
@@ -328,7 +363,7 @@ function App() {
             <span>{c.name}</span>
             <small>
               {
-                entities.filter((e) =>
+                scopedEntities.filter((e) =>
                   e.category_ids.some((id: string) =>
                     descendants(c.id).includes(id),
                   ),
@@ -356,79 +391,33 @@ function App() {
   };
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${page === "chat" ? "chat-shell" : ""}`}>
       <aside className="sidebar">
         <a
           className="brand"
+          aria-label="ArchMind 方案对话"
           href="#"
           onClick={(e) => {
             e.preventDefault();
-            go("overview");
+            go("chat");
           }}
         >
           <span className="brand-icon">
-            <Layers3 size={25} />
+            <span aria-hidden="true">♛</span>
           </span>
           <span>
-            ArchMind<span className="brand-en">KNOWLEDGE OS</span>
+            ArchMind<span className="brand-en">THE KNOWLEDGE ATELIER</span>
           </span>
         </a>
-        <div className="workspace">
-          <span className="workspace-icon">K</span>
-          <div>
-            个人知识空间<small>Personal workspace</small>
-          </div>
-          <ChevronDown size={14} />
-        </div>
-        <div className="nav-caption">
-          工作空间 <span>WORKSPACE</span>
-        </div>
-        <nav>
-          {nav.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              className={page === id ? "active" : ""}
-              onClick={() => go(id)}
-            >
-              <Icon size={18} />
-              {label}
-              {id === "reviews" && overview.pending > 0 && (
-                <b>{overview.pending}</b>
-              )}
-            </button>
+        <nav className="primary-nav" aria-label="主导航">
+          {([{ id: "chat", label: "方案对话", icon: MessageSquare }, { id: "entities", label: "知识库", icon: BookOpen }, { id: "overview", label: "知识管理", icon: Settings2 }] as const).map(({ id, label, icon: Icon }) => (
+            <button key={id} className={(page === id || (id === "overview" && !["chat", "entities"].includes(page))) ? "active" : ""} onClick={() => go(id)}><Icon size={18} />{label}</button>
           ))}
         </nav>
-        <div className="sidebar-note">
-          <span className="live-dot" />
-          知识，有迹可循
-          <p>
-            连接技术、来源与决策，
-            <br />
-            让知识成为可靠的基础。
-          </p>
-          <div>
-            KNOWLEDGE ENGINE <span>v0.1</span>
-          </div>
-        </div>
-        <button
-          className={`settings-nav ${page === "settings" ? "active" : ""}`}
-          onClick={() => go("settings")}
-        >
-          <Settings2 size={18} />
-          系统设置
-        </button>
-        <div className="profile">
-          <span>A</span>
-          <div>
-            管理员<small>个人工作空间</small>
-          </div>
-          <span className="profile-menu">
-            <MoreHorizontal size={18} />
-          </span>
-        </div>
+        <div id="conversation-history-slot" hidden={page !== "chat"} />
       </aside>
       <main className="main">
-        <header className="topbar">
+        {page !== "chat" && <header className="topbar">
           <div>
             <span>工作空间</span>
             <ChevronRight size={14} />
@@ -449,9 +438,9 @@ function App() {
             </button>
             <span className="avatar">A</span>
           </div>
-        </header>
-        <div className="content">
-          <div className="page-heading">
+        </header>}
+        <div className={`content ${page === "chat" ? "chat-content" : ""}`}>
+          {page !== "chat" && <div className="page-heading">
             <div>
               <div className="eyebrow">
                 AI KNOWLEDGE CONSOLE{" "}
@@ -463,7 +452,7 @@ function App() {
                   )}
                 </span>
               </div>
-              <h1>{title[page]}</h1>
+              <h1>{title[page]} <span className="heading-flourish" aria-hidden="true">❦</span></h1>
               <p>{subtitle[page]}</p>
             </div>
             <div className="heading-actions">
@@ -501,7 +490,10 @@ function App() {
                 </button>
               )}
             </div>
-          </div>
+          </div>}
+          {!["chat", "entities"].includes(page) && <nav className="management-nav" aria-label="知识管理导航">
+            {[...nav.filter(n => !["chat", "entities"].includes(n.id)), { id: "settings" as const, label: "系统设置", icon: Settings2 }].map(({ id, label, icon: Icon }) => <button key={id} className={page === id ? "active" : ""} onClick={() => go(id)}><Icon size={15} />{label}{id === "reviews" && overview.pending > 0 && <b>{overview.pending}</b>}</button>)}
+          </nav>}
           {error && (
             <div className="alert error" role="alert">
               <span>{error}</span>
@@ -516,14 +508,15 @@ function App() {
               {notice}
             </div>
           )}
-          {loading ? (
+          <AgentWorkspace visible={page === "chat"} openSnapshot={openSnapshot} />
+          {loading && page !== "chat" ? (
             <div className="empty">
               <Loader2 className="spin" />
               <p>正在读取知识库…</p>
             </div>
           ) : (
             <>
-              {overview.demo_entities > 0 && (
+              {overview.demo_entities > 0 && page !== "chat" && (
                 <div className="demo-notice">
                   <ShieldCheck size={16} />
                   <span>
@@ -537,6 +530,14 @@ function App() {
               )}
               {page === "overview" && (
                 <>
+                  <section className="palace-welcome">
+                    <div><span className="eyebrow">A GARDEN OF IDEAS</span>
+                      <h2>让知识，在此盛放。</h2>
+                      <p>收藏灵感，梳理脉络，让每一份知识都有可靠的出处。</p>
+                      <button className="text-button" onClick={() => go("entities")}>探索我的知识馆 <ArrowRight size={15} /></button>
+                    </div>
+                    <div className="palace-seal" aria-hidden="true"><span>✧</span><b>AM</b><small>EST. 2026</small><span>❦</span></div>
+                  </section>
                   <div className="metrics">
                     {[
                       {
@@ -588,6 +589,14 @@ function App() {
                       </div>
                     ))}
                   </div>
+                  <section className="panel open-model-overview">
+                    <div><h2>开源与开放权重模型 <span>{openModels.length} 个</span></h2><p>已纳入知识库，按分类浏览模型资料、官方权重与许可证。</p></div>
+                    <button className="button" onClick={() => browseOpenModels()}>浏览模型知识 <ArrowRight size={16} /></button>
+                    <div className="model-category-links">{modelBranches.map(c => {
+                      const count = openModels.filter(e => e.category_ids.some((id: string) => descendants(c.id).includes(id))).length;
+                      return count > 0 && <button key={c.id} onClick={() => browseOpenModels(c.id)}>{c.name}<b>{count}</b></button>;
+                    })}</div>
+                  </section>
                   <div className="overview-grid">
                     <section className="panel ecology">
                       <div className="panel-heading">
@@ -808,13 +817,14 @@ function App() {
                       </button>
                     </div>
                     <button
-                      className={`tree-item ${!category ? "selected" : ""}`}
-                      onClick={() => setCategory("")}
+                      className={`tree-item ${!category && !openOnly ? "selected" : ""}`}
+                      onClick={() => { setCategory(""); setOpenOnly(false); setKind(""); }}
                     >
                       <Layers3 size={14} />
                       <span>全部知识</span>
                       <small>{entities.length}</small>
                     </button>
+                    <button className={`tree-item ${openOnly && !category ? "selected" : ""}`} onClick={() => browseOpenModels()}><Download size={14} /><span>开源与开放权重</span><small>{openModels.length}</small></button>
                     {categoryTree()}
                   </aside>
                   <section className="panel entity-panel">
@@ -827,6 +837,9 @@ function App() {
                           onChange={(e) => setFilter(e.target.value)}
                         />
                       </label>
+                      <select aria-label="知识范围" value={openOnly ? "open" : "all"} onChange={e => { setOpenOnly(e.target.value === "open"); setCategory(""); setKind(e.target.value === "open" ? "model" : ""); }}>
+                        <option value="all">全部知识</option><option value="open">开源与开放权重</option>
+                      </select>
                       <select
                         className="mobile-category"
                         aria-label="知识分类"
@@ -872,13 +885,14 @@ function App() {
                             </div>
                             <h3>
                               {e.name}
+                              {e.model_resources && <span className="open-model-tag">开放权重</span>}
                               {e.is_demo && (
                                 <span className="demo-tag">演示</span>
                               )}
                             </h3>
                             <p>{e.description || "尚未填写描述"}</p>
                             <footer>
-                              <span>{e.fact_count} 条已发布事实</span>
+                              <span>{e.fact_count} 条已发布事实{e.model_resources && " · 资料与下载"}</span>
                               <ArrowUpRight size={16} />
                             </footer>
                           </button>
@@ -1525,7 +1539,7 @@ function App() {
                         ? "只读检索口令已配置"
                         : "尚未配置 KNOWLEDGE_TOKEN",
                     ],
-                    ["模型服务", "尚未配置 · 下一阶段接入"],
+                    ["模型服务", "在模型 API 配置页连接 · 密钥仅保存在当前页面会话"],
                     ["向量检索", "尚未启用 · 下一阶段接入 pgvector"],
                     [
                       "自动巡检",
@@ -1546,14 +1560,15 @@ function App() {
                   </div>
                 </section>
               )}
-              <footer className="page-footer">
+              {page !== "chat" && <footer className="page-footer">
                 <span>ArchMind · AI 技术知识平台</span>
                 <span>来源可溯 · 变更可审 · 版本可查</span>
-              </footer>
+              </footer>}
             </>
           )}
         </div>
       </main>
+      {showTop && page !== "chat" && <button className="back-to-top" aria-label="回到顶部" title="回到顶部（Alt + ↑）" onClick={toTop}><ArrowUp size={20} /><span>回到顶部</span><kbd>Alt + ↑</kbd></button>}
       {detail && (
         <div className="drawer-backdrop" onClick={() => setDetail(null)}>
           <aside
@@ -1586,6 +1601,7 @@ function App() {
               </div>
             </div>
             <p className="detail-description">{detail.description}</p>
+            {detail.model_resources && <ModelDownloads key={detail.id} resources={detail.model_resources} />}
             <div className="detail-buttons">
               <button
                 className="button small"
@@ -1949,6 +1965,7 @@ function App() {
                         ))}
                       </div>
                     </label>
+                    <div className="field-guide"><b>建议完善的知识维度</b><p>创建实体后，结合来源快照逐项提交事实并审核。</p><div className="field-chips">{(fieldTemplates[form.kind] || []).map(key => <span key={key}>{key}</span>)}</div></div>
                     <Field
                       label="官网地址（HTTPS）"
                       type="url"
@@ -2100,6 +2117,7 @@ function App() {
                         打开快照核对原文 <ExternalLink size={13} />
                       </button>
                     )}
+                    <div className="field-guide"><b>选择建议字段，也可以自行填写</b><div className="field-chips">{(fieldTemplates[entities.find(e => e.id === form.entity_id)?.kind] || []).map(key => <button type="button" key={key} onClick={() => setForm({ ...form, key })}>{key}</button>)}</div></div>
                     <Field
                       label="事实字段（如：上下文窗口）"
                       required
