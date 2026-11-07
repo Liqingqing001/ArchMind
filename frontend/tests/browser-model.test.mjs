@@ -236,7 +236,7 @@ test("one real category contains all open-weight models without losing capabilit
   const models = db.request("GET", "/entities?category_id=" + open.id);
   assert.equal(models.length, 20);
   assert.ok(models.every((e) => e.category_ids.length >= 2));
-  assert.equal(db.request("GET", "/entities").length, 141);
+  assert.equal(db.request("GET", "/entities").length, 167);
   const qwen = models.find((e) => e.name === "Qwen3-8B");
   assert.ok(qwen.model_resources);
   assert.ok(qwen.category_ids.some((id) => id !== open.id));

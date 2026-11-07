@@ -11,7 +11,24 @@
     "card_url": "https://huggingface.co/Qwen/Qwen3-8B",
     "download_url": "https://huggingface.co/Qwen/Qwen3-8B/tree/main",
     "code_url": "https://github.com/QwenLM/Qwen3",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "thinking mode",
+    "technical_fact": {
+      "key": "上下文边界",
+      "value": "模型卡说明原生上下文 32,768 tokens，使用 YaRN 扩展需额外配置，不能把扩展值当默认值。",
+      "evidence": "32,768 tokens"
+    },
+    "hub_audit": {
+      "name": "Qwen3-8B",
+      "repo": "Qwen/Qwen3-8B",
+      "api_status": 200,
+      "gated": false,
+      "sha": "b968826d9c46dd6066d109eabc6255188de91218",
+      "license": "apache-2.0",
+      "files": 15,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/Qwen/Qwen3-8B/tree/main"
+    }
   },
   {
     "id": "Qwen/Qwen2.5-Coder-7B-Instruct",
@@ -25,7 +42,24 @@
     "card_url": "https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct",
     "download_url": "https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct/tree/main",
     "code_url": "https://github.com/QwenLM/Qwen2.5-Coder",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "code generation",
+    "technical_fact": {
+      "key": "任务边界",
+      "value": "面向代码生成、推理和修复；不因代码能力而推断可直接理解图片或视频。",
+      "evidence": "code fixing"
+    },
+    "hub_audit": {
+      "name": "Qwen2.5-Coder-7B-Instruct",
+      "repo": "Qwen/Qwen2.5-Coder-7B-Instruct",
+      "api_status": 200,
+      "gated": false,
+      "sha": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "license": "apache-2.0",
+      "files": 14,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct/tree/main"
+    }
   },
   {
     "id": "Qwen/Qwen2.5-VL-7B-Instruct",
@@ -39,7 +73,31 @@
     "card_url": "https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct",
     "download_url": "https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct/tree/main",
     "code_url": "https://github.com/QwenLM/Qwen2.5-VL",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "Image-Text-to-Text",
+    "technical_fact": {
+      "key": "视觉任务",
+      "value": "图像与文档理解，并有长视频理解能力；输入分辨率与帧数影响资源消耗。",
+      "evidence": "videos of over 1 hour"
+    },
+    "hub_audit": {
+      "name": "Qwen2.5-VL-7B-Instruct",
+      "repo": "Qwen/Qwen2.5-VL-7B-Instruct",
+      "api_status": 200,
+      "gated": false,
+      "sha": "cc594898137f460bfe9f0759e9844b3ce807cfb5",
+      "license": "apache-2.0",
+      "files": 16,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct/tree/main"
+    },
+    "additional_categories": [
+      [
+        "AI 模型",
+        "多模态模型",
+        "视频理解"
+      ]
+    ]
   },
   {
     "id": "Qwen/Qwen3-Embedding-0.6B",
@@ -53,7 +111,24 @@
     "card_url": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B",
     "download_url": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B/tree/main",
     "code_url": "https://github.com/QwenLM/Qwen3-Embedding",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "Text Embedding",
+    "technical_fact": {
+      "key": "向量规格",
+      "value": "模型表列出 1024 维表示；更改向量模型或维度时需要重建索引。",
+      "evidence": "1024"
+    },
+    "hub_audit": {
+      "name": "Qwen3-Embedding-0.6B",
+      "repo": "Qwen/Qwen3-Embedding-0.6B",
+      "api_status": 200,
+      "gated": false,
+      "sha": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3",
+      "license": "apache-2.0",
+      "files": 12,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B/tree/main"
+    }
   },
   {
     "id": "Qwen/Qwen3-Reranker-0.6B",
@@ -67,7 +142,24 @@
     "card_url": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B",
     "download_url": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B/tree/main",
     "code_url": "https://github.com/QwenLM/Qwen3-Embedding",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "Text Reranking",
+    "technical_fact": {
+      "key": "检索阶段",
+      "value": "对已召回的查询与候选文本对打分；不能用排序分数替代向量建库。",
+      "evidence": "Text Reranking"
+    },
+    "hub_audit": {
+      "name": "Qwen3-Reranker-0.6B",
+      "repo": "Qwen/Qwen3-Reranker-0.6B",
+      "api_status": 200,
+      "gated": false,
+      "sha": "e61197ed45024b0ed8a2d74b80b4d909f1255473",
+      "license": "apache-2.0",
+      "files": 14,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/Qwen/Qwen3-Reranker-0.6B/tree/main"
+    }
   },
   {
     "id": "Qwen/Qwen-Image",
@@ -81,7 +173,24 @@
     "card_url": "https://huggingface.co/Qwen/Qwen-Image",
     "download_url": "https://huggingface.co/Qwen/Qwen-Image/tree/main",
     "code_url": "https://github.com/QwenLM/Qwen-Image",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "image generation foundation model",
+    "technical_fact": {
+      "key": "内容任务",
+      "value": "模型卡强调中文文字渲染；实际文字正确性需在目标素材上检查。",
+      "evidence": "Chinese"
+    },
+    "hub_audit": {
+      "name": "Qwen-Image",
+      "repo": "Qwen/Qwen-Image",
+      "api_status": 200,
+      "gated": false,
+      "sha": "75e0b4be04f60ec59a75f475837eced720f823b6",
+      "license": "apache-2.0",
+      "files": 31,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/Qwen/Qwen-Image/tree/main"
+    }
   },
   {
     "id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
@@ -95,7 +204,24 @@
     "card_url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
     "download_url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B/tree/main",
     "code_url": "https://github.com/deepseek-ai/DeepSeek-R1",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "reasoning",
+    "technical_fact": {
+      "key": "衍生许可",
+      "value": "蒸馏模型基于 Qwen2.5，除当前 MIT 标签外还需留意原始 Apache-2.0 许可与声明。",
+      "evidence": "originally licensed under Apache 2.0 License"
+    },
+    "hub_audit": {
+      "name": "DeepSeek-R1-Distill-Qwen-7B",
+      "repo": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "api_status": 200,
+      "gated": false,
+      "sha": "916b56a44061fd5cd7d6a8fb632557ed4f724f60",
+      "license": "mit",
+      "files": 11,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B/tree/main"
+    }
   },
   {
     "id": "mistralai/Mistral-7B-Instruct-v0.3",
@@ -109,7 +235,24 @@
     "card_url": "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3",
     "download_url": "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3/tree/main",
     "code_url": "https://github.com/mistralai/mistral-inference",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "function calling",
+    "technical_fact": {
+      "key": "工具调用",
+      "value": "模型卡列出 function calling 支持；需配套聊天模板和工具参数格式。",
+      "evidence": "function calling"
+    },
+    "hub_audit": {
+      "name": "Mistral-7B-Instruct-v0.3",
+      "repo": "mistralai/Mistral-7B-Instruct-v0.3",
+      "api_status": 200,
+      "gated": false,
+      "sha": "c170c708c41dac9275d15a8fff4eca08d52bab71",
+      "license": "apache-2.0",
+      "files": 15,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3/tree/main"
+    }
   },
   {
     "id": "microsoft/phi-4",
@@ -123,7 +266,24 @@
     "card_url": "https://huggingface.co/microsoft/phi-4",
     "download_url": "https://huggingface.co/microsoft/phi-4/tree/main",
     "code_url": "",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "Text Generation",
+    "technical_fact": {
+      "key": "上下文窗口",
+      "value": "模型卡标注 16K tokens，文本输入；不能套用其他 Phi 型号的窗口或模态。",
+      "evidence": "16K tokens"
+    },
+    "hub_audit": {
+      "name": "phi-4",
+      "repo": "microsoft/phi-4",
+      "api_status": 200,
+      "gated": false,
+      "sha": "2db69c1c3e91a05d2c64a3185acfbaf36f744e25",
+      "license": "mit",
+      "files": 21,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/microsoft/phi-4/tree/main"
+    }
   },
   {
     "id": "meta-llama/Llama-3.1-8B-Instruct",
@@ -137,7 +297,24 @@
     "card_url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
     "download_url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct/tree/main",
     "code_url": "https://github.com/meta-llama/llama-models",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "multilingual",
+    "technical_fact": {
+      "key": "许可边界",
+      "value": "使用 Llama 3.1 Community License，自定义协议及使用政策应完整核对，不能按 Apache-2.0 处理。",
+      "evidence": "COMMUNITY LICENSE AGREEMENT"
+    },
+    "hub_audit": {
+      "name": "Llama-3.1-8B-Instruct",
+      "repo": "meta-llama/Llama-3.1-8B-Instruct",
+      "api_status": 200,
+      "gated": "manual",
+      "sha": "0e9e39f249a16976918f6564b8830bc894c89659",
+      "license": "llama3.1",
+      "files": 17,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct/tree/main"
+    }
   },
   {
     "id": "google/gemma-3-4b-it",
@@ -151,7 +328,24 @@
     "card_url": "https://huggingface.co/google/gemma-3-4b-it",
     "download_url": "https://huggingface.co/google/gemma-3-4b-it/tree/main",
     "code_url": "https://github.com/google/gemma_pytorch",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "text and image input",
+    "technical_fact": {
+      "key": "输入模态",
+      "value": "支持图像与文本输入、文本输出；下载还需接受 Gemma 使用条件。",
+      "evidence": "text and image input"
+    },
+    "hub_audit": {
+      "name": "gemma-3-4b-it",
+      "repo": "google/gemma-3-4b-it",
+      "api_status": 200,
+      "gated": "manual",
+      "sha": "093f9f388b31de276ce2de164bdc2081324b9767",
+      "license": "gemma",
+      "files": 15,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/google/gemma-3-4b-it/tree/main"
+    }
   },
   {
     "id": "black-forest-labs/FLUX.1-schnell",
@@ -165,7 +359,24 @@
     "card_url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell",
     "download_url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell/tree/main",
     "code_url": "https://github.com/black-forest-labs/flux",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "images",
+    "technical_fact": {
+      "key": "采样特点",
+      "value": "模型卡列出 1–4 步采样；速度仍取决于硬件、尺寸和工作流。",
+      "evidence": "1 to 4 steps"
+    },
+    "hub_audit": {
+      "name": "FLUX.1-schnell",
+      "repo": "black-forest-labs/FLUX.1-schnell",
+      "api_status": 200,
+      "gated": "auto",
+      "sha": "741f7c3ce8b383c54771c7003378a50191e9efe9",
+      "license": "apache-2.0",
+      "files": 28,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell/tree/main"
+    }
   },
   {
     "id": "black-forest-labs/FLUX.1-dev",
@@ -179,7 +390,24 @@
     "card_url": "https://huggingface.co/black-forest-labs/FLUX.1-dev",
     "download_url": "https://huggingface.co/black-forest-labs/FLUX.1-dev/tree/main",
     "code_url": "https://github.com/black-forest-labs/flux",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "images from text descriptions",
+    "technical_fact": {
+      "key": "商业使用边界",
+      "value": "模型权重按非商用许可；模型卡另说明生成结果可依协议用于商业目的，二者不能混淆。",
+      "evidence": "Generated outputs can be used for personal, scientific, and commercial purposes"
+    },
+    "hub_audit": {
+      "name": "FLUX.1-dev",
+      "repo": "black-forest-labs/FLUX.1-dev",
+      "api_status": 200,
+      "gated": "auto",
+      "sha": "3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+      "license": "other",
+      "files": 29,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/black-forest-labs/FLUX.1-dev/tree/main"
+    }
   },
   {
     "id": "stabilityai/stable-diffusion-3.5-medium",
@@ -193,7 +421,24 @@
     "card_url": "https://huggingface.co/stabilityai/stable-diffusion-3.5-medium",
     "download_url": "https://huggingface.co/stabilityai/stable-diffusion-3.5-medium/tree/main",
     "code_url": "https://github.com/Stability-AI/sd3.5",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "text-to-image",
+    "technical_fact": {
+      "key": "商业使用边界",
+      "value": "模型卡社区许可针对年营收低于 100 万美元的组织或个人列出商用条件；超过门槛需企业许可。",
+      "evidence": "less than $1M"
+    },
+    "hub_audit": {
+      "name": "stable-diffusion-3.5-medium",
+      "repo": "stabilityai/stable-diffusion-3.5-medium",
+      "api_status": 200,
+      "gated": "auto",
+      "sha": "b940f670f0eda2d07fbb75229e779da1ad11eb80",
+      "license": "other",
+      "files": 45,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/stabilityai/stable-diffusion-3.5-medium/tree/main"
+    }
   },
   {
     "id": "Wan-AI/Wan2.1-T2V-1.3B",
@@ -207,7 +452,24 @@
     "card_url": "https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B",
     "download_url": "https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B/tree/main",
     "code_url": "https://github.com/Wan-Video/Wan2.1",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "Text-to-Video",
+    "technical_fact": {
+      "key": "显存边界",
+      "value": "官方给出 T2V-1.3B 约 8.19 GB 显存参考；不能推广到 14B 或任意分辨率、并发。",
+      "evidence": "8.19 GB VRAM"
+    },
+    "hub_audit": {
+      "name": "Wan2.1-T2V-1.3B",
+      "repo": "Wan-AI/Wan2.1-T2V-1.3B",
+      "api_status": 200,
+      "gated": false,
+      "sha": "37ec512624d61f7aa208f7ea8140a131f93afc9a",
+      "license": "apache-2.0",
+      "files": 22,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B/tree/main"
+    }
   },
   {
     "id": "Wan-AI/Wan2.1-I2V-14B-480P",
@@ -221,7 +483,24 @@
     "card_url": "https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P",
     "download_url": "https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P/tree/main",
     "code_url": "https://github.com/Wan-Video/Wan2.1",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "Image-to-Video",
+    "technical_fact": {
+      "key": "规格边界",
+      "value": "本条是 14B 图生视频的 480P 版本；T2V-1.3B 的显存参考不适用于该型号。",
+      "evidence": "480P"
+    },
+    "hub_audit": {
+      "name": "Wan2.1-I2V-14B-480P",
+      "repo": "Wan-AI/Wan2.1-I2V-14B-480P",
+      "api_status": 200,
+      "gated": false,
+      "sha": "6b73f84e66371cdfe870c72acd6826e1d61cf279",
+      "license": "apache-2.0",
+      "files": 33,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P/tree/main"
+    }
   },
   {
     "id": "openai/whisper-large-v3",
@@ -235,7 +514,24 @@
     "card_url": "https://huggingface.co/openai/whisper-large-v3",
     "download_url": "https://huggingface.co/openai/whisper-large-v3/tree/main",
     "code_url": "https://github.com/openai/whisper",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "automatic speech recognition",
+    "technical_fact": {
+      "key": "实时边界",
+      "value": "模型卡明确说明不能开箱即用地做实时转写；低延迟服务还需额外工程与评测。",
+      "evidence": "cannot be used for real-time transcription out of the box"
+    },
+    "hub_audit": {
+      "name": "whisper-large-v3",
+      "repo": "openai/whisper-large-v3",
+      "api_status": 200,
+      "gated": false,
+      "sha": "06f233fe06e710322aca913c1bc4249a0d71fce1",
+      "license": "apache-2.0",
+      "files": 21,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/openai/whisper-large-v3/tree/main"
+    }
   },
   {
     "id": "FunAudioLLM/CosyVoice2-0.5B",
@@ -249,7 +545,24 @@
     "card_url": "https://huggingface.co/FunAudioLLM/CosyVoice2-0.5B",
     "download_url": "https://huggingface.co/FunAudioLLM/CosyVoice2-0.5B/tree/main",
     "code_url": "https://github.com/FunAudioLLM/CosyVoice",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "Text-to-Speech",
+    "technical_fact": {
+      "key": "版本边界",
+      "value": "仓库标题为 CosyVoice2，但 README 同时介绍 Fun-CosyVoice 3.0；不将新版的语言数量和表现归给 2.0。",
+      "evidence": "Fun-CosyVoice 3.0"
+    },
+    "hub_audit": {
+      "name": "CosyVoice2-0.5B",
+      "repo": "FunAudioLLM/CosyVoice2-0.5B",
+      "api_status": 200,
+      "gated": false,
+      "sha": "eec1ae6c79877dbd9379285cf8789c9e0879293d",
+      "license": "apache-2.0",
+      "files": 19,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/FunAudioLLM/CosyVoice2-0.5B/tree/main"
+    }
   },
   {
     "id": "BAAI/bge-m3",
@@ -263,7 +576,24 @@
     "card_url": "https://huggingface.co/BAAI/bge-m3",
     "download_url": "https://huggingface.co/BAAI/bge-m3/tree/main",
     "code_url": "https://github.com/FlagOpen/FlagEmbedding",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "dense retrieval",
+    "technical_fact": {
+      "key": "检索形态",
+      "value": "支持稠密、稀疏与多向量检索；单向量维度 1024，混合方案需配置对应索引。",
+      "evidence": "1024"
+    },
+    "hub_audit": {
+      "name": "bge-m3",
+      "repo": "BAAI/bge-m3",
+      "api_status": 200,
+      "gated": false,
+      "sha": "5617a9f61b028005a4858fdac845db406aefb181",
+      "license": "mit",
+      "files": 30,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/BAAI/bge-m3/tree/main"
+    }
   },
   {
     "id": "BAAI/bge-reranker-v2-m3",
@@ -277,6 +607,23 @@
     "card_url": "https://huggingface.co/BAAI/bge-reranker-v2-m3",
     "download_url": "https://huggingface.co/BAAI/bge-reranker-v2-m3/tree/main",
     "code_url": "https://github.com/FlagOpen/FlagEmbedding",
-    "verified_on": "2026-11-07"
+    "verified_on": "2026-11-07",
+    "purpose_evidence": "CrossEncoder",
+    "technical_fact": {
+      "key": "检索阶段",
+      "value": "通过查询与候选文本对计算相关性，用在初步召回之后；不是嵌入向量模型。",
+      "evidence": "relevance"
+    },
+    "hub_audit": {
+      "name": "bge-reranker-v2-m3",
+      "repo": "BAAI/bge-reranker-v2-m3",
+      "api_status": 200,
+      "gated": false,
+      "sha": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+      "license": "apache-2.0",
+      "files": 13,
+      "download_status": 200,
+      "download_final_url": "https://huggingface.co/BAAI/bge-reranker-v2-m3/tree/main"
+    }
   }
 ]

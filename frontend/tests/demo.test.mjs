@@ -18,8 +18,8 @@ const snapshot = seed.snapshots.find(
 );
 
 test("public export contains the updated catalog with traceable excerpts and model downloads", () => {
-  assert.equal(seed.entities.filter((e) => !e.is_demo).length, 140);
-  assert.equal(seed.facts.filter((f) => f.entity_id !== atlas.id).length, 305);
+  assert.equal(seed.entities.filter((e) => !e.is_demo).length, 166);
+  assert.equal(seed.facts.filter((f) => f.entity_id !== atlas.id).length, 453);
   for (const f of seed.facts)
     assert.ok(
       seed.snapshots
@@ -57,6 +57,7 @@ test("review updates shared retrieval but freezes the previous trace and all his
   const before = db.request("POST", "/knowledge/retrieve", {
     query: "上下文窗口",
     include_demo: true,
+    entity_ids: [atlas.id],
   });
   const candidate = seed.changes.find(
     (c) => c.entity_id === atlas.id && c.key === "上下文窗口",
@@ -67,6 +68,7 @@ test("review updates shared retrieval but freezes the previous trace and all his
   const after = db.request("POST", "/knowledge/retrieve", {
     query: "上下文窗口",
     include_demo: true,
+    entity_ids: [atlas.id],
   });
   assert.equal(after.results.find((f) => f.entity_id === atlas.id).version, 2);
   assert.equal(

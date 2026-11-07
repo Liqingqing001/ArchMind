@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
     "build:demo": "node ../scripts/build-demo-data.mjs && tsc -b && vite build --mode demo --base=/ArchMind/",
-    "test:demo": "node ../scripts/build-demo-data.mjs && node --experimental-strip-types tests/demo.test.mjs && node --experimental-strip-types tests/browser-model.test.mjs && node --experimental-strip-types tests/navigation.test.mjs && node --experimental-strip-types tests/solution-flow.test.mjs && node --experimental-strip-types tests/web-search.test.mjs"
+    "test:demo": "node ../scripts/build-demo-data.mjs && node --experimental-strip-types tests/demo.test.mjs && node --experimental-strip-types tests/browser-model.test.mjs && node --experimental-strip-types tests/navigation.test.mjs && node --experimental-strip-types tests/solution-flow.test.mjs && node --experimental-strip-types tests/web-search.test.mjs && node --experimental-strip-types tests/knowledge-audit.test.mjs && node ../scripts/verify-knowledge-audit.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

@@ -11,13 +11,15 @@ const leaf = m => {
  return ['向量与排序模型', /reranker/i.test(m.name) ? '重排序' : '文本嵌入'];
 };
 const data = {
- schema_version: 1, batch_id: 'official-open-models-2026-11-07', checked_on: '2026-11-07',
- sources: models.map(m => ({id:m.id,title:m.name+' 官方模型卡',url:m.card_url,excerpts:[m.id,'License: '+m.license],checked_on:m.verified_on,capture_method:'web_tool_official_model_card',note:'模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。'})),
- entities: models.map(m => ({name:m.name,kind:'model',source:m.id,categories:[['AI 模型',...leaf(m)],['AI 模型','开源与开放权重模型']],description:m.family+' · 开放权重模型 · '+m.description,facts:[
-  {key:'模型用途',value:m.description,evidence:0},
+ schema_version: 1, batch_id: 'open-models-full-audit-2026-11-07', checked_on: '2026-11-07',
+ sources: models.map(m => ({id:m.id,title:m.name+' 官方模型卡与 Hub 元数据',url:m.card_url,excerpts:[m.id,'License: '+m.license,m.purpose_evidence,JSON.stringify({gated:m.hub_audit.gated}),m.technical_fact.evidence],checked_on:m.verified_on,capture_method:'official_model_card_and_public_hub_api',additional_urls:['https://huggingface.co/api/models/'+m.id,m.download_url],hub_audit:m.hub_audit,note:'联合核对官方模型卡、Hub 公共元数据与文件列表；gated 是元数据字段摘录。未下载权重或实测推理，标签不替代完整许可证。'})),
+ entities: models.map(m => ({name:m.name,kind:'model',source:m.id,categories:[['AI 模型',...leaf(m)],['AI 模型','开源与开放权重模型'],...(m.additional_categories || [])],description:m.family+' · 开放权重模型 · '+m.description,facts:[
+  {key:'模型用途',value:m.description,evidence:2},
   {key:'模型卡许可证',value:m.license+'；使用前以官方模型卡及完整协议为准。',evidence:1},
   {key:'官方下载入口',value:m.download_url,evidence:0},
-  {key:'官方模型仓库',value:m.card_url,evidence:0}
+  {key:'官方模型仓库',value:m.card_url,evidence:0},
+  {key:'下载条件',value:m.hub_audit.gated ? 'Hub 元数据标记为 '+m.hub_audit.gated+' 门槛；需要登录并接受或申请相应授权。公开模型卡不等于可匿名下载权重。' : '本轮 Hub 元数据 gated=false，文件列表可读；未执行权重下载，镜像、网络及运行条件需自行确认。',evidence:3},
+  {key:m.technical_fact.key,value:m.technical_fact.value,evidence:4}
  ]}))
 };
 validateDataset(data);
@@ -27,5 +29,5 @@ if (process.argv.includes('--check')) {
  console.log('Import catalog and knowledge dataset consistent: '+models.length+' models');
 } else {
  writeFileSync(target, JSON.stringify(data,null,2)+'\n');
- console.log('Generated '+models.length+' models / '+data.entities.length*4+' facts');
+ console.log('Generated '+models.length+' models / '+data.entities.reduce((n,e)=>n+e.facts.length,0)+' facts');
 }

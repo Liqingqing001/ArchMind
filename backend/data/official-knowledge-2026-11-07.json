@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "batch_id": "official-research-2026-11-07",
+  "batch_id": "official-knowledge-full-audit-2026-11-07",
   "checked_on": "2026-11-07",
   "scope": "主要厂商及现有分类的首批官方资料；并非全球厂商或全部型号的穷尽清单。",
   "sources": [
@@ -55,7 +55,8 @@
         "compatible with OpenAI/Anthropic",
         "DeepSeek-V4.1-Flash-1017",
         "deepseek-v4-pro",
-        "https://api.deepseek.com"
+        "https://api.deepseek.com",
+        "the corresponding models have been retired"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -68,7 +69,9 @@
       "excerpts": [
         "智谱大模型开放平台",
         "文本生成和复杂推理能力",
-        "多轮对话、代码生成及 Agent 应用"
+        "多轮对话、代码生成及 Agent 应用",
+        "模型调用",
+        "OpenAI SDK 兼容"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -81,7 +84,8 @@
       "excerpts": [
         "235 billion total parameters and 22 billion activated parameters",
         "Qwen3-30B-A3B",
-        "coding, math, general capabilities"
+        "coding, math, general capabilities",
+        "30 billion total parameters and 3 billion activated parameters"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -95,7 +99,10 @@
         "text-embedding-v4",
         "qwen3-vl-embedding",
         "qwen3-rerank",
-        "text-to-image and text-to-video search"
+        "text-to-image and text-to-video search",
+        "For plain text search, RAG, or clustering",
+        "cross-modal retrieval",
+        "reorder the top-N results"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -112,7 +119,10 @@
         "speech-2.8-hd",
         "speech-2.8-turbo",
         "1M context window",
-        "Text-to-Video / Image-to-Video"
+        "Text-to-Video / Image-to-Video",
+        "40 languages supported",
+        "4–15s",
+        "7 emotions supported"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -121,14 +131,14 @@
     {
       "id": "kimi",
       "title": "Moonshot Kimi K2 官方介绍",
-      "url": "https://moonshotai.github.io/Kimi-K2/",
+      "url": "https://github.com/MoonshotAI/Kimi-K2/blob/main/README.md",
       "excerpts": [
         "32 billion activated parameters and 1 trillion total parameters",
         "Kimi-K2-Base"
       ],
       "checked_on": "2026-11-07",
-      "capture_method": "web_tool_excerpt",
-      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+      "capture_method": "official_github_readme",
+      "note": "原项目展示页只返回标题，改为同一发布团队的 README；K2 作为明确版本保留，不宣称最新。"
     },
     {
       "id": "tencent",
@@ -137,7 +147,14 @@
       "excerpts": [
         "hunyuan-a13b",
         "hunyuan-vision-1.5-instruct",
-        "hunyuan-translation"
+        "hunyuan-translation",
+        "停止支持新购模型服务",
+        "快慢思考模式切换",
+        "总参数80B，激活13B",
+        "图像分析推理",
+        "33种语言互译和5种民族语言互译",
+        "hunyuan-turbos-vision-video",
+        "视频内容问答"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -163,7 +180,11 @@
         "30-second storytelling with precise reference control and powerful editing capabilities",
         "multimodal image generation model",
         "Seed2.1",
-        "general agents and code engineering"
+        "general agents and code engineering",
+        "Seedance 2.5",
+        "advanced reasoning",
+        "full-duplex interaction",
+        "full-scene audio generation"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -195,27 +216,27 @@
     {
       "id": "veo",
       "title": "Google Gemini API 视频生成",
-      "url": "https://ai.google.dev/gemini-api/docs/video?authuser=6",
+      "url": "https://ai.google.dev/gemini-api/docs/video",
       "excerpts": [
         "Veo 3.1 is a model for generating video with native audio",
         "video extension"
       ],
       "checked_on": "2026-11-07",
-      "capture_method": "web_tool_excerpt",
-      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+      "capture_method": "official_search_index_excerpt",
+      "note": "官方文档迁往 Google AI Studio；本轮直接抓取仅得标题，能力通过官方域名搜索索引交叉核对，未记为实时完整正文。"
     },
     {
       "id": "geminiimage",
       "title": "Google Gemini 图像生成",
-      "url": "https://ai.google.dev/gemini-api/docs/image-generation?authuser=0&hl=es-419",
+      "url": "https://ai.google.dev/gemini-api/docs/image-generation",
       "excerpts": [
         "gemini-3.1-flash-image",
         "gemini-3-pro-image",
         "gemini-3.1-flash-lite-image"
       ],
       "checked_on": "2026-11-07",
-      "capture_method": "web_tool_excerpt",
-      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+      "capture_method": "official_search_index_excerpt",
+      "note": "官方文档迁往 Google AI Studio；本轮直接抓取仅得标题，能力通过官方域名搜索索引交叉核对，未记为实时完整正文。"
     },
     {
       "id": "mistral",
@@ -226,7 +247,8 @@
         "paragraph-level bounding boxes",
         "transcription and diarization",
         "voice cloning",
-        "instruct, reasoning, and coding"
+        "instruct, reasoning, and coding",
+        "Mistral Ecosystem Open Weight License"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -238,7 +260,8 @@
       "url": "https://docs.bfl.ai/quick_start/introduction",
       "excerpts": [
         "FLUX models generate and edit images and video",
-        "through one API"
+        "through one API",
+        "Start with FLUX 3"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -251,11 +274,17 @@
       "excerpts": [
         "Low-level orchestration framework and runtime for long-running, stateful agents",
         "durable execution",
-        "human-in-the-loop"
+        "human-in-the-loop",
+        "does not require LangChain",
+        "{\"repository\":\"langchain-ai/langgraph\",\"tag_name\":\"1.2.20\",\"published_at\":\"2026-11-05T02:20:53Z\"}"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
-      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。 本轮附官方 GitHub Release 元数据摘录；发布版本不代表本项目已实测兼容。",
+      "additional_urls": [
+        "https://api.github.com/repos/langchain-ai/langgraph/releases?per_page=20",
+        "https://github.com/langchain-ai/langgraph/releases/tag/1.2.20"
+      ]
     },
     {
       "id": "llamaindex",
@@ -264,11 +293,17 @@
       "excerpts": [
         "LlamaParse, the hosted document platform",
         "LlamaIndex Framework",
-        "agents and RAG"
+        "agents and RAG",
+        "LiteParse (local parsing)",
+        "{\"repository\":\"run-llama/llama_index\",\"tag_name\":\"v0.14.25\",\"published_at\":\"2026-09-21T16:22:27Z\"}"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
-      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。 本轮附官方 GitHub Release 元数据摘录；发布版本不代表本项目已实测兼容。",
+      "additional_urls": [
+        "https://api.github.com/repos/run-llama/llama_index/releases/latest",
+        "https://github.com/run-llama/llama_index/releases/tag/v0.14.25"
+      ]
     },
     {
       "id": "dify",
@@ -277,33 +312,48 @@
       "excerpts": [
         "Dify is an open-source platform for building AI applications",
         "agents, agentic workflows, and chatbots",
-        "Deploy with Docker Compose"
+        "Deploy with Docker Compose",
+        "{\"repository\":\"langgenius/dify\",\"tag_name\":\"1.19.0\",\"published_at\":\"2026-11-04T07:36:16Z\"}"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
-      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。 本轮附官方 GitHub Release 元数据摘录；发布版本不代表本项目已实测兼容。",
+      "additional_urls": [
+        "https://api.github.com/repos/langgenius/dify/releases/latest",
+        "https://github.com/langgenius/dify/releases/tag/1.19.0"
+      ]
     },
     {
       "id": "vllm",
       "title": "vLLM 快速入门",
       "url": "https://docs.vllm.ai/en/stable/getting_started/quickstart/",
       "excerpts": [
-        "vLLM can be deployed as a server that implements the OpenAI API protocol"
+        "vLLM can be deployed as a server that implements the OpenAI API protocol",
+        "{\"repository\":\"vllm-project/vllm\",\"tag_name\":\"v0.32.0\",\"published_at\":\"2026-10-18T06:50:48Z\"}"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
-      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。 本轮附官方 GitHub Release 元数据摘录；发布版本不代表本项目已实测兼容。",
+      "additional_urls": [
+        "https://api.github.com/repos/vllm-project/vllm/releases?per_page=20",
+        "https://github.com/vllm-project/vllm/releases/tag/v0.32.0"
+      ]
     },
     {
       "id": "peft",
       "title": "Hugging Face PEFT",
       "url": "https://huggingface.co/docs/hub/peft",
       "excerpts": [
-        "without fine-tuning all the model’s parameters"
+        "without fine-tuning all the model’s parameters",
+        "{\"repository\":\"huggingface/peft\",\"tag_name\":\"v0.21.2\",\"published_at\":\"2026-10-01T10:29:50Z\"}"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
-      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。 本轮附官方 GitHub Release 元数据摘录；发布版本不代表本项目已实测兼容。",
+      "additional_urls": [
+        "https://api.github.com/repos/huggingface/peft/releases/latest",
+        "https://github.com/huggingface/peft/releases/tag/v0.21.2"
+      ]
     },
     {
       "id": "datasets",
@@ -311,11 +361,16 @@
       "url": "https://huggingface.co/docs/datasets/index",
       "excerpts": [
         "Datasets is a library for easily accessing and sharing AI datasets",
-        "Audio, Computer Vision, and Natural Language Processing"
+        "Audio, Computer Vision, and Natural Language Processing",
+        "{\"repository\":\"huggingface/datasets\",\"tag_name\":\"5.1.0\",\"published_at\":\"2026-10-05T15:39:37Z\"}"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
-      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。 本轮附官方 GitHub Release 元数据摘录；发布版本不代表本项目已实测兼容。",
+      "additional_urls": [
+        "https://api.github.com/repos/huggingface/datasets/releases/latest",
+        "https://github.com/huggingface/datasets/releases/tag/5.1.0"
+      ]
     },
     {
       "id": "transformers",
@@ -323,11 +378,16 @@
       "url": "https://huggingface.co/docs/transformers/index",
       "excerpts": [
         "compatible with the majority of training frameworks",
-        "inference engines"
+        "inference engines",
+        "{\"repository\":\"huggingface/transformers\",\"tag_name\":\"v5.22.2\",\"published_at\":\"2026-11-06T15:43:27Z\"}"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
-      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。 本轮附官方 GitHub Release 元数据摘录；发布版本不代表本项目已实测兼容。",
+      "additional_urls": [
+        "https://api.github.com/repos/huggingface/transformers/releases/latest",
+        "https://github.com/huggingface/transformers/releases/tag/v5.22.2"
+      ]
     },
     {
       "id": "langsmith",
@@ -346,23 +406,34 @@
       "url": "https://milvus.io/docs/overview.md",
       "excerpts": [
         "Milvus is a vector database for storing embeddings and searching them together with structured metadata",
-        "Developed by Zilliz"
+        "Developed by Zilliz",
+        "{\"repository\":\"milvus-io/milvus\",\"tag_name\":\"v3.0.5\",\"published_at\":\"2026-10-30T10:43:28Z\"}"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
-      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。 本轮附官方 GitHub Release 元数据摘录；发布版本不代表本项目已实测兼容。",
+      "additional_urls": [
+        "https://api.github.com/repos/milvus-io/milvus/releases/latest",
+        "https://github.com/milvus-io/milvus/releases/tag/v3.0.5"
+      ]
     },
     {
       "id": "qdrant",
       "title": "Qdrant 文本检索",
-      "url": "https://qdrant.tech/documentation/guides/text-search/",
+      "url": "https://qdrant.tech/documentation/search/text-search/text-filtering/",
       "excerpts": [
-        "Qdrant is a vector search engine",
-        "filtering on text fields and full-text search"
+        "The vector query is used to score and rank the results",
+        "Full-Text Filtering",
+        "keyword strings",
+        "{\"repository\":\"qdrant/qdrant\",\"tag_name\":\"v1.20.0\",\"published_at\":\"2026-10-22T14:14:12Z\"}"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
-      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。 本轮附官方 GitHub Release 元数据摘录；发布版本不代表本项目已实测兼容。",
+      "additional_urls": [
+        "https://api.github.com/repos/qdrant/qdrant/releases/latest",
+        "https://github.com/qdrant/qdrant/releases/tag/v1.20.0"
+      ]
     },
     {
       "id": "ollama",
@@ -370,22 +441,32 @@
       "url": "https://ollama.com/",
       "excerpts": [
         "Run AI models locally and in the cloud",
-        "build with open models"
+        "build with open models",
+        "{\"repository\":\"ollama/ollama\",\"tag_name\":\"v0.40.15\",\"published_at\":\"2026-11-03T22:52:31Z\"}"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
-      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。 本轮附官方 GitHub Release 元数据摘录；发布版本不代表本项目已实测兼容。",
+      "additional_urls": [
+        "https://api.github.com/repos/ollama/ollama/releases/latest",
+        "https://github.com/ollama/ollama/releases/tag/v0.40.15"
+      ]
     },
     {
       "id": "llamacpp",
       "title": "llama.cpp 官方仓库",
       "url": "https://github.com/ggml-org/llama.cpp",
       "excerpts": [
-        "LLM inference in C/C++"
+        "LLM inference in C/C++",
+        "{\"repository\":\"ggml-org/llama.cpp\",\"tag_name\":\"v0.9.0\",\"published_at\":\"2026-11-04T13:08:06Z\"}"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
-      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。 本轮附官方 GitHub Release 元数据摘录；发布版本不代表本项目已实测兼容。",
+      "additional_urls": [
+        "https://api.github.com/repos/ggml-org/llama.cpp/releases/latest",
+        "https://github.com/ggml-org/llama.cpp/releases/tag/v0.9.0"
+      ]
     },
     {
       "id": "bedrock",
@@ -417,7 +498,8 @@
       "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning",
       "excerpts": [
         "build, train, and manage machine learning (ML) models at scale",
-        "Fully managed compute infrastructure"
+        "Fully managed compute infrastructure",
+        "Model Registry"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -429,7 +511,8 @@
       "url": "https://docs.api.nvidia.com/nim/docs/introduction",
       "excerpts": [
         "portable inference microservices",
-        "exposing industry standard APIs"
+        "exposing industry standard APIs",
+        "NIM are containerized"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -453,7 +536,10 @@
       "url": "https://help.aliyun.com/zh/model-studio/what-is-model-studio",
       "excerpts": [
         "阿里云百炼是一站式大模型开发与应用平台",
-        "兼容 OpenAI"
+        "兼容 OpenAI",
+        "提供文本、视觉、语音、全模态及向量模型 API",
+        "支持在线调用、推理调度与模型训练",
+        "OpenAI/Anthropic 兼容接口调用"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -465,7 +551,8 @@
       "url": "https://learn.microsoft.com/en-us/power-bi/create-reports/copilot-introduction",
       "excerpts": [
         "on-the-fly analysis for business users",
-        "data analysis expression (DAX) generation"
+        "data analysis expression (DAX) generation",
+        "Fabric bills separately"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -489,7 +576,8 @@
       "url": "https://www.adobe.com/products/firefly.html",
       "excerpts": [
         "AI-powered content creation",
-        "Image editing and design"
+        "Image editing and design",
+        "Generate and edit images, video, audio, and designs"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -501,7 +589,8 @@
       "url": "https://aws.amazon.com/q/business/",
       "excerpts": [
         "Amazon Q Business is no longer available to new customers",
-        "assistant for finding information, gaining insight, and taking action at work"
+        "assistant for finding information, gaining insight, and taking action at work",
+        "Introducing Amazon Quick"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "web_tool_excerpt",
@@ -517,8 +606,274 @@
       "excerpts": [
         "generating videos with synced audio",
         "from natural language or images",
-        "Legacy"
+        "Legacy",
+        "The Sora 2 models and Videos API were shut down on September 24, 2026",
+        "no longer available"
       ]
+    },
+    {
+      "id": "qwen-current",
+      "url": "https://help.aliyun.com/zh/model-studio/text-generation-model/",
+      "title": "百炼：文本生成与视觉理解",
+      "excerpts": [
+        "qwen3.8-max",
+        "qwen3.8-flash",
+        "qwen3.7-plus",
+        "支持文本、图像和视频输入",
+        "1M"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "http_official_page_and_editorial_review",
+      "note": "逐项核对的官方短摘录；不是整页快照，不代表实际 API、库存或推理性能已实测。"
+    },
+    {
+      "id": "kimi-current",
+      "url": "https://platform.kimi.com/docs/get-api-key",
+      "title": "Kimi 官方快速开始",
+      "excerpts": [
+        "kimi-k3.1-pro",
+        "kimi-k3",
+        "1M token",
+        "文本、图片与视频输入",
+        "https://api.moonshot.cn/v1"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "http_official_page_and_editorial_review",
+      "note": "逐项核对的官方短摘录；不是整页快照，不代表实际 API、库存或推理性能已实测。"
+    },
+    {
+      "id": "glm53",
+      "url": "https://docs.bigmodel.cn/cn/guide/models/text/glm-5.3",
+      "title": "GLM-5.3 官方模型说明",
+      "excerpts": [
+        "仅支持处理文本模态信息",
+        "1M",
+        "128K",
+        "不再支持禁用思考功能"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "http_official_page_and_editorial_review",
+      "note": "逐项核对的官方短摘录；不是整页快照，不代表实际 API、库存或推理性能已实测。"
+    },
+    {
+      "id": "glm53flash",
+      "url": "https://docs.bigmodel.cn/cn/guide/models/vlm/glm-5.3-flash",
+      "title": "GLM-5.3-Flash/FlashX 官方模型说明",
+      "excerpts": [
+        "glm-5.3-flash",
+        "glm-5.3-flashx",
+        "视频、图像、文本、文件",
+        "1M",
+        "128K",
+        "不支持关闭思考"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "http_official_page_and_editorial_review",
+      "note": "逐项核对的官方短摘录；不是整页快照，不代表实际 API、库存或推理性能已实测。"
+    },
+    {
+      "id": "glmocr",
+      "url": "https://docs.bigmodel.cn/cn/guide/models/vlm/glm-ocr",
+      "title": "GLM-OCR 官方模型说明",
+      "excerpts": [
+        "0.9B",
+        "文档解析",
+        "HTML",
+        "Markdown",
+        "最大支持 100 页"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "http_official_page_and_editorial_review",
+      "note": "逐项核对的官方短摘录；不是整页快照，不代表实际 API、库存或推理性能已实测。"
+    },
+    {
+      "id": "glmimage",
+      "url": "https://docs.bigmodel.cn/cn/guide/models/image-generation/glm-image",
+      "title": "GLM-Image 官方模型说明",
+      "excerpts": [
+        "文字内容的精准嵌入",
+        "文本（最大输入 1000 字符）",
+        "图片 URL"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "http_official_page_and_editorial_review",
+      "note": "逐项核对的官方短摘录；不是整页快照，不代表实际 API、库存或推理性能已实测。"
+    },
+    {
+      "id": "glm-catalog",
+      "url": "https://docs.bigmodel.cn/cn/guide/start/model-overview",
+      "title": "智谱当前官方模型目录",
+      "excerpts": [
+        "GLM-ASR-2512",
+        "GLM-TTS",
+        "CogVideoX-3",
+        "自定义词汇",
+        "首尾帧生成",
+        "非流式与流式接口"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "http_official_page_and_editorial_review",
+      "note": "逐项核对的官方短摘录；不是整页快照，不代表实际 API、库存或推理性能已实测。"
+    },
+    {
+      "id": "gemini-current",
+      "url": "https://ai.google.dev/gemini-api/docs/models?hl=en",
+      "title": "Gemini 官方模型目录",
+      "excerpts": [
+        "gemini-3.8-flash",
+        "gemini-3.8-live",
+        "gemini-3.8-flash-tts",
+        "gemini-3.5-transcribe",
+        "gemini-omni-1.1-flash",
+        "speaker diarization"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "official_search_index_excerpt",
+      "note": "当前官方索引列举；直接文档已迁至 AI Studio 且抓取仅得标题。型号存在和目录定位已交叉核对，未验证实际账户开放权限。"
+    },
+    {
+      "id": "pgvector",
+      "url": "https://github.com/pgvector/pgvector/blob/master/README.md",
+      "title": "pgvector 官方 README",
+      "excerpts": [
+        "vector similarity search for Postgres",
+        "exact and approximate nearest neighbor search",
+        "HNSW",
+        "IVFFlat"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "http_official_page_and_editorial_review",
+      "note": "逐项核对的官方短摘录；不是整页快照，不代表实际 API、库存或推理性能已实测。"
+    },
+    {
+      "id": "ragflow",
+      "url": "https://github.com/infiniflow/ragflow/blob/main/README.md",
+      "title": "RAGFlow 官方 README",
+      "excerpts": [
+        "Retrieval-Augmented Generation",
+        "Deep document understanding",
+        "cloud.ragflow.io",
+        "Local Deployment",
+        "Apache--2.0",
+        "{\"repository\":\"infiniflow/ragflow\",\"tag_name\":\"v1.0.0\",\"published_at\":\"2026-11-06T12:31:31Z\"}"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "official_github_readme_raw_and_rendered",
+      "note": "逐项核对的官方短摘录；不是整页快照，不代表实际 API、库存或推理性能已实测。 本轮附官方 GitHub Release 元数据摘录；发布版本不代表本项目已实测兼容。",
+      "additional_urls": [
+        "https://raw.githubusercontent.com/infiniflow/ragflow/main/README.md",
+        "https://api.github.com/repos/infiniflow/ragflow/releases/latest",
+        "https://github.com/infiniflow/ragflow/releases/tag/v1.0.0"
+      ]
+    },
+    {
+      "id": "ragas",
+      "url": "https://docs.ragas.io/en/stable/",
+      "title": "Ragas 官方文档",
+      "excerpts": [
+        "Evaluate a simple RAG system",
+        "Context Precision",
+        "Context Recall",
+        "Evaluate an AI Agent",
+        "{\"repository\":\"vibrantlabsai/ragas\",\"tag_name\":\"v0.4.3\",\"published_at\":\"2026-01-13T17:47:29Z\"}"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "http_official_page_and_editorial_review",
+      "note": "逐项核对的官方短摘录；不是整页快照，不代表实际 API、库存或推理性能已实测。 本轮附官方 GitHub Release 元数据摘录；发布版本不代表本项目已实测兼容。",
+      "additional_urls": [
+        "https://api.github.com/repos/vibrantlabsai/ragas/releases/latest",
+        "https://github.com/vibrantlabsai/ragas/releases/tag/v0.4.3"
+      ]
+    },
+    {
+      "id": "image26-sunburst",
+      "url": "https://developers.openai.com/api/docs/models/gpt-image-2.6-sunburst",
+      "title": "GPT Image 2.6 sunburst 官方型号说明",
+      "excerpts": [
+        "gpt-image-2.6-sunburst",
+        "Image generation and editing",
+        "Input and output"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "official_model_page_search_and_http",
+      "note": "逐项核对官方型号说明，不将导航栏列举的其他 API 当成该型号支持的端点。"
+    },
+    {
+      "id": "image26-flare",
+      "url": "https://developers.openai.com/api/docs/models/gpt-image-2.6-flare",
+      "title": "GPT Image 2.6 flare 官方型号说明",
+      "excerpts": [
+        "gpt-image-2.6-flare",
+        "Image generation and editing",
+        "Input and output"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "official_model_page_search_and_http",
+      "note": "逐项核对官方型号说明，不将导航栏列举的其他 API 当成该型号支持的端点。"
+    },
+    {
+      "id": "gpt-6-astra",
+      "title": "GPT-6 Astra 官方型号说明",
+      "url": "https://developers.openai.com/api/docs/models/gpt-6-astra",
+      "excerpts": [
+        "Our most capable model",
+        "Near-Astra performance for complex work",
+        "visual reasoning, precise computer use",
+        "focused, high-volume tasks",
+        "Small embedding model",
+        "gpt-6-astra"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "official_model_page_search_and_http",
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+    },
+    {
+      "id": "gpt-6.1-sol",
+      "title": "GPT-6.1 Sol 官方型号说明",
+      "url": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+      "excerpts": [
+        "Our most capable model",
+        "Near-Astra performance for complex work",
+        "visual reasoning, precise computer use",
+        "focused, high-volume tasks",
+        "Small embedding model",
+        "gpt-6.1-sol"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "official_model_page_search_and_http",
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+    },
+    {
+      "id": "gpt-6.1-terra",
+      "title": "GPT-6.1 Terra 官方型号说明",
+      "url": "https://developers.openai.com/api/docs/models/gpt-6.1-terra",
+      "excerpts": [
+        "Our most capable model",
+        "Near-Astra performance for complex work",
+        "visual reasoning, precise computer use",
+        "focused, high-volume tasks",
+        "Small embedding model",
+        "gpt-6.1-terra"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "official_model_page_search_and_http",
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
+    },
+    {
+      "id": "gpt-6-luna",
+      "title": "GPT-6 Luna 官方型号说明",
+      "url": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+      "excerpts": [
+        "Our most capable model",
+        "Near-Astra performance for complex work",
+        "visual reasoning, precise computer use",
+        "focused, high-volume tasks",
+        "Small embedding model",
+        "gpt-6-luna"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "official_model_page_search_and_http",
+      "note": "官方页面或搜索索引的短摘录，非完整网页快照；中文事实为编辑归纳。"
     }
   ],
   "entities": [
@@ -593,8 +948,8 @@
       "facts": [
         {
           "key": "业务方向",
-          "value": "通过百炼提供模型调用和 AI 应用开发服务。",
-          "evidence": 0
+          "value": "百炼模型服务提供多模态 API、推理调度与模型训练。",
+          "evidence": 2
         }
       ]
     },
@@ -709,6 +1064,11 @@
           "key": "业务方向",
           "value": "提供混元语言、视觉理解和翻译模型。",
           "evidence": 0
+        },
+        {
+          "key": "接入状态",
+          "value": "原混元平台停止支持新购模型服务，新模型与新购服务转至 TokenHub；已购模型服务暂不受影响。",
+          "evidence": 3
         }
       ]
     },
@@ -943,7 +1303,7 @@
     {
       "name": "GPT-6 Astra",
       "kind": "model",
-      "source": "openai",
+      "source": "gpt-6-astra",
       "categories": [
         [
           "AI 模型",
@@ -957,6 +1317,11 @@
           "key": "产品定位",
           "value": "面向高难度工作的模型。",
           "evidence": 0
+        },
+        {
+          "key": "API 模型名",
+          "value": "gpt-6-astra",
+          "evidence": 5
         }
       ],
       "vendor": "OpenAI"
@@ -964,7 +1329,7 @@
     {
       "name": "GPT-6.1 Sol",
       "kind": "model",
-      "source": "openai",
+      "source": "gpt-6.1-sol",
       "categories": [
         [
           "AI 模型",
@@ -978,6 +1343,11 @@
           "key": "产品定位",
           "value": "在复杂任务中兼顾能力与成本。",
           "evidence": 1
+        },
+        {
+          "key": "API 模型名",
+          "value": "gpt-6.1-sol",
+          "evidence": 5
         }
       ],
       "vendor": "OpenAI"
@@ -985,7 +1355,7 @@
     {
       "name": "GPT-6.1 Terra",
       "kind": "model",
-      "source": "openai",
+      "source": "gpt-6.1-terra",
       "categories": [
         [
           "AI 模型",
@@ -999,6 +1369,11 @@
           "key": "核心能力",
           "value": "视觉推理、计算机操作、自然语言写作。",
           "evidence": 2
+        },
+        {
+          "key": "API 模型名",
+          "value": "gpt-6.1-terra",
+          "evidence": 5
         }
       ],
       "vendor": "OpenAI"
@@ -1006,7 +1381,7 @@
     {
       "name": "GPT-6 Luna",
       "kind": "model",
-      "source": "openai",
+      "source": "gpt-6-luna",
       "categories": [
         [
           "AI 模型",
@@ -1020,6 +1395,11 @@
           "key": "产品定位",
           "value": "强调聚焦任务的效率与吞吐。",
           "evidence": 3
+        },
+        {
+          "key": "API 模型名",
+          "value": "gpt-6-luna",
+          "evidence": 5
         }
       ],
       "vendor": "OpenAI"
@@ -1247,6 +1627,11 @@
           "key": "模型入口",
           "value": "文档列有 deepseek-flash 与 deepseek-v4-pro。",
           "evidence": 2
+        },
+        {
+          "key": "别名迁移",
+          "value": "deepseek-v4-flash 与 deepseek-v4-flash-vision-exp 已退役，其旧名称请求由 DeepSeek-V4.1-Flash-1017 承接；新调用使用 deepseek-flash。",
+          "evidence": 4
         }
       ],
       "vendor": "DeepSeek"
@@ -1297,7 +1682,12 @@
         {
           "key": "服务范围",
           "value": "模型调用、联网检索与全模态知识库。",
-          "evidence": 0
+          "evidence": 3
+        },
+        {
+          "key": "接入方式",
+          "value": "提供 RESTful API，并支持 OpenAI SDK 兼容方式；不能把 Coding Plan 额度直接当通用 API 余额。",
+          "evidence": 4
         }
       ],
       "vendor": "智谱 AI"
@@ -1370,7 +1760,7 @@
         {
           "key": "模型架构",
           "value": "MoE；总参数 30B，激活参数 3B。",
-          "evidence": 1
+          "evidence": 3
         }
       ],
       "vendor": "阿里云"
@@ -1391,7 +1781,7 @@
         {
           "key": "用途",
           "value": "纯文本检索、RAG 与聚类。",
-          "evidence": 0
+          "evidence": 4
         }
       ],
       "vendor": "阿里云"
@@ -1417,7 +1807,7 @@
         {
           "key": "检索模态",
           "value": "支持图文融合表示及跨模态检索。",
-          "evidence": 1
+          "evidence": 5
         }
       ],
       "vendor": "阿里云"
@@ -1438,7 +1828,7 @@
         {
           "key": "用途",
           "value": "对文本检索候选进行相关性重排序。",
-          "evidence": 2
+          "evidence": 6
         }
       ],
       "vendor": "阿里云"
@@ -1495,7 +1885,7 @@
         {
           "key": "核心能力",
           "value": "多模态理解与代码任务。",
-          "evidence": 1
+          "evidence": 0
         },
         {
           "key": "上下文窗口",
@@ -1532,6 +1922,11 @@
           "key": "扩展控制",
           "value": "支持首尾帧及多模态参考。",
           "evidence": 2
+        },
+        {
+          "key": "输出规格",
+          "value": "官方目录列出 768P / 2K、4–15 秒、24 fps；具体输入方式和规格组合仍须按生成接口核对。",
+          "evidence": 8
         }
       ],
       "vendor": "MiniMax"
@@ -1552,7 +1947,12 @@
         {
           "key": "能力方向",
           "value": "多语言语音生成。",
-          "evidence": 3
+          "evidence": 7
+        },
+        {
+          "key": "控制能力",
+          "value": "目录列出 40 种语言和 7 类情绪，并支持指定语言及方言；具体声音和权限以账号为准。",
+          "evidence": 9
         }
       ],
       "vendor": "MiniMax"
@@ -1573,7 +1973,12 @@
         {
           "key": "能力方向",
           "value": "多语言语音生成。",
-          "evidence": 4
+          "evidence": 7
+        },
+        {
+          "key": "控制能力",
+          "value": "目录列出 40 种语言和 7 类情绪；该型号强调流畅和速度，仍需用目标语言试听。",
+          "evidence": 9
         }
       ],
       "vendor": "MiniMax"
@@ -1625,12 +2030,17 @@
         {
           "key": "推理模式",
           "value": "支持快思考和慢思考模式。",
-          "evidence": 0
+          "evidence": 4
         },
         {
           "key": "模型规模",
           "value": "总参数 80B、激活参数 13B。",
-          "evidence": 0
+          "evidence": 5
+        },
+        {
+          "key": "接入状态",
+          "value": "原混元平台停止支持新购模型服务，新模型与新购服务转至 TokenHub；已购模型服务暂不受影响。",
+          "evidence": 3
         }
       ],
       "vendor": "腾讯"
@@ -1656,7 +2066,12 @@
         {
           "key": "核心能力",
           "value": "图像识别、图像分析与推理。",
-          "evidence": 1
+          "evidence": 6
+        },
+        {
+          "key": "接入状态",
+          "value": "原混元平台停止支持新购模型服务，新模型与新购服务转至 TokenHub；已购模型服务暂不受影响。",
+          "evidence": 3
         }
       ],
       "vendor": "腾讯"
@@ -1677,7 +2092,12 @@
         {
           "key": "能力方向",
           "value": "多语言互译。",
-          "evidence": 2
+          "evidence": 7
+        },
+        {
+          "key": "接入状态",
+          "value": "原混元平台停止支持新购模型服务，新模型与新购服务转至 TokenHub；已购模型服务暂不受影响。",
+          "evidence": 3
         }
       ],
       "vendor": "腾讯"
@@ -1734,7 +2154,7 @@
         {
           "key": "已核验型号",
           "value": "官方目录包含 Seedance 2.5。",
-          "evidence": 0
+          "evidence": 4
         }
       ],
       "vendor": "字节跳动 Seed"
@@ -1807,7 +2227,7 @@
         {
           "key": "核心能力",
           "value": "结合推理进行图像内容生成。",
-          "evidence": 1
+          "evidence": 5
         }
       ],
       "vendor": "字节跳动 Seed"
@@ -2035,6 +2455,11 @@
           "key": "核心能力",
           "value": "通用多模态开放权重模型。",
           "evidence": 0
+        },
+        {
+          "key": "权重许可",
+          "value": "目录标注 Mistral Ecosystem Open Weight License；开放权重不等于 Apache-2.0，商用与再分发需核对完整协议。",
+          "evidence": 5
         }
       ],
       "vendor": "Mistral AI"
@@ -2150,6 +2575,11 @@
           "key": "接入方式",
           "value": "通过官方 API 接入。",
           "evidence": 1
+        },
+        {
+          "key": "目录范围",
+          "value": "当前介绍页以 FLUX 3 家族为入口；图像、视频和其他能力应按具体型号选择，不能互相套用。",
+          "evidence": 2
         }
       ],
       "vendor": "Black Forest Labs"
@@ -2175,6 +2605,16 @@
           "key": "运行能力",
           "value": "持久执行与人工介入。",
           "evidence": 1
+        },
+        {
+          "key": "集成边界",
+          "value": "可独立于 LangChain 使用；框架负责状态与执行编排，模型、工具和提示词仍由应用接入。",
+          "evidence": 3
+        },
+        {
+          "key": "软件发布版本",
+          "value": "本轮核对发布标签 1.2.20（2026-11-05）；https://github.com/langchain-ai/langgraph/releases/tag/1.2.20。升级前核对变更和依赖。 此处是核心包版本，SDK 与 CLI 有各自版本。",
+          "evidence": 4
         }
       ],
       "vendor": "LangChain"
@@ -2199,6 +2639,16 @@
           "key": "核心能力",
           "value": "构建数据驱动的 Agent 与检索增强应用。",
           "evidence": 2
+        },
+        {
+          "key": "产品边界",
+          "value": "LlamaIndex Framework 用于 Agent 与 RAG；托管 LlamaParse 与本地 LiteParse 是另列的解析产品。",
+          "evidence": 3
+        },
+        {
+          "key": "软件发布版本",
+          "value": "本轮核对发布标签 v0.14.25（2026-09-21）；https://github.com/run-llama/llama_index/releases/tag/v0.14.25。升级前核对变更和依赖。",
+          "evidence": 4
         }
       ],
       "vendor": "LlamaIndex"
@@ -2252,6 +2702,11 @@
           "key": "部署方式",
           "value": "可使用托管服务或 Docker Compose 自托管。",
           "evidence": 2
+        },
+        {
+          "key": "软件发布版本",
+          "value": "本轮核对发布标签 1.19.0（2026-11-04）；https://github.com/langgenius/dify/releases/tag/1.19.0。升级前核对变更和依赖。",
+          "evidence": 3
         }
       ]
     },
@@ -2275,6 +2730,11 @@
           "key": "服务协议",
           "value": "提供兼容 OpenAI API 协议的服务。",
           "evidence": 0
+        },
+        {
+          "key": "软件发布版本",
+          "value": "本轮核对发布标签 v0.32.0（2026-10-18）；https://github.com/vllm-project/vllm/releases/tag/v0.32.0。升级前核对变更和依赖。 另见 v0.33.0rc3 候选版本；虽然 GitHub prerelease=false，仍按 rc 候选对待。",
+          "evidence": 1
         }
       ]
     },
@@ -2294,6 +2754,11 @@
           "key": "训练方式",
           "value": "仅调整部分参数来适配下游任务。",
           "evidence": 0
+        },
+        {
+          "key": "软件发布版本",
+          "value": "本轮核对发布标签 v0.21.2（2026-10-01）；https://github.com/huggingface/peft/releases/tag/v0.21.2。升级前核对变更和依赖。",
+          "evidence": 1
         }
       ],
       "vendor": "Hugging Face"
@@ -2318,6 +2783,11 @@
           "key": "生态兼容",
           "value": "支持多种训练框架与推理引擎。",
           "evidence": 0
+        },
+        {
+          "key": "软件发布版本",
+          "value": "本轮核对发布标签 v5.22.2（2026-11-06）；https://github.com/huggingface/transformers/releases/tag/v5.22.2。升级前核对变更和依赖。",
+          "evidence": 2
         }
       ],
       "vendor": "Hugging Face"
@@ -2343,6 +2813,11 @@
           "key": "任务范围",
           "value": "音频、计算机视觉、自然语言处理。",
           "evidence": 1
+        },
+        {
+          "key": "软件发布版本",
+          "value": "本轮核对发布标签 5.1.0（2026-10-05）；https://github.com/huggingface/datasets/releases/tag/5.1.0。升级前核对变更和依赖。",
+          "evidence": 2
         }
       ],
       "vendor": "Hugging Face"
@@ -2391,6 +2866,11 @@
           "key": "数据能力",
           "value": "向量存储、相似性检索与结构化元数据过滤。",
           "evidence": 0
+        },
+        {
+          "key": "软件发布版本",
+          "value": "本轮核对发布标签 v3.0.5（2026-10-30）；https://github.com/milvus-io/milvus/releases/tag/v3.0.5。升级前核对变更和依赖。",
+          "evidence": 2
         }
       ],
       "vendor": "Zilliz"
@@ -2409,13 +2889,23 @@
       "facts": [
         {
           "key": "检索能力",
-          "value": "向量语义搜索。",
+          "value": "向量查询负责评分与排序，可结合 payload 条件缩小结果范围。",
           "evidence": 0
         },
         {
           "key": "文本能力",
-          "value": "支持文本过滤和全文检索。",
+          "value": "支持全文过滤；精确字符串使用 keyword，词项匹配使用 text。全文过滤和相关性排序须分别配置。",
           "evidence": 1
+        },
+        {
+          "key": "字段选择",
+          "value": "ID、分类与标签适合 keyword 精确匹配，长文本词项使用 text；不能把两种过滤方式混用。",
+          "evidence": 2
+        },
+        {
+          "key": "软件发布版本",
+          "value": "本轮核对发布标签 v1.20.0（2026-10-22）；https://github.com/qdrant/qdrant/releases/tag/v1.20.0。升级前核对变更和依赖。",
+          "evidence": 3
         }
       ]
     },
@@ -2439,6 +2929,11 @@
           "key": "运行方式",
           "value": "本地及云端运行模型。",
           "evidence": 0
+        },
+        {
+          "key": "软件发布版本",
+          "value": "本轮核对发布标签 v0.40.15（2026-11-03）；https://github.com/ollama/ollama/releases/tag/v0.40.15。升级前核对变更和依赖。",
+          "evidence": 2
         }
       ]
     },
@@ -2462,6 +2957,11 @@
           "key": "技术实现",
           "value": "使用 C/C++ 实现 LLM 推理。",
           "evidence": 0
+        },
+        {
+          "key": "软件发布版本",
+          "value": "本轮核对发布标签 v0.9.0（2026-11-04）；https://github.com/ggml-org/llama.cpp/releases/tag/v0.9.0。升级前核对变更和依赖。",
+          "evidence": 1
         }
       ]
     },
@@ -2544,6 +3044,11 @@
           "key": "基础设施",
           "value": "提供托管计算基础设施。",
           "evidence": 1
+        },
+        {
+          "key": "训练方式",
+          "value": "支持 AutoML 与自定义训练；无服务器训练提供托管计算，模型可通过 Model Registry 管理。",
+          "evidence": 2
         }
       ],
       "vendor": "Google"
@@ -2569,6 +3074,11 @@
           "key": "集成方式",
           "value": "暴露标准 API，封装推理运行细节。",
           "evidence": 1
+        },
+        {
+          "key": "部署方式",
+          "value": "容器化推理微服务可在云、数据中心或工作站自托管；需按目标模型核对 GPU、运行时与许可证。",
+          "evidence": 2
         }
       ],
       "vendor": "NVIDIA"
@@ -2616,13 +3126,13 @@
       "facts": [
         {
           "key": "平台定位",
-          "value": "模型开发、调用及可视化应用构建。",
-          "evidence": 0
+          "value": "百炼模型服务覆盖文本、视觉、语音、全模态与向量模型的在线调用、推理调度及模型训练。",
+          "evidence": 3
         },
         {
           "key": "接口兼容",
-          "value": "兼容 OpenAI 接口规范。",
-          "evidence": 1
+          "value": "提供 OpenAI 与 Anthropic 兼容调用方式；具体功能与地域需按模型文档核对。",
+          "evidence": 4
         }
       ],
       "vendor": "阿里云"
@@ -2705,6 +3215,11 @@
           "key": "开发辅助",
           "value": "支持 DAX 表达式生成。",
           "evidence": 1
+        },
+        {
+          "key": "费用边界",
+          "value": "Copilot 消耗 Fabric 容量；触发的 DAX、刷新等下游操作另计。资格、区域和租户开关应按具体体验核对。",
+          "evidence": 2
         }
       ],
       "vendor": "Microsoft"
@@ -2728,7 +3243,7 @@
         {
           "key": "产品定位",
           "value": "辅助生成与编辑创意内容。",
-          "evidence": 0
+          "evidence": 2
         }
       ],
       "vendor": "Adobe"
@@ -2758,6 +3273,11 @@
           "key": "应用用途",
           "value": "工作场景的信息查找、洞察与任务处理。",
           "evidence": 1
+        },
+        {
+          "key": "迁移方向",
+          "value": "不再面向新客户开放；官网引导了解 Amazon Quick，具体功能与迁移方式另行评估。",
+          "evidence": 2
         }
       ],
       "vendor": "AWS"
@@ -2778,11 +3298,11 @@
           "图生视频"
         ]
       ],
-      "description": "OpenAI 视频模型资料；Sora 2 Pro 文档标为 Legacy，具体可用性以账户与官方生命周期公告为准。",
+      "description": "Sora 2 历史视频生成资料；模型及 Videos API 已于 2026-09-24 关闭。",
       "facts": [
         {
           "key": "核心能力",
-          "value": "生成音画同步的视频。",
+          "value": "本条来源限定为历史 Sora 2 Pro：曾支持生成音画同步的视频。",
           "evidence": 0
         },
         {
@@ -2792,8 +3312,13 @@
         },
         {
           "key": "文档状态",
-          "value": "Legacy（历史型号）；本条不代表账户仍可调用。",
-          "evidence": 2
+          "value": "已关闭：Sora 2 模型及 Videos API 于 2026-09-24 关闭，官方说明没有一对一替代 API。",
+          "evidence": 3
+        },
+        {
+          "key": "接入状态",
+          "value": "停止服务：Sora 2 / Videos API 已关闭，仅保留历史能力资料，不推荐新项目接入。",
+          "evidence": 4
         }
       ],
       "vendor": "OpenAI"
@@ -2814,7 +3339,7 @@
           "图生视频"
         ]
       ],
-      "description": "OpenAI 视频模型资料；Sora 2 Pro 文档标为 Legacy，具体可用性以账户与官方生命周期公告为准。",
+      "description": "Sora 2 历史视频生成资料；模型及 Videos API 已于 2026-09-24 关闭。",
       "facts": [
         {
           "key": "核心能力",
@@ -2828,11 +3353,857 @@
         },
         {
           "key": "文档状态",
-          "value": "Legacy（历史型号）；本条不代表账户仍可调用。",
-          "evidence": 2
+          "value": "已关闭：Sora 2 模型及 Videos API 于 2026-09-24 关闭，官方说明没有一对一替代 API。",
+          "evidence": 3
+        },
+        {
+          "key": "接入状态",
+          "value": "停止服务：Sora 2 / Videos API 已关闭，仅保留历史能力资料，不推荐新项目接入。",
+          "evidence": 4
         }
       ],
       "vendor": "OpenAI"
+    },
+    {
+      "name": "Qwen3.8-Max",
+      "kind": "model",
+      "source": "qwen-current",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "通用对话"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视觉理解"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视频理解"
+        ]
+      ],
+      "description": "推理与理解效果优先",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "qwen3.8-max",
+          "evidence": 0
+        },
+        {
+          "key": "输入输出",
+          "value": "接收文本、图像、视频，以文本回答；视频理解不等于生成视频。",
+          "evidence": 3
+        },
+        {
+          "key": "上下文窗口",
+          "value": "官方推荐模型表列为 1M；输入、输出及多模态限制需分别核对。",
+          "evidence": 4
+        }
+      ],
+      "vendor": "阿里云"
+    },
+    {
+      "name": "Qwen3.8-Flash",
+      "kind": "model",
+      "source": "qwen-current",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "通用对话"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视觉理解"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视频理解"
+        ]
+      ],
+      "description": "成本优先，先验证目标任务效果",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "qwen3.8-flash",
+          "evidence": 1
+        },
+        {
+          "key": "输入输出",
+          "value": "接收文本、图像、视频，以文本回答；视频理解不等于生成视频。",
+          "evidence": 3
+        },
+        {
+          "key": "上下文窗口",
+          "value": "官方推荐模型表列为 1M；输入、输出及多模态限制需分别核对。",
+          "evidence": 4
+        }
+      ],
+      "vendor": "阿里云"
+    },
+    {
+      "name": "Qwen3.7-Plus",
+      "kind": "model",
+      "source": "qwen-current",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "通用对话"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视觉理解"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视频理解"
+        ]
+      ],
+      "description": "官方默认均衡选择",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "qwen3.7-plus",
+          "evidence": 2
+        },
+        {
+          "key": "输入输出",
+          "value": "接收文本、图像、视频，以文本回答；视频理解不等于生成视频。",
+          "evidence": 3
+        },
+        {
+          "key": "上下文窗口",
+          "value": "官方推荐模型表列为 1M；输入、输出及多模态限制需分别核对。",
+          "evidence": 4
+        }
+      ],
+      "vendor": "阿里云"
+    },
+    {
+      "name": "Kimi K3.1 Pro",
+      "kind": "model",
+      "source": "kimi-current",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "通用对话"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视觉理解"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视频理解"
+        ]
+      ],
+      "description": "Kimi 当前 API 型号；K2 的参数不适用于本型号。",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "kimi-k3.1-pro",
+          "evidence": 0
+        },
+        {
+          "key": "支持输入",
+          "value": "支持文本、图片与视频输入，适合知识工作与编程 Agent；具体输入参数按模型页核对。",
+          "evidence": 3
+        },
+        {
+          "key": "接入地址",
+          "value": "OpenAI 兼容示例 Base URL：https://api.moonshot.cn/v1。",
+          "evidence": 4
+        },
+        {
+          "key": "上下文窗口",
+          "value": "K3.1 Pro 文档标注 1M token；普通版与高速版的价格需单独核对。",
+          "evidence": 2
+        }
+      ],
+      "vendor": "月之暗面 Moonshot AI"
+    },
+    {
+      "name": "Kimi K3",
+      "kind": "model",
+      "source": "kimi-current",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "通用对话"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视觉理解"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视频理解"
+        ]
+      ],
+      "description": "Kimi 当前 API 型号；K2 的参数不适用于本型号。",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "kimi-k3",
+          "evidence": 1
+        },
+        {
+          "key": "支持输入",
+          "value": "支持文本、图片与视频输入，适合知识工作与编程 Agent；具体输入参数按模型页核对。",
+          "evidence": 3
+        },
+        {
+          "key": "接入地址",
+          "value": "OpenAI 兼容示例 Base URL：https://api.moonshot.cn/v1。",
+          "evidence": 4
+        }
+      ],
+      "vendor": "月之暗面 Moonshot AI"
+    },
+    {
+      "name": "GLM-5.3",
+      "kind": "model",
+      "source": "glm53",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "通用对话"
+        ]
+      ],
+      "description": "文本编程与长程 Agent 模型。",
+      "facts": [
+        {
+          "key": "支持输入",
+          "value": "仅支持文本；需要图像或视频理解时应另选支持视觉的型号。",
+          "evidence": 0
+        },
+        {
+          "key": "上下文窗口",
+          "value": "1M token；最大输出 128K token。",
+          "evidence": 2
+        },
+        {
+          "key": "思考限制",
+          "value": "始终启用思考，不支持禁用；需正确配置推理强度。",
+          "evidence": 3
+        }
+      ],
+      "vendor": "智谱 AI"
+    },
+    {
+      "name": "GLM-5.3-Flash",
+      "kind": "model",
+      "source": "glm53flash",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "通用对话"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视觉理解"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视频理解"
+        ]
+      ],
+      "description": "原生多模态编程与专业任务；FlashX 为独立接入型号。",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "glm-5.3-flash",
+          "evidence": 0
+        },
+        {
+          "key": "支持输入",
+          "value": "视频、图像、文本与文件；输出文本。",
+          "evidence": 2
+        },
+        {
+          "key": "上下文窗口",
+          "value": "1M token，最大输出 128K token。",
+          "evidence": 4
+        },
+        {
+          "key": "思考限制",
+          "value": "仅开启思考，不能关闭；FlashX 是否可用需区分通用 API 与 Coding Plan。",
+          "evidence": 5
+        }
+      ],
+      "vendor": "智谱 AI"
+    },
+    {
+      "name": "GLM-5.3-FlashX",
+      "kind": "model",
+      "source": "glm53flash",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "通用对话"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视觉理解"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视频理解"
+        ]
+      ],
+      "description": "原生多模态编程与专业任务；FlashX 为独立接入型号。",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "glm-5.3-flashx",
+          "evidence": 1
+        },
+        {
+          "key": "支持输入",
+          "value": "视频、图像、文本与文件；输出文本。",
+          "evidence": 2
+        },
+        {
+          "key": "上下文窗口",
+          "value": "1M token，最大输出 128K token。",
+          "evidence": 4
+        },
+        {
+          "key": "思考限制",
+          "value": "仅开启思考，不能关闭；FlashX 是否可用需区分通用 API 与 Coding Plan。",
+          "evidence": 5
+        }
+      ],
+      "vendor": "智谱 AI"
+    },
+    {
+      "name": "GLM-OCR",
+      "kind": "model",
+      "source": "glmocr",
+      "categories": [
+        [
+          "AI 模型",
+          "多模态模型",
+          "文档理解"
+        ]
+      ],
+      "description": "面向 PDF、扫描件和复杂表格的文档解析模型。",
+      "facts": [
+        {
+          "key": "模型规模",
+          "value": "0.9B 参数；资源要求仍随分辨率与并发变化。",
+          "evidence": 0
+        },
+        {
+          "key": "解析任务",
+          "value": "识别文档内容及结构，可用于文档入库和 RAG 预处理。",
+          "evidence": 1
+        },
+        {
+          "key": "表格输出",
+          "value": "复杂表格可输出 HTML；不能把 OCR 模型当作通用视频理解模型。",
+          "evidence": 2
+        },
+        {
+          "key": "输入限制",
+          "value": "官方页面列出最大 100 页；单图及 PDF 大小另按接口核对。",
+          "evidence": 4
+        }
+      ],
+      "vendor": "智谱 AI"
+    },
+    {
+      "name": "GLM-Image",
+      "kind": "model",
+      "source": "glmimage",
+      "categories": [
+        [
+          "AI 模型",
+          "图像生成模型",
+          "文生图"
+        ]
+      ],
+      "description": "偏重海报、PPT 等含文字内容的图像生成。",
+      "facts": [
+        {
+          "key": "使用任务",
+          "value": "可生成包含文字的海报与宣传图；成品文字仍应检查。",
+          "evidence": 0
+        },
+        {
+          "key": "输入限制",
+          "value": "本页 API 文本输入最多 1000 字符。",
+          "evidence": 1
+        },
+        {
+          "key": "输出方式",
+          "value": "API 返回图片 URL，需要下载图片保存。",
+          "evidence": 2
+        }
+      ],
+      "vendor": "智谱 AI"
+    },
+    {
+      "name": "GLM-ASR-2512",
+      "kind": "model",
+      "source": "glm-catalog",
+      "categories": [
+        [
+          "AI 模型",
+          "语音与音频",
+          "语音识别"
+        ]
+      ],
+      "description": "官方当前目录收录的专项模型。",
+      "facts": [
+        {
+          "key": "识别控制",
+          "value": "官方目录说明可自定义词汇，适合业务术语识别；流式及时间戳能力需另查接口。",
+          "evidence": 3
+        },
+        {
+          "key": "官方型号",
+          "value": "GLM-ASR-2512",
+          "evidence": 0
+        }
+      ],
+      "vendor": "智谱 AI"
+    },
+    {
+      "name": "GLM-TTS",
+      "kind": "model",
+      "source": "glm-catalog",
+      "categories": [
+        [
+          "AI 模型",
+          "语音与音频",
+          "语音合成"
+        ]
+      ],
+      "description": "官方当前目录收录的专项模型。",
+      "facts": [
+        {
+          "key": "输出方式",
+          "value": "支持流式与非流式语音合成；音色权限与克隆授权需按实际 API 核对。",
+          "evidence": 5
+        },
+        {
+          "key": "官方型号",
+          "value": "GLM-TTS",
+          "evidence": 1
+        }
+      ],
+      "vendor": "智谱 AI"
+    },
+    {
+      "name": "CogVideoX-3",
+      "kind": "model",
+      "source": "glm-catalog",
+      "categories": [
+        [
+          "AI 模型",
+          "视频生成模型",
+          "文生视频"
+        ]
+      ],
+      "description": "官方当前目录收录的专项模型。",
+      "facts": [
+        {
+          "key": "创作控制",
+          "value": "官方目录列出首尾帧生成；不能从系列名称推断开放权重或本地部署条件。",
+          "evidence": 4
+        },
+        {
+          "key": "官方型号",
+          "value": "CogVideoX-3",
+          "evidence": 2
+        }
+      ],
+      "vendor": "智谱 AI"
+    },
+    {
+      "name": "Gemini 3.8 Flash",
+      "kind": "model",
+      "source": "gemini-current",
+      "categories": [
+        [
+          "AI 模型",
+          "大语言模型",
+          "通用对话"
+        ]
+      ],
+      "description": "Google 官方模型目录条目；当前依据为官方索引，非 API 实测。",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "gemini-3.8-flash",
+          "evidence": 0
+        },
+        {
+          "key": "任务定位",
+          "value": "官方目录面向编程、Agent 与企业工作流；具体模态和限制以单型号文档为准。",
+          "evidence": 0
+        }
+      ],
+      "vendor": "Google"
+    },
+    {
+      "name": "Gemini 3.8 Live",
+      "kind": "model",
+      "source": "gemini-current",
+      "categories": [
+        [
+          "AI 模型",
+          "多模态模型",
+          "声音理解"
+        ],
+        [
+          "AI 模型",
+          "语音与音频",
+          "语音合成"
+        ]
+      ],
+      "description": "Google 官方模型目录条目；当前依据为官方索引，非 API 实测。",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "gemini-3.8-live",
+          "evidence": 1
+        },
+        {
+          "key": "交互形态",
+          "value": "Live API 用于低延迟语音 Agent 与实时对话；此条资料未确认该型号的视频输入能力。",
+          "evidence": 1
+        }
+      ],
+      "vendor": "Google"
+    },
+    {
+      "name": "Gemini 3.8 Flash TTS",
+      "kind": "model",
+      "source": "gemini-current",
+      "categories": [
+        [
+          "AI 模型",
+          "语音与音频",
+          "语音合成"
+        ]
+      ],
+      "description": "Google 官方模型目录条目；当前依据为官方索引，非 API 实测。",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "gemini-3.8-flash-tts",
+          "evidence": 2
+        },
+        {
+          "key": "任务定位",
+          "value": "面向可控语音合成，具体音色、声音设计及复刻权限以官方要求为准。",
+          "evidence": 2
+        }
+      ],
+      "vendor": "Google"
+    },
+    {
+      "name": "Gemini 3.5 Transcribe",
+      "kind": "model",
+      "source": "gemini-current",
+      "categories": [
+        [
+          "AI 模型",
+          "语音与音频",
+          "语音识别"
+        ]
+      ],
+      "description": "Google 官方模型目录条目；当前依据为官方索引，非 API 实测。",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "gemini-3.5-transcribe",
+          "evidence": 3
+        },
+        {
+          "key": "识别能力",
+          "value": "官方目录包含语音转写、说话人区分和词级时间戳；批处理与实时型号须分别核对。",
+          "evidence": 5
+        }
+      ],
+      "vendor": "Google"
+    },
+    {
+      "name": "Gemini Omni Flash",
+      "kind": "model",
+      "source": "gemini-current",
+      "categories": [
+        [
+          "AI 模型",
+          "视频生成模型",
+          "文生视频"
+        ]
+      ],
+      "description": "Google 官方模型目录条目；当前依据为官方索引，非 API 实测。",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "gemini-omni-1.1-flash",
+          "evidence": 4
+        },
+        {
+          "key": "创作任务",
+          "value": "面向视频生成、编辑、插帧与延长；不要与已关闭的旧 preview 型号混用。",
+          "evidence": 4
+        }
+      ],
+      "vendor": "Google"
+    },
+    {
+      "name": "SeedRealtime",
+      "kind": "model",
+      "source": "seed",
+      "categories": [
+        [
+          "AI 模型",
+          "多模态模型",
+          "声音理解"
+        ],
+        [
+          "AI 模型",
+          "多模态模型",
+          "视频理解"
+        ],
+        [
+          "AI 模型",
+          "语音与音频",
+          "语音合成"
+        ]
+      ],
+      "description": "面向全双工音视频交互的实时模型。",
+      "facts": [
+        {
+          "key": "交互能力",
+          "value": "结合声音、视觉和时序线索进行全双工交互；不同于视频生成。",
+          "evidence": 6
+        }
+      ],
+      "vendor": "字节跳动 Seed"
+    },
+    {
+      "name": "Seed Audio 1.0",
+      "kind": "model",
+      "source": "seed",
+      "categories": [
+        [
+          "AI 模型",
+          "语音与音频",
+          "语音合成"
+        ]
+      ],
+      "description": "面向内容创作的音频生成模型。",
+      "facts": [
+        {
+          "key": "任务定位",
+          "value": "覆盖全场景音频生成；具体音轨、接口权限及计费单位需从接入文档确认。",
+          "evidence": 7
+        }
+      ],
+      "vendor": "字节跳动 Seed"
+    },
+    {
+      "name": "Hunyuan TurboS Vision Video",
+      "kind": "model",
+      "source": "tencent",
+      "categories": [
+        [
+          "AI 模型",
+          "多模态模型",
+          "视频理解"
+        ]
+      ],
+      "description": "混元视频生文 API 型号，支持视频描述与问答。",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "hunyuan-turbos-vision-video",
+          "evidence": 8
+        },
+        {
+          "key": "理解任务",
+          "value": "视频描述和视频内容问答；输出文本，不负责生成视频。",
+          "evidence": 9
+        },
+        {
+          "key": "接入状态",
+          "value": "旧混元平台停止新购模型服务；新服务需转至 TokenHub 核对开放型号。",
+          "evidence": 3
+        }
+      ],
+      "vendor": "腾讯"
+    },
+    {
+      "name": "pgvector",
+      "kind": "project",
+      "source": "pgvector",
+      "categories": [
+        [
+          "开源项目",
+          "数据库",
+          "向量数据库"
+        ]
+      ],
+      "description": "在 PostgreSQL 内存储向量并进行相似性查询。",
+      "facts": [
+        {
+          "key": "组件定位",
+          "value": "PostgreSQL 向量扩展，需先生成向量并在数据库启用扩展。",
+          "evidence": 0
+        },
+        {
+          "key": "索引选择",
+          "value": "支持精确及近似最近邻；HNSW 与 IVFFlat 有不同的构建、内存和召回取舍。",
+          "evidence": 2
+        },
+        {
+          "key": "集成边界",
+          "value": "提供向量查询，不自动完成网页采集、切片、嵌入或回答评测。",
+          "evidence": 1
+        }
+      ]
+    },
+    {
+      "name": "RAGFlow",
+      "kind": "framework",
+      "source": "ragflow",
+      "categories": [
+        [
+          "AI 技术框架",
+          "RAG 与知识处理"
+        ]
+      ],
+      "description": "融合文档解析、RAG 与 Agent 的知识处理引擎。",
+      "facts": [
+        {
+          "key": "核心能力",
+          "value": "基于深度文档理解抽取复杂文档知识并组织 RAG 流程；实际召回率需用业务样本验证。",
+          "evidence": 1
+        },
+        {
+          "key": "部署方式",
+          "value": "官方同时提供云服务与本地部署说明；自托管仍需配模型及存储依赖。",
+          "evidence": 3
+        },
+        {
+          "key": "许可证",
+          "value": "仓库标注 Apache-2.0；模型、第三方依赖与托管费用另行核对。",
+          "evidence": 4
+        },
+        {
+          "key": "软件发布版本",
+          "value": "本轮核对发布标签 v1.0.0（2026-11-06）；https://github.com/infiniflow/ragflow/releases/tag/v1.0.0。升级前核对变更和依赖。",
+          "evidence": 5
+        }
+      ]
+    },
+    {
+      "name": "Ragas",
+      "kind": "framework",
+      "source": "ragas",
+      "categories": [
+        [
+          "AI 技术框架",
+          "评估与可观测性"
+        ]
+      ],
+      "description": "面向 RAG 与 Agent 的评测工具。",
+      "facts": [
+        {
+          "key": "评测对象",
+          "value": "官方指南覆盖简单 RAG 系统及 AI Agent；需要准备业务评测样本。",
+          "evidence": 3
+        },
+        {
+          "key": "检索指标",
+          "value": "Context Precision 与 Context Recall 可用于检索评估；指标结果不等于生产质量保证。",
+          "evidence": 1
+        },
+        {
+          "key": "软件发布版本",
+          "value": "本轮核对发布标签 v0.4.3（2026-01-13）；https://github.com/vibrantlabsai/ragas/releases/tag/v0.4.3。升级前核对变更和依赖。",
+          "evidence": 4
+        }
+      ]
+    },
+    {
+      "name": "GPT Image 2.6 Sunburst",
+      "kind": "model",
+      "vendor": "OpenAI",
+      "source": "image26-sunburst",
+      "categories": [
+        [
+          "AI 模型",
+          "图像生成模型",
+          "文生图"
+        ]
+      ],
+      "description": "详细构图与精细编辑",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "gpt-image-2.6-sunburst",
+          "evidence": 0
+        },
+        {
+          "key": "生成任务",
+          "value": "详细构图与精细编辑；接收文字或图片生成与编辑图像，不支持音频或视频模态。",
+          "evidence": 1
+        }
+      ]
+    },
+    {
+      "name": "GPT Image 2.6 Flare",
+      "kind": "model",
+      "vendor": "OpenAI",
+      "source": "image26-flare",
+      "categories": [
+        [
+          "AI 模型",
+          "图像生成模型",
+          "文生图"
+        ]
+      ],
+      "description": "快速迭代图像生成与编辑",
+      "facts": [
+        {
+          "key": "API 模型名",
+          "value": "gpt-image-2.6-flare",
+          "evidence": 0
+        },
+        {
+          "key": "生成任务",
+          "value": "快速迭代图像生成与编辑；接收文字或图片生成与编辑图像，不支持音频或视频模态。",
+          "evidence": 1
+        }
+      ]
     }
   ]
 }

@@ -8,7 +8,7 @@ from app.models import Entity,Fact,Change
 
 def test_curated_import_is_idempotent_and_conflicts_require_review(db):
     data=json.loads((Path(__file__).parent.parent/'data/video-workflow-knowledge-2026-11-07.json').read_text())
-    assert import_curated(db,data)=={'entities':1,'facts':4,'pending':0}
+    assert import_curated(db,data)=={'entities':1,'facts':5,'pending':0}
     db.commit()
     entity=db.scalar(select(Entity).where(Entity.name=='ComfyUI'))
     assert not entity.is_demo

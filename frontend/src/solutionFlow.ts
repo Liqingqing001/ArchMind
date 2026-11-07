@@ -158,8 +158,11 @@ export function rankKnowledge(
     rows
       .filter(
         (r) =>
-          /legacy|不再向新客户|已下线|停止服务/i.test(r.value) &&
-          !prompt.toLowerCase().includes(r.entity_name.toLowerCase()),
+          policy.availability_fields.includes(r.key) &&
+          policy.unavailable_markers.some((marker) =>
+            r.value.toLowerCase().includes(marker),
+          ) &&
+          !(goal + " " + prompt).toLowerCase().includes(r.entity_name.toLowerCase()),
       )
       .map((r) => r.entity_id),
   );
@@ -237,6 +240,23 @@ export function rankKnowledge(
     perEntity: Record<string, number> = {};
   const add = (r: Row) => {
     if (chosen.includes(r) || (perEntity[r.entity_id] || 0) >= 2) return;
+    if (!perEntity[r.entity_id]) {
+      const constraints = ranked
+        .filter(
+          (x) =>
+            x.entity_id === r.entity_id &&
+            policy.constraint_fields.includes(x.key),
+        )
+        .sort(
+          (a, b) =>
+            policy.constraint_fields.indexOf(a.key) -
+            policy.constraint_fields.indexOf(b.key),
+        );
+      if (constraints.length && constraints[0] !== r) {
+        chosen.push(constraints[0]);
+        perEntity[r.entity_id] = 1;
+      }
+    }
     chosen.push(r);
     perEntity[r.entity_id] = (perEntity[r.entity_id] || 0) + 1;
   };

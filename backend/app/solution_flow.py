@@ -84,7 +84,7 @@ def rank_knowledge(rows,entities,categories,links,workflow,prompt):
     by_id = {e['id']:e for e in entities}
     cats = {c['id']:c['name'] for c in categories}
     exact = [t for t in re.findall(r'[a-z0-9][a-z0-9._+-]{1,}',prompt.lower()) if t not in POLICY['stop_terms']]
-    inactive = {r['entity_id'] for r in rows if re.search('legacy|不再向新客户|已下线|停止服务',r['value'],re.I) and r['entity_name'].lower() not in prompt.lower()}
+    inactive = {r['entity_id'] for r in rows if r['key'] in POLICY['availability_fields'] and any(marker in r['value'].lower() for marker in POLICY['unavailable_markers']) and r['entity_name'].lower() not in (goal+' '+prompt).lower()}
     ranked = []
     for row in rows:
         if row.get('is_demo') or row['entity_kind']=='vendor' or row['entity_id'] in inactive:
@@ -113,6 +113,11 @@ def rank_knowledge(rows,entities,categories,links,workflow,prompt):
     def add(r):
         if r in chosen or counts.get(r['entity_id'],0)>=2:
             return
+        if not counts.get(r['entity_id']):
+            constraints = [x for x in ranked if x['entity_id']==r['entity_id'] and x['key'] in POLICY['constraint_fields']]
+            constraints.sort(key=lambda x: POLICY['constraint_fields'].index(x['key']))
+            if constraints and constraints[0] is not r:
+                chosen.append(constraints[0]);counts[r['entity_id']]=1
         chosen.append(r)
         counts[r['entity_id']] = counts.get(r['entity_id'],0)+1
     if scene:

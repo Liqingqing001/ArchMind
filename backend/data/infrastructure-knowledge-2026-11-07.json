@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "batch_id": "gpu-inference-platforms-2026-11-07",
+  "batch_id": "infrastructure-full-audit-2026-11-07",
   "checked_on": "2026-11-07",
   "sources": [
     {
@@ -11,7 +11,8 @@
         "GPU云服务器属平台提供的计算能力的一种",
         "按量计费、包年包月、抢占式实例",
         "计费项包括实例规格、云盘、公网IP等",
-        "具体费用请以云服务器控制台实际下单结果为准"
+        "具体费用请以云服务器控制台实际下单结果为准",
+        "A100/A800"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "public_web_official_document_excerpt",
@@ -250,11 +251,12 @@
       "excerpts": [
         "本工作流已提供API服务",
         "https://openapi.liblibai.cloud/api/generate/comfyui/app",
-        "输出视频的节点ID"
+        "输出视频的节点ID",
+        "7天"
       ],
       "checked_on": "2026-11-07",
-      "capture_method": "public_web_official_document_excerpt",
-      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+      "capture_method": "official_search_index_excerpt",
+      "note": "直接页面仅返回标题；本轮以官方页面搜索索引交叉核验接口与结果字段，未验证实际调用和账户权限。"
     },
     {
       "id": "infra-19",
@@ -317,7 +319,8 @@
       "excerpts": [
         "'NV' family",
         "graphics rendering, simulation, and virtual desktops",
-        "size family or series"
+        "size family or series",
+        "'NC' sub-family"
       ],
       "checked_on": "2026-11-07",
       "capture_method": "public_web_official_document_excerpt",
@@ -356,6 +359,11 @@
           "key": "报价边界",
           "value": "价格计算器仅为参考，实际费用以下单控制台为准。",
           "evidence": 3
+        },
+        {
+          "key": "续费限制",
+          "value": "文档列明部分 A100/A800 包年包月规格续费受限，需联系客户经理；库存与续费不能仅依据历史型号列表推断。",
+          "evidence": 4
         }
       ]
     },
@@ -939,6 +947,11 @@
           "key": "视频结果",
           "value": "工作流接口参数包含视频输出节点 ID，需要与实际工作流节点对应。",
           "evidence": 2
+        },
+        {
+          "key": "结果留存",
+          "value": "文档说明结果地址有 7 天有效期，获取后应自行保存；不能把临时链接当持久素材库。",
+          "evidence": 3
         }
       ]
     },
@@ -1094,6 +1107,11 @@
           "key": "选型入口",
           "value": "从虚拟机尺寸家族和具体系列核对目标规格，不使用泛称 GPU 替代系列规格。",
           "evidence": 2
+        },
+        {
+          "key": "训练与推理",
+          "value": "NC / ND 系列面向 GPU 计算和深度学习，NV 侧重图形任务；不能把 NV 当成所有 AI 训练的默认系列。",
+          "evidence": 3
         }
       ]
     }
