@@ -274,21 +274,48 @@
           "terms": [
             "gpu",
             "算力"
+          ],
+          "categories": [
+            "GPU租赁与算力"
+          ],
+          "entities": [
+            "腾讯云"
+          ],
+          "kinds": [
+            "cloud"
           ]
         },
         {
-          "name": "托管推理",
+          "name": "模型 API 与托管推理",
           "terms": [
             "serverless",
             "托管推理",
             "推理端点"
+          ],
+          "categories": [
+            "模型API与推理"
+          ],
+          "entities": [],
+          "kinds": [
+            "cloud",
+            "api"
           ]
         },
         {
-          "name": "云端工作流",
+          "name": "工作流工具与托管",
           "terms": [
             "comfyui",
             "工作流"
+          ],
+          "categories": [
+            "云端工作流"
+          ],
+          "entities": [
+            "ComfyUI"
+          ],
+          "kinds": [
+            "product",
+            "project"
           ]
         }
       ],

@@ -250,3 +250,26 @@ for (const name of [
 console.log(
   "PASS: search settings isolation, bounded official API requests, safe URLs, separate web citations, explicit errors/empty/partial states, frozen continuation and researched GPU coverage",
 );
+const { matchesSceneTask, solutionPolicy } = await import(
+  "../src/solutionFlow.ts"
+);
+const gpuScene = solutionPolicy.scenes.find((s) => s.id === "gpu");
+const gpuTask = (name) => {
+  const entity = seed.entities.find((e) => e.name === name);
+  const labels = seed.links
+    .filter((l) => l.entity_id === entity.id)
+    .map((l) => seed.categories.find((c) => c.id === l.category_id).name);
+  return gpuScene.tasks.find((t) =>
+    matchesSceneTask(
+      t,
+      entity,
+      (entity.name + " " + entity.description).toLowerCase(),
+      labels,
+    ),
+  )?.name;
+};
+assert.equal(gpuTask("AnyGPU 算力云"), "GPU算力");
+assert.equal(gpuTask("火山方舟"), "模型 API 与托管推理");
+assert.equal(gpuTask("Modal Serverless"), "模型 API 与托管推理");
+assert.equal(gpuTask("ComfyUI"), "工作流工具与托管");
+assert.equal(gpuTask("Dify"), undefined);
