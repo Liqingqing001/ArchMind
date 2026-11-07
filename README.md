@@ -6,13 +6,28 @@ ArchMind 是通过对话生成解决方案的 AI 知识平台。用户配置自�
 
 ## 实际运行截图
 
-以下截图来自 2026-11-07 本地实际运行的统一知识浏览界面。当前尚未发布 GitHub Pages 演示站。
+以下截图来自 2026-11-07 本地实际运行的统一知识浏览界面。已增加 GitHub Pages 静态体验构建，部署方式见下文。
 
 ![ArchMind 知识浏览中的模型资料与下载](docs/screenshots/knowledge-models-20261107.jpg)
 
 早期演示数据验收截图仍保存在 `docs/screenshots/`。
 
 GitHub Pages 的展示方案见 [面试演示部署说明](docs/github-pages.md)。
+
+## GitHub Pages 体验模式
+
+已增加无需 API Key 的公开体验构建，复用当前对话、知识库和知识管理界面。可体验 116 个公开知识条目与模型下载、引用、历史、模拟审核和版本追溯。对话明确标为静态模板演示；访客操作只存在各自浏览器，不会调用真实模型或采集器。
+
+```bash
+cd frontend
+npm ci
+npm run test:demo
+npm run build:demo
+```
+
+合并 main 后由 Pages 工作流发布。仓库所有者需在 Settings → Pages 将 Source 选为 GitHub Actions；当前连接对 Pages 启用接口缺少权限，部署状态以 Actions 结果为准。详见 [Pages 部署和验收](docs/github-pages.md)。
+
+本地与云端并行开发遵循 [协作约定](docs/collaboration.md)：开工前同步最新 main，在独立分支开发，PR 合并前再次检查远端，不覆盖或强推共享分支。
 
 ## 获取项目
 

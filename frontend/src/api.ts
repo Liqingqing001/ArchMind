@@ -6,6 +6,9 @@ export async function api<T = any>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
+  if (import.meta.env.VITE_DEMO_MODE === "true") {
+    return (await import("./demo/api")).demoApi<T>(path, options);
+  }
   const response = await fetch(`/api${path}`, {
     ...options,
     headers: {

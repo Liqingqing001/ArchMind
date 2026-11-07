@@ -4,6 +4,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ArrowDown, ArrowUp, BookOpen, Check, Copy, Download, History, Loader2, MessageSquare, Pencil, Plus, Search, Settings2, Sparkles, Trash2, X } from "lucide-react";
 import { api, post } from "./api";
+import { isDemo } from "./demo/mode";
 import { ModelSettings } from "./ModelSettings";
 import { Connection, presetConnection } from "./modelProviders";
 
@@ -68,7 +69,7 @@ export function AgentWorkspace({ visible, openSnapshot }: { visible: boolean; op
   const current = activeId ? documents[activeId] : undefined;
   const draftKey = activeId || "new";
   const draft = drafts[draftKey] || "";
-  const configured = !!connection.api_key.trim() && !!connection.model.trim();
+  const configured = isDemo || (!!connection.api_key.trim() && !!connection.model.trim());
   const matching = history.filter(h => (h.title + h.preview).toLowerCase().includes(search.trim().toLowerCase()));
   const putConversation = (conversation: Conversation) => {
     setDocuments(v => v[conversation.id]?.revision > conversation.revision ? v : { ...v, [conversation.id]: conversation });
@@ -166,19 +167,19 @@ export function AgentWorkspace({ visible, openSnapshot }: { visible: boolean; op
       : <><button className="history-select" title={row.title} onClick={() => openConversation(row.id)}>{pending?.id === row.id ? <Loader2 size={15} className="spin" /> : <MessageSquare size={15} />}<span>{row.title}<small>{row.message_count ? Math.floor(row.message_count / 2) + " 轮对话" : "尚未开始"} · {new Date(row.updated_at).toLocaleDateString("zh-CN",{month:"numeric",day:"numeric"})}</small></span></button><div className="history-item-actions"><button aria-label={`重命名对话：${row.title}`} onClick={() => { setRenameId(row.id); setRenameTitle(row.title); }}><Pencil size={13} /></button><button aria-label={`删除对话：${row.title}`} disabled={pending?.id === row.id} onClick={() => remove(row)}><Trash2 size={13} /></button></div></>}
     </div>)}
     {!loadingHistory && !matching.length && <p className="history-empty">{search ? "没有匹配的对话" : "开始对话后，记录会保存在这里。"}</p>}</div>
-    <small className="history-storage">历史自动保存到当前工作空间</small>
+    <small className="history-storage">{isDemo ? "历史仅保存在此浏览器" : "历史自动保存到当前工作空间"}</small>
   </section>;
   return <>
     {historySlot && createPortal(historyPanel, historySlot)}
     <section className="agent-workspace chat-layout" hidden={!visible}>
       <header className="conversation-header"><div><button className="icon-button mobile-only" aria-label="打开历史对话" onClick={() => setHistoryOpen(true)}><History size={19} /></button><h1 title={current?.title}>{current?.title || "方案对话"}</h1></div>
         <div><button className="icon-button mobile-only" aria-label="新建对话" disabled={creating || pending?.id === "new"} onClick={newConversation}><Plus size={20} /></button>{!!current?.messages.length && <button className="icon-button" aria-label="导出当前对话" title="导出 Markdown" onClick={exportChat}><Download size={18} /></button>}
-          <button className="model-switch" onClick={() => setSettingsOpen(true)}><span className={configured ? "model-ready-dot" : "model-empty-dot"} /><span>{configured ? connection.model : "连接模型"}</span><Settings2 size={16} /></button>
+          <button className="model-switch" onClick={() => setSettingsOpen(true)}><span className={configured ? "model-ready-dot" : "model-empty-dot"} /><span>{isDemo ? "免密体验 · 静态演示" : configured ? connection.model : "连接模型"}</span><Settings2 size={16} /></button>
         </div>
       </header>
       <div className="conversation-scroll" ref={scrollRef} onScroll={e => { const el = e.currentTarget; nearBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 180; setShowLatest(!nearBottom.current); }}>
         {loadingId === activeId && !current ? <div className="conversation-loading"><Loader2 className="spin" />读取对话…</div> : <>
-          {!current?.messages.length && pending?.id !== draftKey && <div className="chat-start"><span className="start-icon"><Sparkles size={25} /></span><h2>把想法，变成可执行的方案。</h2><p>说说目标、预算与限制，我会参考知识库与你一起完善。</p><div className="start-suggestions">{suggestions.map(s => <button key={s.title} onClick={() => setDrafts(v => ({ ...v, [draftKey]: s.text }))}><MessageSquare size={16} />{s.title}<ArrowUp size={14} /></button>)}</div></div>}
+          {!current?.messages.length && pending?.id !== draftKey && <div className="chat-start"><span className="start-icon"><Sparkles size={25} /></span><h2>把想法，变成可执行的方案。</h2><p>{isDemo ? "先体验公开知识检索与引用；演示对话不调用大模型，无需 API Key。" : "说说目标、预算与限制，我会参考知识库与你一起完善。"}</p><div className="start-suggestions">{suggestions.map(s => <button key={s.title} onClick={() => setDrafts(v => ({ ...v, [draftKey]: s.text }))}><MessageSquare size={16} />{s.title}<ArrowUp size={14} /></button>)}</div></div>}
           <div className="conversation">{current?.messages.map(turn => <Reply key={turn.id} turn={turn} openSnapshot={openSnapshot} />)}{pending?.id === draftKey && <><article className="chat-message user"><header>你</header><p className="user-text">{pending.content}</p></article><div className="chat-progress" role="status"><Loader2 className="spin" size={18} />正在参考知识库，生成方案…<span>{elapsed}s</span></div></>}</div>
         </>}
       </div>
@@ -186,7 +187,7 @@ export function AgentWorkspace({ visible, openSnapshot }: { visible: boolean; op
         {showLatest && <button className="jump-latest" onClick={() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" })}><ArrowDown size={15} />回到最新消息</button>}
         {errors[draftKey] && <div className="send-error" role="alert"><span>{errors[draftKey]}</span>{activeId && <button onClick={() => openConversation(activeId)}>重新载入</button>}<button aria-label="关闭发送错误" onClick={() => setErrors(v => ({ ...v, [draftKey]: "" }))}><X size={15} /></button></div>}
         <form className="chat-composer" onSubmit={send}><label className="sr-only" htmlFor="solution-prompt">你的需求</label><textarea id="solution-prompt" rows={3} placeholder="描述你的需求，或继续追问…" maxLength={6000} disabled={pending?.id === draftKey} value={draft} onChange={e => setDrafts(v => ({ ...v, [draftKey]: e.target.value }))} onKeyDown={e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && !e.nativeEvent.isComposing) { e.preventDefault(); e.currentTarget.form?.requestSubmit(); } }} /><div><span>{pending && pending.id !== draftKey ? "另一段对话正在生成，完成后可发送" : "Ctrl + Enter 发送 · Enter 换行"}</span>{configured ? <button className="button primary" disabled={!!pending || creating || !draft.trim() || loadingId === activeId || (!!activeId && !current)}><ArrowUp size={17} />发送</button> : <button type="button" className="button primary" onClick={() => setSettingsOpen(true)}>连接模型</button>}</div></form>
-        <p className="composer-caption"><BookOpen size={12} />基于已发布知识回答 · 重要结论请核对引用来源</p>
+        <p className="composer-caption"><BookOpen size={12} />{isDemo ? "静态演示，不调用模型 · 基于本地已发布资料展示引用" : "基于已发布知识回答 · 重要结论请核对引用来源"}</p>
       </div>
     </section>
     {settingsOpen && <ModelSettings connection={connection} provider={provider} onClose={() => setSettingsOpen(false)} onSave={(value, selected) => { setConnection(value); setProvider(selected); setSettingsOpen(false); }} />}
