@@ -1,8 +1,12 @@
+import { WebEvidence } from "./WebEvidence";
+import { SearchSettings } from "./SearchSettings";
+import { loadSearchSettings, saveSearchSettings, clearSearchSettings, SEARCH_SETTINGS_EVENT, SEARCH_SETTINGS_KEY } from "./webSearch";
+import type { SearchConnection, WebSearch, WebResult } from "./webSearch";
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ArrowDown, ArrowUp, BookOpen, Check, Copy, Download, History, Loader2, MessageSquare, Pencil, Plus, Search, Settings2, Sparkles, Trash2, X } from "lucide-react";
+import { ArrowDown, ArrowUp, BookOpen, Check, Copy, Download, History, Loader2, Globe2, MessageSquare, Pencil, Plus, Search, Settings2, Sparkles, Trash2, X } from "lucide-react";
 import { api, post } from "./api";
 import { isDemo } from "./demo/mode";
 import { ModelSettings } from "./ModelSettings";
@@ -12,7 +16,7 @@ import type { Workflow } from "./solutionFlow";
 import { Connection, presetConnection } from "./modelProviders";
 
 type Citation = { citation_id: string; entity_name: string; key: string; value: string; snapshot_id: string; source_url: string; version: number };
-type Answer = { answer: string; citations: Citation[]; retrieved: Citation[]; warnings: string[]; trace_id: string; model: string; workflow?:Workflow; finish_reason?:string; diagnostics?:Record<string,any> };
+type Answer = { answer: string; citations: Citation[]; retrieved: Citation[]; warnings: string[]; trace_id: string; model: string; workflow?:Workflow; finish_reason?:string; diagnostics?:Record<string,any>; web_search?:WebSearch; web_citations?:WebResult[] };
 type Turn = { id: string; role: "user" | "assistant"; content: string; result?: Answer };
 type Summary = { id: string; title: string; revision: number; updated_at: string; message_count: number; preview: string };
 type Conversation = Summary & { messages: Turn[] };
@@ -34,12 +38,13 @@ function Reply({ turn, openSnapshot }: { turn: Turn; openSnapshot: (id: string) 
     }}>{turn.content}</Markdown></div>}
     {turn.result && <>
       {(turn.result.warnings||[]).map(w => <p className="chat-warning" key={w}>{w}</p>)}
-      <div className="reply-actions"><button onClick={copy}>{copied ? <Check size={14} /> : <Copy size={14} />}{copied ? "已复制" : "复制回答"}</button>{turn.result.trace_id&&<span>{turn.result.citations.length} 条引用 · {turn.result.retrieved.length} 条检索资料</span>}</div>
+      <div className="reply-actions"><button onClick={copy}>{copied ? <Check size={14} /> : <Copy size={14} />}{copied ? "已复制" : "复制回答"}</button>{turn.result.trace_id&&<span>{turn.result.citations.length+(turn.result.web_citations?.length||0)} 条引用 · {turn.result.retrieved.length} 条库内资料 · {turn.result.web_search?.results.length||0} 条网页</span>}</div>
       {copyError && <p role="status">{copyError}</p>}
       {!!turn.result.trace_id && <details className="reply-sources"><summary><BookOpen size={14} />查看知识来源</summary>
         {turn.result.citations.map(c => <button className="citation-row" key={c.citation_id} onClick={() => openSnapshot(c.snapshot_id)}><b>[{c.citation_id}] {c.entity_name}</b><span>{c.key}：{c.value}</span><small>事实 v{c.version} · 查看证据</small></button>)}
         <details><summary>全部检索资料（{turn.result.retrieved.length}）</summary>{turn.result.retrieved.map(c => <p key={c.citation_id}><b>[{c.citation_id}] {c.entity_name}</b> · {c.key}：{c.value}<br /><a href={c.source_url} target="_blank" rel="noreferrer">官方资料 ↗</a></p>)}<small>检索记录：{turn.result.trace_id}</small></details>
       </details>}
+      <WebEvidence web={turn.result.web_search} citations={turn.result.web_citations}/>
       {turn.result.diagnostics && turn.result.workflow?.phase==="generated" && <details className="reply-status"><summary>回复状态</summary><p>停止原因：{turn.result.finish_reason==="length"?"达到输出上限":turn.result.finish_reason==="content_filter"?"服务商限制输出":"正常结束"} · 输出上限：{turn.result.diagnostics.output_limit||"未记录"} tokens</p><p>服务商用量：{Object.entries(turn.result.diagnostics.usage||{}).map(([key,value])=>`${key}: ${value}`).join(" · ")||"未返回"}</p></details>}
     </>}
   </article>;
@@ -47,6 +52,9 @@ function Reply({ turn, openSnapshot }: { turn: Turn; openSnapshot: (id: string) 
 export function AgentWorkspace({ visible, openSnapshot }: { visible: boolean; openSnapshot: (id: string) => void }) {
   const [connection, setConnection] = useState<Connection>(() => loadModelSettings()?.connection || presetConnection("DeepSeek"));
   const [provider, setProvider] = useState(() => loadModelSettings()?.provider || "DeepSeek");
+  const [searchConnection,setSearchConnection]=useState<SearchConnection>(()=>loadSearchSettings());
+  const [searchSettingsOpen,setSearchSettingsOpen]=useState(false);
+  useEffect(()=>{const reload=()=>setSearchConnection(loadSearchSettings());const storage=(e:StorageEvent)=>{if(e.key===SEARCH_SETTINGS_KEY||e.key===null)reload();};window.addEventListener(SEARCH_SETTINGS_EVENT,reload);window.addEventListener("storage",storage);return()=>{window.removeEventListener(SEARCH_SETTINGS_EVENT,reload);window.removeEventListener("storage",storage);};},[]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [history, setHistory] = useState<Summary[]>([]);
   const [documents, setDocuments] = useState<Record<string, Conversation>>({});
@@ -156,14 +164,14 @@ export function AgentWorkspace({ visible, openSnapshot }: { visible: boolean; op
       }
       nearBottom.current = true;
       setDrafts(v => ({ ...v, [id]: "" })); setErrors(v => ({ ...v, [id]: "" }));
-      const result = await post("/agent/chat", { connection, action, conversation_id: id, revision: conversation.revision, messages: [{ role: "user", content }] });
+      const result = await post("/agent/chat", { connection, web_search:searchConnection, action, conversation_id: id, revision: conversation.revision, messages: [{ role: "user", content }] });
       putConversation(result.conversation);
     } catch (e) { setErrors(v => ({ ...v, [id]: (e as Error).message })); setDrafts(v => ({ ...v, [id]: content })); }
     finally { setPending(null); }
   };
   const exportChat = () => {
     if (!current?.messages.length) return;
-    const text = "# " + current.title + "\n\n" + current.messages.map(t => "## " + (t.role === "user" ? "你" : "ArchMind") + "\n\n" + t.content + (t.result?.citations.length ? "\n\n" + t.result.citations.map(c => `- [${c.citation_id}] ${c.entity_name} · ${c.key}：${c.value}\n  ${c.source_url}`).join("\n") : "")).join("\n\n");
+    const text = "# " + current.title + "\n\n" + current.messages.map(t => "## " + (t.role === "user" ? "你" : "ArchMind") + "\n\n" + t.content + ((t.result?.web_citations?.length||0)>0?"\n\n"+t.result!.web_citations!.map(c=>`- [${c.citation_id}] ${c.title}\n  ${c.url}\n  检索时间：${c.searched_at}`).join("\n"):"") + (t.result?.citations.length ? "\n\n" + t.result.citations.map(c => `- [${c.citation_id}] ${c.entity_name} · ${c.key}：${c.value}\n  ${c.source_url}`).join("\n") : "")).join("\n\n");
     const url = URL.createObjectURL(new Blob([text], { type: "text/markdown;charset=utf-8" }));
     const link = document.createElement("a"); link.href = url; link.download = current.title.replace(/[\\/:*?"<>|]/g,"_").slice(0,60)+".md"; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
@@ -182,9 +190,11 @@ export function AgentWorkspace({ visible, openSnapshot }: { visible: boolean; op
   </section>;
   return <>
     {historySlot && createPortal(historyPanel, historySlot)}
+    {searchSettingsOpen&&<SearchSettings connection={searchConnection} onClose={()=>setSearchSettingsOpen(false)} onSave={value=>{setSearchConnection(saveSearchSettings(value));setSearchSettingsOpen(false);}} onClear={()=>{clearSearchSettings();setSearchConnection(loadSearchSettings());setSearchSettingsOpen(false);}}/>}
     <section className="agent-workspace chat-layout" hidden={!visible}>
       <header className="conversation-header"><div><button className="icon-button mobile-only" aria-label="打开历史对话" onClick={() => setHistoryOpen(true)}><History size={19} /></button><h1 title={current?.title}>{current?.title || "方案对话"}</h1></div>
         <div><button className="icon-button mobile-only" aria-label="新建对话" disabled={creating || pending?.id === "new"} onClick={newConversation}><Plus size={20} /></button>{!!current?.messages.length && <button className="icon-button" aria-label="导出当前对话" title="导出 Markdown" onClick={exportChat}><Download size={18} /></button>}
+          <button className={`web-search-switch ${searchConnection.enabled?"enabled":""}`} onClick={()=>setSearchSettingsOpen(true)} title={searchConnection.enabled?"联网检索已启用":"配置联网检索"}><Globe2 size={15}/><span>联网检索{searchConnection.enabled?"：开":"：关"}</span></button>
           <button className="model-switch" onClick={() => setSettingsOpen(true)}><span className={configured ? "model-ready-dot" : "model-empty-dot"} /><span>{hasConnection ? connection.model : "连接模型"}</span><Settings2 size={16} /></button>
         </div>
       </header>

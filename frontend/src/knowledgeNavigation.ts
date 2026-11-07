@@ -93,16 +93,21 @@ export function buildKnowledgeNavigation(
         rule.paths.map((path) => [...path, vendor]),
       );
       if (!paths.length) paths = [["其他知识", "待整理模型", vendor]];
-    } else
-      paths = [
-        [
-          ...((policy.kind_paths as Record<string, string[]>)[entity.kind] || [
-            "其他知识",
-            "待整理模型",
-          ]),
-          vendor,
-        ],
-      ];
+    } else {
+      const services = policy.service_rules.filter((rule) =>
+        tags.has(rule.category),
+      );
+      paths = services.length
+        ? services.map((rule) => [...rule.path, vendor])
+        : [
+            [
+              ...((policy.kind_paths as Record<string, string[]>)[
+                entity.kind
+              ] || ["其他知识", "待整理模型"]),
+              vendor,
+            ],
+          ];
+    }
     for (const path of paths) {
       path.forEach((_, i) => {
         const node = ensure(path.slice(0, i + 1));

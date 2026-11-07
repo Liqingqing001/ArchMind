@@ -1,0 +1,1101 @@
+{
+  "schema_version": 1,
+  "batch_id": "gpu-inference-platforms-2026-11-07",
+  "checked_on": "2026-11-07",
+  "sources": [
+    {
+      "id": "infra-1",
+      "title": "火山引擎 GPU 云服务器 官方资料",
+      "url": "https://docs.volcengine.com/docs/gpu/billing?lang=zh",
+      "excerpts": [
+        "GPU云服务器属平台提供的计算能力的一种",
+        "按量计费、包年包月、抢占式实例",
+        "计费项包括实例规格、云盘、公网IP等",
+        "具体费用请以云服务器控制台实际下单结果为准"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-2",
+      "title": "OneThingAI 官方资料",
+      "url": "https://onethingai.com/",
+      "excerpts": [
+        "模型 API 服务",
+        "面向企业的专属算力",
+        "整机独享",
+        "资源报价联系商务询价",
+        "管理本地私有GPU集群"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-3",
+      "title": "AnyGPU 算力云 官方资料",
+      "url": "https://www.anygpu.cn/gpu.html",
+      "excerpts": [
+        "GPU租赁",
+        "RTX 3080/3090/4090/5090",
+        "按小时、按天、按月、按年计费",
+        "预装CUDA、cuDNN、PyTorch、TensorFlow"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-4",
+      "title": "AutoDL 官方资料",
+      "url": "https://www.autodl.com/docs/price/",
+      "excerpts": [
+        "容器实例支持按量计费和包年包月",
+        "以实例开关机时间为准",
+        "无论实例是否开机，均会计费",
+        "关机后GPU不会预留",
+        "请以网站显示的现价为准"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-5",
+      "title": "矩池云 官方资料",
+      "url": "https://www.matpool.com/catalog/pricing",
+      "excerpts": [
+        "云算力云存储模型 API",
+        "仅实例处于运行中时计费",
+        "启动、保存、恢复、不可用状态不计费",
+        "包日 / 包周 / 包月",
+        "网盘扩容"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-6",
+      "title": "Featurize 官方资料",
+      "url": "https://docs.featurize.cn/docs/manual/instance-rent",
+      "excerpts": [
+        "按量使用和长期租用",
+        "实际是以分钟为单位计费",
+        "是不能够中途退、换实例得",
+        "先按量使用测试机型",
+        "到期自动归还"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-7",
+      "title": "RunPod GPU Pods 官方资料",
+      "url": "https://docs.runpod.io/pods/storage/types",
+      "excerpts": [
+        "Pods offer four storage types",
+        "cleared when the Pod stops",
+        "deleted when the Pod is terminated",
+        "Retained independently",
+        "/workspace"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-8",
+      "title": "Vast.ai 官方资料",
+      "url": "https://docs.vast.ai/guides/instances/pricing",
+      "excerpts": [
+        "Market-driven rates",
+        "compute, storage, and bandwidth",
+        "Storage charges continue",
+        "On-demand",
+        "CLI"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-9",
+      "title": "Lambda GPU Cloud 官方资料",
+      "url": "https://lambda.com/instances",
+      "excerpts": [
+        "8x, 4x, 2x, or 1x GPU",
+        "from POC to production",
+        "create, stop, and restart",
+        "CLI, CI/CD"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-10",
+      "title": "Modal Serverless 官方资料",
+      "url": "https://modal.com/pricing",
+      "excerpts": [
+        "Modal is serverless",
+        "billed by the second",
+        "can't be directly compared",
+        "Functions and Sandboxes"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-11",
+      "title": "腾讯云 HAI 官方资料",
+      "url": "https://cloud.tencent.cn/document/product/1721/102027",
+      "excerpts": [
+        "CPU、GPU 和内存将进行释放",
+        "算力（CPU、GPU、内存）将停止计费",
+        "云盘将继续计费",
+        "可能会因实例资源不足导致启动失败"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-12",
+      "title": "阿里云 PAI EAS 官方资料",
+      "url": "https://help.aliyun.com/zh/pai/product-overview/billing-of-eas",
+      "excerpts": [
+        "模型在线服务 (EAS)",
+        "使用公共资源部署的服务",
+        "OSS、NAS",
+        "建议停止或删除该服务实例"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-13",
+      "title": "火山方舟 官方资料",
+      "url": "https://console.volcengine.com/ark/region%3Acn-beijing/docs/online-inference-standard",
+      "excerpts": [
+        "直接通过 Model ID 调用",
+        "无需创建接入点",
+        "https://ark.cn-beijing.volces.com/api/v3"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-14",
+      "title": "硅基流动 SiliconFlow 官方资料",
+      "url": "https://siliconflow.cn/pricing",
+      "excerpts": [
+        "大模型 API 价格方案",
+        "输入、输出、缓存命中成本",
+        "按厂商快速定位",
+        "仅展示可用模型"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-15",
+      "title": "Replicate 官方资料",
+      "url": "https://replicate.com/pricing",
+      "excerpts": [
+        "pay for what you use",
+        "price-per-second varies",
+        "how billing works"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-16",
+      "title": "Hugging Face Inference Endpoints 官方资料",
+      "url": "https://huggingface.co/docs/inference-endpoints/en/autoscaling",
+      "excerpts": [
+        "adjust the number of endpoint replicas",
+        "autoscaling to 0",
+        "traffic and accelerator utilization"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-17",
+      "title": "RunningHub 官方资料",
+      "url": "https://www.runninghub.cn/runninghub-api-doc-cn/doc-8287334",
+      "excerpts": [
+        "多模态 AI 能力与大语言模型能力",
+        "图像、视频、音频",
+        "个人账户是使用 RunningHub API 的基础身份"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-18",
+      "title": "LiblibAI 工作流 API 官方资料",
+      "url": "https://www.liblib.art/apis/workflow",
+      "excerpts": [
+        "本工作流已提供API服务",
+        "https://openapi.liblibai.cloud/api/generate/comfyui/app",
+        "输出视频的节点ID"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-19",
+      "title": "Tavily Search API 官方资料",
+      "url": "https://docs.tavily.com/documentation/api-reference/endpoint/search",
+      "excerpts": [
+        "https://api.tavily.com/search",
+        "Authorization: Bearer",
+        "include_raw_content",
+        "max_results"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-20",
+      "title": "博查 Web Search API 官方资料",
+      "url": "https://open.bochaai.com/",
+      "excerpts": [
+        "https://api.bochaai.com/v1/web-search",
+        "Authorization: Bearer",
+        "webPages",
+        "freshness"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "2026-11-07 联网核对的短摘录，非完整页面；服务能力和规则不代表当前库存、实际下单报价或实测性能。"
+    },
+    {
+      "id": "infra-21",
+      "title": "Amazon EC2 GPU 实例 官方资料",
+      "url": "https://aws.amazon.com/ec2/instance-types/accelerated-computing/",
+      "excerpts": [
+        "Accelerated computing",
+        "GPU Memory (GB)",
+        "AI training and inference"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "官方短摘录；不是完整网页，不代表实际库存或最终报价。"
+    },
+    {
+      "id": "infra-22",
+      "title": "Google Cloud GPU 官方资料",
+      "url": "https://docs.cloud.google.com/compute/docs/gpus/about-gpus",
+      "excerpts": [
+        "About GPU instances",
+        "global GPU quota",
+        "NVIDIA RTX Virtual Workstation license"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "官方短摘录；不是完整网页，不代表实际库存或最终报价。"
+    },
+    {
+      "id": "infra-23",
+      "title": "Azure GPU 虚拟机 官方资料",
+      "url": "https://learn.microsoft.com/azure/virtual-machines/sizes-general",
+      "excerpts": [
+        "'NV' family",
+        "graphics rendering, simulation, and virtual desktops",
+        "size family or series"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "public_web_official_document_excerpt",
+      "note": "官方短摘录；不是完整网页，不代表实际库存或最终报价。"
+    }
+  ],
+  "entities": [
+    {
+      "name": "火山引擎 GPU 云服务器",
+      "kind": "cloud",
+      "description": "火山引擎 GPU 云算力；采购时需同时核对实例、云盘、公网IP与地域。",
+      "source": "infra-1",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "GPU租赁与算力"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "服务形态",
+          "value": "GPU 云服务器，计费体系与 ECS 云服务器一致。",
+          "evidence": 0
+        },
+        {
+          "key": "计费方式",
+          "value": "包括按量、包年包月和抢占式实例等方式；不同方式的生命周期规则应分别核对。",
+          "evidence": 1
+        },
+        {
+          "key": "费用组成",
+          "value": "应将实例规格、云盘、公网 IP 一并计入费用。",
+          "evidence": 2
+        },
+        {
+          "key": "报价边界",
+          "value": "价格计算器仅为参考，实际费用以下单控制台为准。",
+          "evidence": 3
+        }
+      ]
+    },
+    {
+      "name": "OneThingAI",
+      "kind": "cloud",
+      "description": "网心科技 OneThingAI：GPU 算力、企业裸金属和多模态模型 API 平台；区分租算力与调用模型。",
+      "source": "infra-2",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "GPU租赁与算力"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "服务范围",
+          "value": "平台同时展示模型 API 服务与企业裸金属算力服务。",
+          "evidence": 0
+        },
+        {
+          "key": "裸金属形态",
+          "value": "面向企业的专属算力，强调物理隔离及自主配置环境。",
+          "evidence": 1
+        },
+        {
+          "key": "资源隔离",
+          "value": "企业裸金属方案提供整机独享和物理隔离，不等同于所有零售实例默认具有同等边界。",
+          "evidence": 2
+        },
+        {
+          "key": "报价方式",
+          "value": "官网裸金属参考系列采用联系商务询价；不能用零售按小时报价替代企业整机报价。",
+          "evidence": 3
+        },
+        {
+          "key": "集群管理",
+          "value": "提供管理本地私有 GPU 集群的企业解决方案。",
+          "evidence": 4
+        }
+      ]
+    },
+    {
+      "name": "AnyGPU 算力云",
+      "kind": "cloud",
+      "description": "AnyGPU GPU 云主机与算力租赁，面向训练、推理和内容创作；具体配置和库存到官网核验。",
+      "source": "infra-3",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "GPU租赁与算力"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "服务形态",
+          "value": "提供 GPU 租赁和云主机，官方页面列出 RTX 系列配置。",
+          "evidence": 0
+        },
+        {
+          "key": "型号范围",
+          "value": "页面列举 RTX 3080、3090、4090、5090；此列表不保证当前有库存。",
+          "evidence": 1
+        },
+        {
+          "key": "计费方式",
+          "value": "支持按小时及按天、月、年等方式，选择时核对具体配置对应价格。",
+          "evidence": 2
+        },
+        {
+          "key": "环境工具",
+          "value": "页面介绍预装 CUDA、cuDNN、PyTorch、TensorFlow 等框架；具体镜像版本需在订单核对。",
+          "evidence": 3
+        }
+      ]
+    },
+    {
+      "name": "AutoDL",
+      "kind": "cloud",
+      "description": "AutoDL GPU 算力容器实例；实例计费、付费数据盘和关机后 GPU 预留规则需要分开核算。",
+      "source": "infra-4",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "GPU租赁与算力"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "计费方式",
+          "value": "容器实例支持按量和包年包月。",
+          "evidence": 0
+        },
+        {
+          "key": "计费时段",
+          "value": "按量实例开机起计费、关机结束实例计费；按开关机时段，不按是否实际运行 GPU 计算。",
+          "evidence": 1
+        },
+        {
+          "key": "付费数据盘",
+          "value": "按量实例的付费扩容数据盘独立计费，关机不会自动停止这部分费用。",
+          "evidence": 2
+        },
+        {
+          "key": "资源预留",
+          "value": "按量实例关机后 GPU 不预留，再次启动可能需要等待或迁移。",
+          "evidence": 3
+        },
+        {
+          "key": "报价入口",
+          "value": "各型号 GPU 以网站当前显示价格为准。",
+          "evidence": 4
+        }
+      ]
+    },
+    {
+      "name": "矩池云",
+      "kind": "cloud",
+      "description": "矩池云云算力、云存储和模型 API；按时与包周期适用规则不同。",
+      "source": "infra-5",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "GPU租赁与算力"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "服务范围",
+          "value": "定价页分别提供云算力、云存储、模型 API 等产品的规则。",
+          "evidence": 0
+        },
+        {
+          "key": "按时计费",
+          "value": "云算力按时计费仅在实例运行中产生实例费用。",
+          "evidence": 1
+        },
+        {
+          "key": "实例状态",
+          "value": "启动、保存、恢复、不可用状态不计该项算力费用。",
+          "evidence": 2
+        },
+        {
+          "key": "包周期",
+          "value": "支持包日、周、月，下单时预付，需核对到期释放及续费选择。",
+          "evidence": 3
+        },
+        {
+          "key": "存储边界",
+          "value": "网盘扩容单独列为云存储产品，不应把算力停止计费等同所有产品免费。",
+          "evidence": 4
+        }
+      ]
+    },
+    {
+      "name": "Featurize",
+      "kind": "cloud",
+      "description": "机器学习在线实验 GPU 实例；适合交互开发，注意长期租用与数据归还规则。",
+      "source": "infra-6",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "GPU租赁与算力"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "租用方式",
+          "value": "提供按量使用和长期租用两类方式。",
+          "evidence": 0
+        },
+        {
+          "key": "计费粒度",
+          "value": "按量标价为每小时单价，但实际以分钟计费，租用后开始计费。",
+          "evidence": 1
+        },
+        {
+          "key": "长期租用",
+          "value": "长期租用一开始支付固定时长费用，非实例故障一般不能中途退换。",
+          "evidence": 2
+        },
+        {
+          "key": "试用建议",
+          "value": "官方建议先按量测试机型，成功运行后再转长期租用。",
+          "evidence": 3
+        },
+        {
+          "key": "到期选择",
+          "value": "长期租用到期可选择自动归还或转按量，需避免无意继续计费。",
+          "evidence": 4
+        }
+      ]
+    },
+    {
+      "name": "RunPod GPU Pods",
+      "kind": "cloud",
+      "description": "RunPod GPU 实例；容器盘、卷盘和网络卷的数据保留与费用不同。",
+      "source": "infra-7",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "GPU租赁与算力"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "服务形态",
+          "value": "Pods 使用可选存储形态，需按持久性、性能和共享要求选择。",
+          "evidence": 0
+        },
+        {
+          "key": "临时数据",
+          "value": "容器磁盘为临时数据，Pod 停止时会清除。",
+          "evidence": 1
+        },
+        {
+          "key": "卷盘数据",
+          "value": "卷盘数据可跨停止和重启保留，但终止 Pod 会删除。",
+          "evidence": 2
+        },
+        {
+          "key": "独立存储",
+          "value": "网络卷独立保留，可用于跨 Pod 的数据共享。",
+          "evidence": 3
+        },
+        {
+          "key": "备份位置",
+          "value": "默认卷盘挂载 /workspace，重要数据需按所选盘类型安排备份。",
+          "evidence": 4
+        }
+      ]
+    },
+    {
+      "name": "Vast.ai",
+      "kind": "cloud",
+      "description": "GPU 算力市场；报价随供需、主机可靠性、地域与租用类型变化。",
+      "source": "infra-8",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "GPU租赁与算力"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "定价机制",
+          "value": "市场价格随供需变化；不能将某条最低报价视为所有主机的固定价。",
+          "evidence": 0
+        },
+        {
+          "key": "费用组成",
+          "value": "总成本包括 GPU 计算、存储和带宽。",
+          "evidence": 1
+        },
+        {
+          "key": "存储计费",
+          "value": "实例停止后存储费用仍继续，需要分别核对保留数据和删除实例的影响。",
+          "evidence": 2
+        },
+        {
+          "key": "实例类型",
+          "value": "提供按需、预留和可中断类型；可中断任务需考虑恢复机制。",
+          "evidence": 3
+        },
+        {
+          "key": "价格入口",
+          "value": "可以在控制台筛选，也可通过 CLI 或 API 查询当前市场报价。",
+          "evidence": 4
+        }
+      ]
+    },
+    {
+      "name": "Lambda GPU Cloud",
+      "kind": "cloud",
+      "description": "Lambda 按需 GPU 云实例，支持单卡到多卡配置和 API 管理；库存与价格在控制台确认。",
+      "source": "infra-9",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "GPU租赁与算力"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "资源形态",
+          "value": "提供不同 GPU 卡数的云实例，包括单卡及多卡配置。",
+          "evidence": 0
+        },
+        {
+          "key": "任务范围",
+          "value": "官网面向从 PoC 到生产的 AI 工作负载。",
+          "evidence": 1
+        },
+        {
+          "key": "自动化管理",
+          "value": "Lambda Cloud API 可用于创建、停止及重启实例。",
+          "evidence": 2
+        },
+        {
+          "key": "接入方式",
+          "value": "支持在 CLI、CI/CD 或编排脚本中自动化管理实例。",
+          "evidence": 3
+        }
+      ]
+    },
+    {
+      "name": "Modal Serverless",
+      "kind": "cloud",
+      "description": "面向代码部署的 Serverless GPU/CPU 计算，按请求量弹性扩缩；费用口径不同于整机租用。",
+      "source": "infra-10",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "模型API与推理"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "服务形态",
+          "value": "提供 Serverless 计算，并按请求量弹性扩缩。",
+          "evidence": 0
+        },
+        {
+          "key": "计费粒度",
+          "value": "计算类使用按秒计费，涉及 CPU、内存、GPU 时间。",
+          "evidence": 1
+        },
+        {
+          "key": "计费边界",
+          "value": "不能把 Serverless 单价与传统按需或竞价实例直接等价比较。",
+          "evidence": 2
+        },
+        {
+          "key": "计费资源",
+          "value": "Functions 与 Sandboxes 的 CPU、内存、GPU 资源需按用量口径核算。",
+          "evidence": 3
+        }
+      ]
+    },
+    {
+      "name": "腾讯云 HAI",
+      "kind": "cloud",
+      "description": "腾讯云高性能应用服务 HAI；关机释放算力但保留云盘，需核对资源重启与存储收费。",
+      "source": "infra-11",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "GPU租赁与算力"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "停机行为",
+          "value": "关机时释放 CPU、GPU 与内存。",
+          "evidence": 0
+        },
+        {
+          "key": "算力计费",
+          "value": "关机后算力停止计费。",
+          "evidence": 1
+        },
+        {
+          "key": "云盘计费",
+          "value": "云盘继续计费，不应把停机理解成全部费用为零。",
+          "evidence": 2
+        },
+        {
+          "key": "重启限制",
+          "value": "因算力资源已释放，重启时可能遇到库存不足。",
+          "evidence": 3
+        }
+      ]
+    },
+    {
+      "name": "阿里云 PAI EAS",
+      "kind": "cloud",
+      "description": "PAI 模型在线服务 EAS；为在线推理核算资源费用，外部网络和存储服务另算。",
+      "source": "infra-12",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "模型API与推理"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "产品定位",
+          "value": "EAS 是 PAI 模型在线服务的计费与资源管理对象。",
+          "evidence": 0
+        },
+        {
+          "key": "资源计费",
+          "value": "公共资源创建的在线服务按所选资源和计费模式核算，需看控制台对应服务。",
+          "evidence": 1
+        },
+        {
+          "key": "附加费用",
+          "value": "如使用弹性公网、OSS、NAS，会产生对应其他云服务的费用。",
+          "evidence": 2
+        },
+        {
+          "key": "停用操作",
+          "value": "仍在运行但不再使用的服务应停止或删除，以避免继续按量计费。",
+          "evidence": 3
+        }
+      ]
+    },
+    {
+      "name": "火山方舟",
+      "kind": "api",
+      "description": "火山方舟在线模型推理；Model ID 与 Endpoint ID 的接入方式需区分，调用 API 不等同租 GPU。",
+      "source": "infra-13",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "模型API与推理"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "接入方式",
+          "value": "标准在线推理支持直接通过 Model ID 调用预置推理接入点。",
+          "evidence": 0
+        },
+        {
+          "key": "接入点",
+          "value": "预置方式不要求用户先手动创建推理接入点；具体模型开放范围仍看账户。",
+          "evidence": 1
+        },
+        {
+          "key": "接口地址",
+          "value": "北京地域示例 Base URL 为 https://ark.cn-beijing.volces.com/api/v3，地域与账户方案需匹配。",
+          "evidence": 2
+        }
+      ]
+    },
+    {
+      "name": "硅基流动 SiliconFlow",
+      "kind": "api",
+      "description": "模型 API 服务与价格查询；输入、输出和缓存命中需要使用对应模型的报价口径。",
+      "source": "infra-14",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "模型API与推理"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "服务形态",
+          "value": "提供模型 API 的生产选型价格页面。",
+          "evidence": 0
+        },
+        {
+          "key": "计费维度",
+          "value": "价格页分别展示输入、输出和缓存命中成本，不应将输入价当总成本。",
+          "evidence": 1
+        },
+        {
+          "key": "查询方式",
+          "value": "可按厂商和模型查价格。",
+          "evidence": 2
+        },
+        {
+          "key": "开放范围",
+          "value": "价格页说明仅展示可用模型；账户实际权限仍需确认。",
+          "evidence": 3
+        }
+      ]
+    },
+    {
+      "name": "Replicate",
+      "kind": "api",
+      "description": "托管模型预测 API，按所用模型及硬件的实际计费规则核算，非统一整机租用。",
+      "source": "infra-15",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "模型API与推理"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "计费方式",
+          "value": "按实际使用付费，不同模型与硬件需看对应价格。",
+          "evidence": 0
+        },
+        {
+          "key": "硬件计费",
+          "value": "使用按硬件时间计价的模型时，每秒单价依硬件而异。",
+          "evidence": 1
+        },
+        {
+          "key": "查询入口",
+          "value": "可从价格页进入详细账单规则，不能用一个每秒价覆盖所有模型。",
+          "evidence": 2
+        }
+      ]
+    },
+    {
+      "name": "Hugging Face Inference Endpoints",
+      "kind": "cloud",
+      "description": "托管专用模型推理端点，按流量和利用率调整副本；注意缩容到零的延迟与冷启动。",
+      "source": "infra-16",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "模型API与推理"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "弹性副本",
+          "value": "可根据流量和加速器利用率动态调整模型端点副本。",
+          "evidence": 0
+        },
+        {
+          "key": "缩容到零",
+          "value": "支持无流量时将副本数降至零。",
+          "evidence": 1
+        },
+        {
+          "key": "触发依据",
+          "value": "扩缩容需要配置对应流量和利用率策略，并非任意时刻自动零成本。",
+          "evidence": 2
+        }
+      ]
+    },
+    {
+      "name": "RunningHub",
+      "kind": "product",
+      "description": "云端 ComfyUI 与多模态工作流 API；适合通过平台运行可复用的图像、视频、音频工作流。",
+      "source": "infra-17",
+      "categories": [
+        [
+          "AI 应用与产品",
+          "云端工作流"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "API范围",
+          "value": "提供多模态 AI 和大语言模型接入能力。",
+          "evidence": 0
+        },
+        {
+          "key": "集成任务",
+          "value": "可把图像、视频、音频、AI 应用及工作流集成到产品或自动化流程。",
+          "evidence": 1
+        },
+        {
+          "key": "身份要求",
+          "value": "个人账户是使用 API 的基础身份，具体授权和额度需另核对。",
+          "evidence": 2
+        }
+      ]
+    },
+    {
+      "name": "LiblibAI 工作流 API",
+      "kind": "product",
+      "description": "LiblibAI 工作流开放平台，可通过 API 运行已开通的 ComfyUI 工作流；权限和计费按对应工作流核对。",
+      "source": "infra-18",
+      "categories": [
+        [
+          "AI 应用与产品",
+          "云端工作流"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "服务条件",
+          "value": "对应工作流需已提供并开通 API 服务。",
+          "evidence": 0
+        },
+        {
+          "key": "工作流接口",
+          "value": "公开文档展示 POST https://openapi.liblibai.cloud/api/generate/comfyui/app 接口。",
+          "evidence": 1
+        },
+        {
+          "key": "视频结果",
+          "value": "工作流接口参数包含视频输出节点 ID，需要与实际工作流节点对应。",
+          "evidence": 2
+        }
+      ]
+    },
+    {
+      "name": "Tavily Search API",
+      "kind": "api",
+      "description": "AI 应用的网页检索 API，可返回链接、摘要与可选页面正文；需单独的搜索服务凭据。",
+      "source": "infra-19",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "联网检索API"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "接口地址",
+          "value": "通过 POST https://api.tavily.com/search 发起查询。",
+          "evidence": 0
+        },
+        {
+          "key": "认证方式",
+          "value": "使用 Bearer API Token 认证。",
+          "evidence": 1
+        },
+        {
+          "key": "请求控制",
+          "value": "请求可设置搜索深度、最大结果数量和是否包含原始正文。",
+          "evidence": 2
+        },
+        {
+          "key": "数量控制",
+          "value": "max_results 参数控制返回的最大结果数量，需结合延迟和用量预算设置。",
+          "evidence": 3
+        }
+      ]
+    },
+    {
+      "name": "博查 Web Search API",
+      "kind": "api",
+      "description": "面向 AI 的网页搜索接口，支持返回网页摘要和来源链接；搜索服务 Key 与模型 Key 不同。",
+      "source": "infra-20",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "联网检索API"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "接口地址",
+          "value": "通过 POST https://api.bochaai.com/v1/web-search 查询网页。",
+          "evidence": 0
+        },
+        {
+          "key": "认证方式",
+          "value": "使用 Bearer API Key。",
+          "evidence": 1
+        },
+        {
+          "key": "结果内容",
+          "value": "网页结果包含名称、URL、snippet 与 summary 等字段。",
+          "evidence": 2
+        },
+        {
+          "key": "查询控制",
+          "value": "支持 freshness、summary 和 count 参数，时间筛选不是网页已核验的保证。",
+          "evidence": 3
+        }
+      ]
+    },
+    {
+      "name": "Amazon EC2 GPU 实例",
+      "kind": "cloud",
+      "description": "AWS EC2 加速计算中的 GPU 实例；按卡型、显存、网络与存储规格选型，避免把不同加速器视为同一类 GPU。",
+      "source": "infra-21",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "GPU租赁与算力"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "服务形态",
+          "value": "EC2 加速计算产品页提供 GPU 实例系列。",
+          "evidence": 0
+        },
+        {
+          "key": "配置维度",
+          "value": "实例表分别列出 GPU 数量、GPU 显存、网络带宽和存储，选型需整体核对。",
+          "evidence": 1
+        },
+        {
+          "key": "任务方向",
+          "value": "页面包含面向 AI 训练和推理的 NVIDIA GPU 实例系列，不等于所有系列都使用相同加速器。",
+          "evidence": 2
+        }
+      ]
+    },
+    {
+      "name": "Google Cloud GPU",
+      "kind": "cloud",
+      "description": "Google Compute Engine GPU 实例；卡型、地域配额和工作站许可都可能影响落地。",
+      "source": "infra-22",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "GPU租赁与算力"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "GPU 实例",
+          "value": "Compute Engine 提供带 GPU 的实例配置。",
+          "evidence": 0
+        },
+        {
+          "key": "账户配额",
+          "value": "新项目具有全局 GPU 配额，配额会限制可创建的 GPU 总数。",
+          "evidence": 1
+        },
+        {
+          "key": "工作站许可",
+          "value": "选择虚拟工作站 GPU 时会加入 NVIDIA RTX Virtual Workstation 许可，不能忽略软件许可维度。",
+          "evidence": 2
+        }
+      ]
+    },
+    {
+      "name": "Azure GPU 虚拟机",
+      "kind": "cloud",
+      "description": "Azure GPU 加速虚拟机家族；按任务选择系列，例如图形工作站不应直接替代训练型配置。",
+      "source": "infra-23",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "GPU租赁与算力"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "实例家族",
+          "value": "Azure 的 NV 家族属于 GPU 加速虚拟机系列。",
+          "evidence": 0
+        },
+        {
+          "key": "图形任务",
+          "value": "NV 系列面向图形密集场景，包括渲染、模拟和虚拟桌面。",
+          "evidence": 1
+        },
+        {
+          "key": "选型入口",
+          "value": "从虚拟机尺寸家族和具体系列核对目标规格，不使用泛称 GPU 替代系列规格。",
+          "evidence": 2
+        }
+      ]
+    }
+  ]
+}

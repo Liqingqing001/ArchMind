@@ -1,3 +1,4 @@
+import { searchWeb, testBrowserSearch } from "../webSearch";
 import {
   extractionMessages,
   applyExtraction,
@@ -73,6 +74,8 @@ export async function demoApi<T>(
 ): Promise<T> {
   const body =
     typeof options.body === "string" ? JSON.parse(options.body) : undefined;
+  if (path === "/agent/search/test" && options.method === "POST")
+    return (await testBrowserSearch(body)) as T;
   if (path === "/agent/test" && options.method === "POST")
     return (await testBrowserConnection(body)) as T;
   if (
@@ -133,6 +136,17 @@ export async function demoApi<T>(
         diagnostics: { stage: "requirements" },
       };
     else {
+      if (!prepared.continuing) {
+        prepared.web_search = await searchWeb(
+          body.web_search,
+          workflow,
+          prepared.prompt,
+          [body.connection.api_key],
+        );
+        await transaction((engine) =>
+          engine.attachWebTrace(prepared.trace_id, prepared.web_search),
+        );
+      }
       const reply = await completeBrowser(
         body.connection,
         groundedMessages(prepared),
@@ -153,6 +167,18 @@ export async function demoApi<T>(
     )) as T;
   }
   return transaction((engine) =>
-    engine.request(options.method || "GET", path, body),
+    engine.request(
+      options.method || "GET",
+      path,
+      path === "/agent/chat"
+        ? {
+            conversation_id: body?.conversation_id,
+            revision: body?.revision,
+            messages: body?.messages,
+            action: body?.action,
+            search_requested: !!body?.web_search?.enabled,
+          }
+        : body,
+    ),
   ) as Promise<T>;
 }

@@ -50,7 +50,7 @@ def import_curated(db,dataset):
             existing=db.scalar(select(Change).where(Change.entity_id==entity.id,Change.key==item['key'],Change.new_value==item['value'],Change.status=='pending'))
             if existing:
                 continue
-            change=Change(entity_id=entity.id,snapshot_id=snapshot.id,key=item['key'],old_value=current.value if current else None,new_value=item['value'],base_version=current.version if current else 0,evidence=evidence,origin='curated_web',status='pending' if current else 'approved',reviewer=None if current else '仓库编辑核验资料',review_note='核对官方短摘录；不推断价格或硬件配置。',reviewed_at=None if current else now())
+            change=Change(entity_id=entity.id,snapshot_id=snapshot.id,key=item['key'],old_value=current.value if current else None,new_value=item['value'],base_version=current.version if current else 0,evidence=evidence,origin='curated_web',status='pending' if current else 'approved',reviewer=None if current else '仓库编辑核验资料',review_note='核对官方短摘录；报价、库存与硬件以核验条件和日期为界。',reviewed_at=None if current else now())
             db.add(change);db.flush()
             if current:
                 stats['pending']+=1
@@ -63,8 +63,9 @@ def import_curated(db,dataset):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--apply',action='store_true',help='Commit the reviewed public dataset; default is a rolled-back preview')
+    parser.add_argument('--dataset',choices=['video-workflow-knowledge-2026-11-07.json','infrastructure-knowledge-2026-11-07.json'],default='infrastructure-knowledge-2026-11-07.json')
     args=parser.parse_args()
-    dataset=json.loads((Path(__file__).resolve().parent.parent/'data/video-workflow-knowledge-2026-11-07.json').read_text(encoding='utf-8'))
+    dataset=json.loads((Path(__file__).resolve().parent.parent/'data'/args.dataset).read_text(encoding='utf-8'))
     with Session() as db:
         stats=import_curated(db,dataset)
         if args.apply:
