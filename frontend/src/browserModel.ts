@@ -1,4 +1,4 @@
-import { solutionPolicy } from "./solutionFlow.ts";
+import { solutionPolicy, editorialGuide } from "./solutionFlow.ts";
 import type { Workflow } from "./solutionFlow.ts";
 import type { Connection } from "./modelProviders.ts";
 export const MODEL_SETTINGS_KEY = "archmind-model-settings-v1";
@@ -296,7 +296,7 @@ export function groundedMessages(context: {
     ...context.history,
     {
       role: "user",
-      content:JSON.stringify({BRIEF:context.workflow?.fields||{},EDITORIAL_GUIDE:solutionPolicy.scenes.find(s=>s.id===context.workflow?.scene)||null,EVIDENCE_JSON:context.retrieved,USER_INPUT:context.prompt}),
+      content:JSON.stringify({BRIEF:context.workflow?.fields||{},EDITORIAL_GUIDE:editorialGuide(context.workflow),EVIDENCE_JSON:context.retrieved,USER_INPUT:context.prompt}),
     },
   ];
 }

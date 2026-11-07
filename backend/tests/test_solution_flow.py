@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from app import agent
 from app.models import Conversation
-from app.solution_flow import empty_workflow,apply_extraction,is_confirmation,clarification,rank_knowledge,previous_workflow
+from app.solution_flow import empty_workflow,apply_extraction,is_confirmation,clarification,rank_knowledge,previous_workflow,editorial_guide
 from test_solution_agent import CONNECTION,ready_conversation,request
 
 
@@ -18,6 +18,7 @@ def test_consultation_requires_explicit_confirmation_and_resets_on_edit(client,d
     monkeypatch.setattr(agent,'complete',extract)
     result=request(client,text,conversation_id=row['id'],revision=0).json()
     assert result['workflow']['phase']=='ready' and result['retrieved']==[]
+    assert [r['name'] for r in editorial_guide(result['workflow'])['routes']]==['现成平台']
     assert '现在为你生成简版方案吗' in result['answer']
     assert len(calls)==1
     monkeypatch.setattr(agent,'complete',lambda *a,**k:('先做小样，价格待核验。','stop'))

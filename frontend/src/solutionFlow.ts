@@ -282,3 +282,23 @@ export function previewExtraction(prompt: string, previous: Workflow) {
       if (!updates[id]) set(id, "暂不确定，方案须注明假设");
   return JSON.stringify({ updates });
 }
+
+export function editorialGuide(workflow?: Workflow) {
+  const scene = policy.scenes.find((s) => s.id === workflow?.scene);
+  if (!scene) return null;
+  const delivery = workflow?.fields.delivery?.value || "";
+  const index = /现成|免部署|一站式/.test(delivery)
+    ? 0
+    : /gpu|自部署|本地/i.test(delivery)
+      ? 2
+      : /api|工作流/i.test(delivery)
+        ? 1
+        : null;
+  return {
+    name: scene.name,
+    description: scene.description,
+    routes:
+      index === null ? scene.routes : [scene.routes[index] || scene.routes[0]],
+    gaps: scene.gaps,
+  };
+}

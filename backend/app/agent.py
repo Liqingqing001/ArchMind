@@ -11,7 +11,7 @@ from .models import Entity, Fact, Snapshot, Source, Trace, Category, EntityCateg
 from .collector import validate_url
 from .provider_protocols import request_parts, response_text
 from .conversations import get_conversation, summary
-from .solution_flow import POLICY, terms, rank_knowledge, previous_workflow, extraction_messages, apply_extraction, is_confirmation, clarification
+from .solution_flow import POLICY, terms, rank_knowledge, previous_workflow, extraction_messages, apply_extraction, is_confirmation, clarification, editorial_guide
 
 router = APIRouter(prefix="/api/agent", tags=["solution-agent"])
 
@@ -187,7 +187,7 @@ def chat(body: ChatRequest, db=Depends(get_db)):
             evidence,trace_id = latest.get('retrieved',[]),latest.get('trace_id','')
         else:
             evidence,trace_id = retrieve_context(db,messages,workflow)
-        scene = next((s for s in POLICY['scenes'] if s['id']==workflow['scene']),None)
+        scene = editorial_guide(workflow)
         prompt = [{'role':'system','content':POLICY['answer_prompt']+('\n'+POLICY['continue_prompt'] if continuing else '')}]
         prompt.extend(m.model_dump() for m in messages[:-1])
         prompt.append({'role':'user','content':json.dumps({'BRIEF':workflow['fields'],'EDITORIAL_GUIDE':scene,'EVIDENCE_JSON':evidence,'USER_INPUT':user},ensure_ascii=False)})

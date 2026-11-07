@@ -119,3 +119,13 @@ def rank_knowledge(rows,entities,categories,links,workflow,prompt):
             break
         add(r)
     return [dict(**{k:v for k,v in r.items() if k!='score'},citation_id=f'K{i+1}') for i,r in enumerate(chosen[:12])]
+
+
+def editorial_guide(workflow):
+    scene=next((s for s in POLICY['scenes'] if s['id']==workflow['scene']),None)
+    if not scene:
+        return None
+    delivery=workflow['fields'].get('delivery',{}).get('value','')
+    index=0 if re.search('现成|免部署|一站式',delivery) else 2 if re.search('gpu|自部署|本地',delivery,re.I) else 1 if re.search('api|工作流',delivery,re.I) else None
+    routes=scene['routes'] if index is None else [scene['routes'][index] if index<len(scene['routes']) else scene['routes'][0]]
+    return dict(name=scene['name'],description=scene['description'],routes=routes,gaps=scene['gaps'])

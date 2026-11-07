@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
+  editorialGuide,
   emptyWorkflow,
   applyExtraction,
   isConfirmation,
@@ -29,6 +30,10 @@ assert.ok(w.missing.includes("scale"));
 assert.ok(!w.missing.includes("experience"));
 apply("每周两条一分钟短剧，写实风格，人物一致");
 assert.equal(w.phase, "ready");
+assert.deepEqual(
+  editorialGuide(w).routes.map((r) => r.name),
+  ["现成平台"],
+);
 assert.ok(isConfirmation(w, "可以"));
 assert.ok(!isConfirmation(w, "不可以，预算要修改"));
 assert.ok(clarification(w).includes("现在为你生成简版方案吗"));
