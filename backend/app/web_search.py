@@ -88,7 +88,8 @@ def parse_results(provider,data,at,secrets=()):
         if not url:
             continue
         raw=row.get('raw_content') if isinstance(row.get('raw_content'),str) and row['raw_content'].strip() else None
-        text=raw or row.get('summary') or row.get('content') or row.get('snippet')
+        summary=row.get('summary') or row.get('content') or row.get('snippet')
+        text='搜索摘要：'+summary[:800]+'\n页面摘录：'+raw[:800] if raw and isinstance(summary,str) and summary.strip() else raw or summary
         if not isinstance(text,str) or not text.strip():
             continue
         host=urlsplit(url).hostname

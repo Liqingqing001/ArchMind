@@ -204,7 +204,10 @@ export function parseSearchResults(
       typeof row.raw_content === "string" && row.raw_content.trim()
         ? row.raw_content
         : null;
-    const text = raw || row.summary || row.content || row.snippet;
+    const summary = row.summary || row.content || row.snippet;
+    const text = raw && typeof summary==='string' && summary.trim()
+      ? '搜索摘要：'+summary.slice(0,800)+'\n页面摘录：'+raw.slice(0,800)
+      : raw || summary;
     if (typeof text !== "string" || !text.trim()) continue;
     const host = new URL(url).hostname;
     results.push({

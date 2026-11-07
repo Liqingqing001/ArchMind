@@ -40,10 +40,11 @@ def test_provider_transport_is_fixed_bounded_and_never_follows_redirects(monkeyp
 
 
 def test_web_sanitization_preserves_provenance_without_secrets_or_local_urls():
-    rows=search.parse_results('tavily',{'results':[{'url':'https://www.autodl.com/docs/price/#x','title':'AutoDL '+KEY,'raw_content':'页面 '+KEY,'published_date':'not-a-date'},{'url':'https://127.0.0.1/x','content':'local'},{'url':'javascript:alert(1)','content':'script'},{'url':'https://example.com/?key='+KEY,'content':'credential'}]},'2026-11-07T00:00:00Z',[KEY])
+    rows=search.parse_results('tavily',{'results':[{'url':'https://www.autodl.com/docs/price/#x','title':'AutoDL '+KEY,'raw_content':'页面 '+KEY,'content':'命中摘要：存储计费规则','published_date':'not-a-date'},{'url':'https://127.0.0.1/x','content':'local'},{'url':'javascript:alert(1)','content':'script'},{'url':'https://example.com/?key='+KEY,'content':'credential'}]},'2026-11-07T00:00:00Z',[KEY])
     assert len(rows)==1 and rows[0]['source_type']=='official' and rows[0]['content_kind']=='page_excerpt'
     assert rows[0]['published_at'] is None and '#' not in rows[0]['url']
     assert KEY not in json.dumps(rows)
+    assert '命中摘要：存储计费规则' in rows[0]['excerpt']
     queries=search.search_queries(workflow(),'现在生成 '+KEY,[KEY])
     assert len(queries)<=2 and all(len(q)<=190 and KEY not in q for q in queries)
 

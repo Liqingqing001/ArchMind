@@ -103,6 +103,7 @@ assert.equal(web.results.length, 2);
 assert.equal(web.results[0].source_type, "official");
 assert.equal(web.results[1].source_type, "web");
 assert.equal(web.results[0].content_kind, "page_excerpt");
+assert.ok(web.results[0].excerpt.includes("按量、存储和计费"));
 assert.ok(!JSON.stringify(web).includes(connection.api_key));
 assert.equal(web.results[0].url, "https://www.autodl.com/docs/price/");
 assert.equal(web.results[0].citation_id, "W1");
