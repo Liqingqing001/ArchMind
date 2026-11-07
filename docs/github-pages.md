@@ -34,7 +34,7 @@ npm exec vite -- preview --host 127.0.0.1 --port 4173
 
 PR 自动执行演示行为测试和构建，只生成预览 artifact。合并 main 后执行 Pages 发布；工作流也支持在 Actions 中手动运行。
 
-仓库所有者需要在 [Settings → Pages](https://github.com/Liqingqing001/ArchMind/settings/pages) 的 Build and deployment 中，将 Source 选择为 **GitHub Actions**。当前连接使用的 GitHub integration 对启用 Pages 的 API 返回 403，因此不能保证它能替所有者完成这一步；configure-pages 也会尝试启用，如权限不足需所有者在设置页完成后重跑工作流。
+仓库已启用 GitHub Actions Pages 部署；可在 [Settings → Pages](https://github.com/Liqingqing001/ArchMind/settings/pages) 查看配置。
 
 预期默认项目地址：https://liqingqing001.github.io/ArchMind/ 。上线以 Pages 工作流部署成功及该地址实际返回页面为准。
 
@@ -49,7 +49,7 @@ PR 自动执行演示行为测试和构建，只生成预览 artifact。合并 m
 
 ## 分类与数据升级
 
-取消“全部知识 / 开源与开放权重”的双范围入口。20 个模型在同一棵分类树的“AI 模型 → 开源与开放权重模型”下，同时保留语言、图像、语音等能力分类。没有复制实体或资料。构建数据更新会追加新分类并保留浏览器已有对话、审核操作与检索记录。
+全部知识首页只显示能力分组。选择“生成类 → 大语言模型 → 阿里云”后，才展示该厂家的具体模型；理解类提供文字、图片、声音、视频四个入口。侧栏支持逐层展开、折叠，手机通过分组卡片和路径导航完成同样操作。开放权重是模型标签，不再独立成第二份目录。多能力模型共用同一实体、事实与版本；保留浏览器已有对话、审核操作与检索记录。规则与维护方式见 [分层知识目录](knowledge-navigation.md)。
 
 ## 完整后端版
 

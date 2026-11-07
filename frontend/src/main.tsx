@@ -9,14 +9,12 @@ import {
   BookOpen,
   Boxes,
   Check,
-  ChevronDown,
   ChevronRight,
   Clock3,
   Database,
   ExternalLink,
   FileCheck2,
   FileText,
-  FolderTree,
   GitBranch,
   Globe2,
   History,
@@ -36,6 +34,8 @@ import {
 } from "lucide-react";
 import { api, post, setToken, kinds, states, time } from "./api";
 import "./styles.css";
+import { KnowledgeBrowser } from "./KnowledgeBrowser";
+import type { KnowledgeNavigation } from "./knowledgeNavigation";
 import { isDemo } from "./demo/mode";
 import { DemoBanner } from "./demo/DemoBanner";
 import "./demo/demo.css";
@@ -133,6 +133,7 @@ function App() {
   const [overview, setOverview] = useState<Row>({});
   const [entities, setEntities] = useState<Row[]>([]);
   const [categories, setCategories] = useState<Row[]>([]);
+  const [navigation,setNavigation] = useState<KnowledgeNavigation>({version:1,roots:[],nodes:[]});
   const [sources, setSources] = useState<Row[]>([]);
   const [runs, setRuns] = useState<Row[]>([]);
   const [changes, setChanges] = useState<Row[]>([]);
@@ -143,7 +144,6 @@ function App() {
   const [login, setLogin] = useState(false);
   const [busy, setBusy] = useState(false);
   const [filter, setFilter] = useState("");
-  const [category, setCategory] = useState("");
   const [kind, setKind] = useState("");
   const [detail, setDetail] = useState<Row | null>(null);
   const [detailTab, setDetailTab] = useState("facts");
@@ -170,6 +170,7 @@ function App() {
       api("/changes"),
       api("/config"),
       api("/traces"),
+      api("/knowledge/navigation"),
     ]);
     setOverview(values[0]);
     setEntities(values[1]);
@@ -179,6 +180,7 @@ function App() {
     setChanges(values[5]);
     setConfig(values[6]);
     setTraces(values[7]);
+    setNavigation(values[8]);
   }, []);
   useEffect(() => {
     load()
@@ -243,7 +245,6 @@ function App() {
     setPage(p);
     window.scrollTo({ top: 0, behavior: "instant" });
     setFilter("");
-    setCategory("");
     setKind("");
   };
   const openForm = async (type: string, initial: Row = {}) => {
@@ -317,60 +318,6 @@ function App() {
       if (run.status === "failed") throw new Error(run.message);
       setNotice(run.message);
     });
-  const descendants = (id: string): string[] => [
-    id,
-    ...categories
-      .filter((c) => c.parent_id === id)
-      .flatMap((c) => descendants(c.id)),
-  ];
-  const openModels = entities.filter(e => e.model_resources);
-  const modelCategory = categories.find(c => c.name === "AI 模型" && !c.parent_id);
-  const openModelCategory = categories.find(c => c.parent_id === modelCategory?.id && c.name === "开源与开放权重模型");
-  const browseOpenModels = () => { go("entities"); setCategory(openModelCategory?.id || modelCategory?.id || ""); };
-  const filtered = entities.filter(
-    (e) =>
-      (!filter ||
-        `${e.name} ${e.description}`
-          .toLowerCase()
-          .includes(filter.toLowerCase())) &&
-      (!kind || e.kind === kind) &&
-      (!category ||
-        e.category_ids.some((id: string) =>
-          descendants(category).includes(id),
-        )),
-  );
-  const categoryTree = (
-    parent: string | null = null,
-    depth = 0,
-  ): React.ReactNode =>
-    categories
-      .filter((c) => c.parent_id === parent)
-      .map((c) => (
-        <React.Fragment key={c.id}>
-          <button
-            className={`tree-item ${category === c.id ? "selected" : ""}`}
-            style={{ paddingLeft: 14 + depth * 16 }}
-            onClick={() => setCategory(c.id)}
-          >
-            {categories.some((x) => x.parent_id === c.id) ? (
-              <ChevronDown size={13} />
-            ) : (
-              <span className="tree-line" />
-            )}
-            <span>{c.name}</span>
-            <small>
-              {
-                entities.filter((e) =>
-                  e.category_ids.some((id: string) =>
-                    descendants(c.id).includes(id),
-                  ),
-                ).length
-              }
-            </small>
-          </button>
-          {categoryTree(c.id, depth + 1)}
-        </React.Fragment>
-      ));
   const submitSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     await action(async () => {
@@ -542,7 +489,7 @@ function App() {
                         label: "知识实体",
                         value: overview.entities,
                         icon: Boxes,
-                        sub: `${overview.categories || 0} 个分类 · 多类型关联`,
+                        sub: "按能力、类型和厂家逐层浏览",
                         color: "blue",
                       },
                       {
@@ -587,11 +534,6 @@ function App() {
                       </div>
                     ))}
                   </div>
-                  <section className="panel open-model-overview">
-                    <div><h2>开源与开放权重模型 <span>{openModels.length} 个</span></h2><p>全部知识 → AI 模型 → 开源与开放权重模型；保留原有能力分类。</p></div>
-                    <button className="button" onClick={() => browseOpenModels()}>浏览模型知识 <ArrowRight size={16} /></button>
-
-                  </section>
                   <div className="overview-grid">
                     <section className="panel ecology">
                       <div className="panel-heading">
@@ -795,111 +737,7 @@ function App() {
                   </div>
                 </>
               )}
-              {page === "entities" && (
-                <div className="browser-grid">
-                  <aside className="panel category-panel">
-                    <div className="category-title">
-                      <span>
-                        <FolderTree size={16} />
-                        知识分类
-                      </span>
-                      <button
-                        className="icon-button"
-                        aria-label="添加分类"
-                        onClick={() => openForm("category")}
-                      >
-                        <Plus size={16} />
-                      </button>
-                    </div>
-                    <button
-                      className={`tree-item ${!category ? "selected" : ""}`}
-                      onClick={() => { setCategory(""); setKind(""); }}
-                    >
-                      <Layers3 size={14} />
-                      <span>全部知识</span>
-                      <small>{entities.length}</small>
-                    </button>
-
-                    {categoryTree()}
-                  </aside>
-                  <section className="panel entity-panel">
-                    <div className="filter-bar">
-                      <label className="search-input">
-                        <Search size={17} />
-                        <input
-                          placeholder="搜索名称、描述…"
-                          value={filter}
-                          onChange={(e) => setFilter(e.target.value)}
-                        />
-                      </label>
-
-                      <select
-                        className="mobile-category"
-                        aria-label="知识分类"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                      >
-                        <option value="">全部分类</option>
-                        {categories.map((c) => (
-                          <option key={c.id} value={c.id}>
-                            {c.name}
-                          </option>
-                        ))}
-                      </select>
-                      <select
-                        aria-label="实体类型"
-                        value={kind}
-                        onChange={(e) => setKind(e.target.value)}
-                      >
-                        <option value="">全部类型</option>
-                        {Object.entries(kinds).map(([v, l]) => (
-                          <option key={v} value={v}>
-                            {l}
-                          </option>
-                        ))}
-                      </select>
-                      <span className="count">{filtered.length} 个实体</span>
-                    </div>
-                    {filtered.length ? (
-                      <div className="entity-grid">
-                        {filtered.map((e) => (
-                          <button
-                            className="entity-card"
-                            key={e.id}
-                            onClick={() => openEntity(e.id)}
-                          >
-                            <div>
-                              <span className={`entity-letter ${e.kind}`}>
-                                {e.name.slice(0, 1)}
-                              </span>
-                              <span className="entity-type">
-                                {kinds[e.kind]}
-                              </span>
-                            </div>
-                            <h3>
-                              {e.name}
-                              {e.model_resources && <span className="open-model-tag">开放权重</span>}
-                              {e.is_demo && (
-                                <span className="demo-tag">演示</span>
-                              )}
-                            </h3>
-                            <p>{e.description || "尚未填写描述"}</p>
-                            <footer>
-                              <span>{e.fact_count} 条已发布事实{e.model_resources && " · 资料与下载"}</span>
-                              <ArrowUpRight size={16} />
-                            </footer>
-                          </button>
-                        ))}
-                      </div>
-                    ) : (
-                      <Empty
-                        text="没有符合条件的实体"
-                        detail="调整分类与搜索条件，或创建新的知识实体。"
-                      />
-                    )}
-                  </section>
-                </div>
-              )}
+              {page === "entities" && <KnowledgeBrowser entities={entities} navigation={navigation} kind={kind} onClearKind={()=>setKind("")} onOpen={openEntity}/>}
               {page === "sources" && (
                 <section className="panel">
                   <div className="filter-bar">

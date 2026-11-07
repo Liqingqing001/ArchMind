@@ -16,6 +16,7 @@ from .agent import router as agent_router
 from .conversations import router as conversations_router
 from .model_resources import model_resources
 from .taxonomy import link_open_models
+from .navigation import knowledge_navigation, vendor_names
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
@@ -82,6 +83,11 @@ def overview(db: DBSession = Depends(get_db)):
     return {"entities": count(Entity), "sources": count(Source), "facts": db.scalar(select(func.count()).select_from(Fact).where(Fact.valid_to.is_(None))), "pending": db.scalar(select(func.count()).select_from(Change).where(Change.status == "pending")), "failed": db.scalar(select(func.count()).select_from(Source).where(Source.status == "failed")), "snapshots": count(Snapshot), "categories": count(Category), "demo_entities": db.scalar(select(func.count()).select_from(Entity).where(Entity.is_demo.is_(True))), "kinds": [{"kind": k, "count": c} for k, c in db.execute(select(Entity.kind, func.count()).group_by(Entity.kind))], "recent_runs": [data(r) for r in db.scalars(select(Run).order_by(Run.started_at.desc()).limit(5))]}
 
 
+@app.get("/api/knowledge/navigation")
+def navigation(db: DBSession = Depends(get_db)):
+    return knowledge_navigation(db)
+
+
 @app.get("/api/categories")
 def categories(db: DBSession = Depends(get_db)):
     return [data(r) for r in db.scalars(select(Category).order_by(Category.name))]
@@ -122,7 +128,8 @@ def entities(q: str = "", category_id: str = "", kind: str = "", db: DBSession =
     links = list(db.scalars(select(EntityCategory)))
     facts = list(db.scalars(select(Fact).where(Fact.valid_to.is_(None))))
     downloads = model_resources(db, [r.id for r in rows])
-    return [{**data(r), "model_resources": downloads.get(r.id), "category_ids": [l.category_id for l in links if l.entity_id == r.id], "fact_count": sum(f.entity_id == r.id for f in facts)} for r in rows]
+    vendors = vendor_names(list(db.scalars(select(Entity))), list(db.scalars(select(Relation))))
+    return [{**data(r), "vendor_name": vendors.get(r.id, ""), "model_resources": downloads.get(r.id), "category_ids": [l.category_id for l in links if l.entity_id == r.id], "fact_count": sum(f.entity_id == r.id for f in facts)} for r in rows]
 
 
 @app.post("/api/entities", status_code=201)
