@@ -1,0 +1,62 @@
+name: Knowledge platform checks
+on: [push, pull_request]
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        database: [sqlite, postgres]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: knowledge
+          POSTGRES_PASSWORD: ci-only
+          POSTGRES_DB: knowledge_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U knowledge -d knowledge_test"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.5'
+          python-version: '3.12'
+      - run: uv sync --frozen
+      - name: SQLite migrations and tests
+        if: matrix.database == 'sqlite'
+        run: |
+          uv run alembic upgrade head
+          uv run alembic check
+          uv run pytest -q
+          uv run alembic downgrade base
+          uv run alembic upgrade head
+      - name: PostgreSQL migrations and tests
+        if: matrix.database == 'postgres'
+        env:
+          DATABASE_URL: postgresql+psycopg://knowledge:ci-only@localhost:5432/knowledge_test
+          TEST_DATABASE_URL: postgresql+psycopg://knowledge:ci-only@localhost:5432/knowledge_test
+        run: |
+          uv run alembic upgrade head
+          uv run alembic check
+          uv run alembic downgrade base
+          uv run pytest -q
+          uv run alembic upgrade head
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build

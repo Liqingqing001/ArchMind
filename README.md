@@ -46,7 +46,7 @@ uv run python -m app.worker
 ```bash
 cp .env.example .env
 # 编辑 .env：分别填写 POSTGRES_PASSWORD 与 ADMIN_TOKEN；接入 Agent 时另设 KNOWLEDGE_TOKEN
-# 两个值使用不同的随机十六进制字符串：python -c "import secrets; print(secrets.token_hex(32))"
+# 各口令使用不同的随机十六进制字符串：python -c "import secrets; print(secrets.token_hex(32))"
 docker compose up --build -d
 # 可选：导入演示数据。已有实体时跳过。
 docker compose --profile demo run --rm seed
