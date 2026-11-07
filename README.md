@@ -4,6 +4,16 @@ ArchMind 是以知识库为产品的 AI 解决方案平台。你在后台看到�
 
 技术栈：Python 3.12 / FastAPI / SQLAlchemy / Alembic，React 19 / TypeScript / Vite，PostgreSQL 16；SQLite 可用于轻量本地体验。
 
+## 实际运行截图
+
+以下截图来自本地实际启动的 FastAPI + React 应用，使用明确标注的演示数据。不是设计稿；当前尚未发布 GitHub Pages 演示站。
+
+![ArchMind 知识总览](docs/screenshots/overview.png)
+
+![Agent 检索记录与证据追溯](docs/screenshots/agent-retrieval.png)
+
+GitHub Pages 的展示方案见 [面试演示部署说明](docs/github-pages.md)。
+
 ## 获取项目
 
 ```bash
