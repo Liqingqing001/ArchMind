@@ -143,7 +143,7 @@ export function createDemoStore(initial: Row) {
       query,
       results: copy(results),
       caller,
-      request_context: { ...context, simulated: true },
+      request_context: { simulated: true, ...context },
       created_at: stamp(),
     };
     state.traces.unshift(row);
@@ -262,7 +262,7 @@ export function createDemoStore(initial: Row) {
     ...summary(c),
     messages: c.messages,
   });
-  const chat = (body: Row) => {
+  const prepareChat = (body: Row, browser = false) => {
     const c = conversation(body.conversation_id);
     if (c.revision !== body.revision)
       fail("对话已在另一页面更新，请重新打开后发送");
@@ -326,36 +326,34 @@ export function createDemoStore(initial: Row) {
       .slice(0, 12)
       .map(({ row }, i) => ({ ...row, citation_id: `K${i + 1}` }));
     const t = trace(prompt, retrieved, "agent", {
-      purpose: "demo_solution_chat",
+      purpose: browser ? "browser_solution_chat" : "demo_solution_chat",
+      simulated: !browser,
       method: "ranked_keyword",
       include_demo: false,
       request_id: c.id,
     });
-    const citations = retrieved.slice(0, 6);
-    const facts = citations
-      .map(
-        (r) =>
-          `- **${r.entity_name} · ${r.key}**：${r.value} [${r.citation_id}]`,
-      )
-      .join("\n");
-    const answer = `> 静态体验模式：未调用大模型。以下内容由已发布资料与固定讲解模板组装，用于体验检索、引用和对话历史。\n\n## 你的需求\n\n${prompt.replace(/[<>]/g, "")}\n\n## 本轮检索到的知识\n\n${facts || "没有找到匹配的已发布事实。可以尝试“企业知识问答”“开源模型”“文档检索”等关键词。"}\n\n## 实施路径（演示建议）\n\n1. 确定数据范围、隐私要求、部署位置与验收问题。\n2. 从上方资料中选择候选组件，打开来源核对版本、许可证与下载条件。\n3. 在完整后端版接入模型，验证检索覆盖率、引用准确性与回答质量。\n4. 采集新资料后先审核再发布，保留方案使用的事实版本。\n\n## 下一步\n\n可以继续追问，或打开“查看知识来源”，再到知识管理的检索记录核对本轮证据。价格、硬件需求和性能仍需依据最新官方资料核验。`;
-    const result = {
-      answer,
-      citations,
-      retrieved,
-      trace_id: t.id,
-      warnings: [
-        "静态演示，没有向任何模型供应商发送请求；真实模型连接请使用完整后端版。",
-      ],
-      model: "静态演示 · 未调用大模型",
-    };
-    const time = stamp();
+    let history = c.messages
+      .slice(-18)
+      .map((m: Row) => ({ role: m.role, content: m.content }));
+    while (
+      history.length &&
+      history.reduce((n: number, m: Row) => n + m.content.length, 0) > 34000
+    )
+      history = history.slice(2);
+    return { prompt, retrieved, trace_id: t.id, history };
+  };
+  const commitChat = (body: Row, result: Row) => {
+    const c = conversation(body.conversation_id);
+    if (c.revision !== body.revision)
+      fail("对话已在另一页面更新，请重新打开后发送");
+    const prompt = text(body.messages?.at(-1)?.content, 6000),
+      time = stamp();
     c.messages.push(
       { id: id(), role: "user", content: prompt, created_at: time },
       {
         id: id(),
         role: "assistant",
-        content: answer,
+        content: result.answer,
         result,
         created_at: time,
       },
@@ -364,6 +362,28 @@ export function createDemoStore(initial: Row) {
     c.revision++;
     c.updated_at = time;
     return { ...result, conversation: conversationView(c) };
+  };
+  const chat = (body: Row) => {
+    const { prompt, retrieved, trace_id } = prepareChat(body);
+    const citations = retrieved.slice(0, 6);
+    const facts = citations
+      .map(
+        (r) =>
+          `- **${r.entity_name} · ${r.key}**：${r.value} [${r.citation_id}]`,
+      )
+      .join("\n");
+    const answer = `> 静态体验模式：未调用大模型。以下内容由已发布资料与固定讲解模板组装，用于体验检索、引用和对话历史。\n\n## 你的需求\n\n${prompt.replace(/[<>]/g, "")}\n\n## 本轮检索到的知识\n\n${facts || "没有找到匹配的已发布事实。可以尝试“企业知识问答”“开源模型”“文档检索”等关键词。"}\n\n## 实施路径（演示建议）\n\n1. 确定数据范围、隐私要求、部署位置与验收问题。\n2. 从上方资料中选择候选组件，打开来源核对版本、许可证与下载条件。\n3. 连接你的 API 或运行完整后端版，验证检索覆盖率、引用准确性与回答质量。\n4. 采集新资料后先审核再发布，保留方案使用的事实版本。\n\n## 下一步\n\n可以继续追问，或打开“查看知识来源”，再到知识管理的检索记录核对本轮证据。价格、硬件需求和性能仍需依据最新官方资料核验。`;
+    const result = {
+      answer,
+      citations,
+      retrieved,
+      trace_id,
+      warnings: [
+        "未配置 API，本轮使用静态演示；点击右上角连接模型后可发起真实调用。",
+      ],
+      model: "静态演示 · 未调用大模型",
+    };
+    return commitChat(body, result);
   };
   const request = (method: string, input: string, body: Row = {}): any => {
     const parsed = new URL(input, "https://demo.invalid"),
@@ -608,7 +628,7 @@ export function createDemoStore(initial: Row) {
     if (method === "GET" && (match = path.match(/^\/traces\/([^/]+)$/)))
       return find("traces", match[1]);
     if (path === "/agent/test")
-      fail("公开体验版不接收 API Key，不连接模型服务；请使用完整后端版。");
+      fail("模型连接测试由浏览器直连适配器处理，不进入知识与会话存储。");
     if (method === "POST" && path === "/agent/chat") return chat(body);
     if (path === "/conversations") {
       if (method === "GET")
@@ -664,6 +684,9 @@ export function createDemoStore(initial: Row) {
         throw error;
       }
     },
+    prepareBrowserChat: (body: Row) => copy(prepareChat(body, true)),
+    commitBrowserChat: (body: Row, result: Row) =>
+      copy(commitChat(body, result)),
     exportState: () => copy(state),
   };
 }

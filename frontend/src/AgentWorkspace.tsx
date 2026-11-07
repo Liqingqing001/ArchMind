@@ -6,6 +6,7 @@ import { ArrowDown, ArrowUp, BookOpen, Check, Copy, Download, History, Loader2, 
 import { api, post } from "./api";
 import { isDemo } from "./demo/mode";
 import { ModelSettings } from "./ModelSettings";
+import { loadModelSettings, saveModelSettings, clearModelSettings, MODEL_SETTINGS_KEY, MODEL_SETTINGS_EVENT } from "./browserModel";
 import { Connection, presetConnection } from "./modelProviders";
 
 type Citation = { citation_id: string; entity_name: string; key: string; value: string; snapshot_id: string; source_url: string; version: number };
@@ -41,8 +42,8 @@ function Reply({ turn, openSnapshot }: { turn: Turn; openSnapshot: (id: string) 
   </article>;
 }
 export function AgentWorkspace({ visible, openSnapshot }: { visible: boolean; openSnapshot: (id: string) => void }) {
-  const [connection, setConnection] = useState<Connection>(() => presetConnection("DeepSeek"));
-  const [provider, setProvider] = useState("DeepSeek");
+  const [connection, setConnection] = useState<Connection>(() => loadModelSettings()?.connection || presetConnection("DeepSeek"));
+  const [provider, setProvider] = useState(() => loadModelSettings()?.provider || "DeepSeek");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [history, setHistory] = useState<Summary[]>([]);
   const [documents, setDocuments] = useState<Record<string, Conversation>>({});
@@ -69,7 +70,14 @@ export function AgentWorkspace({ visible, openSnapshot }: { visible: boolean; op
   const current = activeId ? documents[activeId] : undefined;
   const draftKey = activeId || "new";
   const draft = drafts[draftKey] || "";
-  const configured = isDemo || (!!connection.api_key.trim() && !!connection.model.trim());
+  const hasConnection = !!connection.api_key.trim() && !!connection.model.trim();
+  const configured = isDemo || hasConnection;
+  useEffect(() => {
+    const sync=()=>{const saved=loadModelSettings();setConnection(saved?.connection || presetConnection("DeepSeek"));setProvider(saved?.provider || "DeepSeek");};
+    const stored=(event:StorageEvent)=>{if(event.key===MODEL_SETTINGS_KEY)sync();};
+    window.addEventListener('storage',stored);window.addEventListener(MODEL_SETTINGS_EVENT,sync);
+    return ()=>{window.removeEventListener('storage',stored);window.removeEventListener(MODEL_SETTINGS_EVENT,sync);};
+  },[]);
   const matching = history.filter(h => (h.title + h.preview).toLowerCase().includes(search.trim().toLowerCase()));
   const putConversation = (conversation: Conversation) => {
     setDocuments(v => v[conversation.id]?.revision > conversation.revision ? v : { ...v, [conversation.id]: conversation });
@@ -174,12 +182,12 @@ export function AgentWorkspace({ visible, openSnapshot }: { visible: boolean; op
     <section className="agent-workspace chat-layout" hidden={!visible}>
       <header className="conversation-header"><div><button className="icon-button mobile-only" aria-label="打开历史对话" onClick={() => setHistoryOpen(true)}><History size={19} /></button><h1 title={current?.title}>{current?.title || "方案对话"}</h1></div>
         <div><button className="icon-button mobile-only" aria-label="新建对话" disabled={creating || pending?.id === "new"} onClick={newConversation}><Plus size={20} /></button>{!!current?.messages.length && <button className="icon-button" aria-label="导出当前对话" title="导出 Markdown" onClick={exportChat}><Download size={18} /></button>}
-          <button className="model-switch" onClick={() => setSettingsOpen(true)}><span className={configured ? "model-ready-dot" : "model-empty-dot"} /><span>{isDemo ? "免密体验 · 静态演示" : configured ? connection.model : "连接模型"}</span><Settings2 size={16} /></button>
+          <button className="model-switch" onClick={() => setSettingsOpen(true)}><span className={configured ? "model-ready-dot" : "model-empty-dot"} /><span>{hasConnection ? connection.model : "连接模型"}</span><Settings2 size={16} /></button>
         </div>
       </header>
       <div className="conversation-scroll" ref={scrollRef} onScroll={e => { const el = e.currentTarget; nearBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 180; setShowLatest(!nearBottom.current); }}>
         {loadingId === activeId && !current ? <div className="conversation-loading"><Loader2 className="spin" />读取对话…</div> : <>
-          {!current?.messages.length && pending?.id !== draftKey && <div className="chat-start"><span className="start-icon"><Sparkles size={25} /></span><h2>把想法，变成可执行的方案。</h2><p>{isDemo ? "先体验公开知识检索与引用；演示对话不调用大模型，无需 API Key。" : "说说目标、预算与限制，我会参考知识库与你一起完善。"}</p><div className="start-suggestions">{suggestions.map(s => <button key={s.title} onClick={() => setDrafts(v => ({ ...v, [draftKey]: s.text }))}><MessageSquare size={16} />{s.title}<ArrowUp size={14} /></button>)}</div></div>}
+          {!current?.messages.length && pending?.id !== draftKey && <div className="chat-start"><span className="start-icon"><Sparkles size={25} /></span><h2>把想法，变成可执行的方案。</h2><p>{isDemo ? "可直接体验资料与引用；连接自己的 API 后，使用真实模型生成方案。" : "说说目标、预算与限制，我会参考知识库与你一起完善。"}</p><div className="start-suggestions">{suggestions.map(s => <button key={s.title} onClick={() => setDrafts(v => ({ ...v, [draftKey]: s.text }))}><MessageSquare size={16} />{s.title}<ArrowUp size={14} /></button>)}</div></div>}
           <div className="conversation">{current?.messages.map(turn => <Reply key={turn.id} turn={turn} openSnapshot={openSnapshot} />)}{pending?.id === draftKey && <><article className="chat-message user"><header>你</header><p className="user-text">{pending.content}</p></article><div className="chat-progress" role="status"><Loader2 className="spin" size={18} />正在参考知识库，生成方案…<span>{elapsed}s</span></div></>}</div>
         </>}
       </div>
@@ -187,9 +195,9 @@ export function AgentWorkspace({ visible, openSnapshot }: { visible: boolean; op
         {showLatest && <button className="jump-latest" onClick={() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" })}><ArrowDown size={15} />回到最新消息</button>}
         {errors[draftKey] && <div className="send-error" role="alert"><span>{errors[draftKey]}</span>{activeId && <button onClick={() => openConversation(activeId)}>重新载入</button>}<button aria-label="关闭发送错误" onClick={() => setErrors(v => ({ ...v, [draftKey]: "" }))}><X size={15} /></button></div>}
         <form className="chat-composer" onSubmit={send}><label className="sr-only" htmlFor="solution-prompt">你的需求</label><textarea id="solution-prompt" rows={3} placeholder="描述你的需求，或继续追问…" maxLength={6000} disabled={pending?.id === draftKey} value={draft} onChange={e => setDrafts(v => ({ ...v, [draftKey]: e.target.value }))} onKeyDown={e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && !e.nativeEvent.isComposing) { e.preventDefault(); e.currentTarget.form?.requestSubmit(); } }} /><div><span>{pending && pending.id !== draftKey ? "另一段对话正在生成，完成后可发送" : "Ctrl + Enter 发送 · Enter 换行"}</span>{configured ? <button className="button primary" disabled={!!pending || creating || !draft.trim() || loadingId === activeId || (!!activeId && !current)}><ArrowUp size={17} />发送</button> : <button type="button" className="button primary" onClick={() => setSettingsOpen(true)}>连接模型</button>}</div></form>
-        <p className="composer-caption"><BookOpen size={12} />{isDemo ? "静态演示，不调用模型 · 基于本地已发布资料展示引用" : "基于已发布知识回答 · 重要结论请核对引用来源"}</p>
+        <p className="composer-caption"><BookOpen size={12} />{isDemo ? (hasConnection ? "浏览器直连你的模型 · 使用当前本地知识与引用" : "尚未配置 API，本轮使用静态演示 · 可在右上角连接模型") : "基于已发布知识回答 · 重要结论请核对引用来源"}</p>
       </div>
     </section>
-    {settingsOpen && <ModelSettings connection={connection} provider={provider} onClose={() => setSettingsOpen(false)} onSave={(value, selected) => { setConnection(value); setProvider(selected); setSettingsOpen(false); }} />}
+    {settingsOpen && <ModelSettings connection={connection} provider={provider} onClose={() => setSettingsOpen(false)} onClear={() => { clearModelSettings(); setConnection(presetConnection("DeepSeek")); setProvider("DeepSeek"); setSettingsOpen(false); }} onSave={(value, selected) => { const clean=saveModelSettings(value,selected); setConnection(clean); setProvider(selected); setSettingsOpen(false); }} />}
   </>;
 }

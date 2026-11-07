@@ -176,7 +176,7 @@ test("browser instances are isolated, responses cannot mutate store, and revisio
   );
 });
 
-test("sources never perform network collection; keys are not accepted for model tests", () => {
+test("sources never collect; model credentials are excluded from knowledge storage", () => {
   const db = setup();
   assert.throws(
     () => db.request("POST", `/sources/${seed.sources[0].id}/collect`),
@@ -184,7 +184,7 @@ test("sources never perform network collection; keys are not accepted for model 
   );
   assert.throws(
     () => db.request("POST", "/agent/test", { api_key: "secret" }),
-    /不接收 API Key/,
+    /直连适配器/,
   );
   assert.ok(!JSON.stringify(db.exportState()).includes('"api_key"'));
   assert.throws(

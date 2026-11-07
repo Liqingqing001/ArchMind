@@ -64,3 +64,14 @@ API 集成测试在受限沙箱内的 TestClient 事件循环阻塞，使用获�
 - 最新后端回归测试：60 项通过，1 项 PostgreSQL 专用测试跳过（后续 GitHub CI 同时验证 PostgreSQL）。
 - Chromium 在完全没有后端的静态 HTTP 服务上完成真实验证：/ArchMind/ 资源路径、免密对话、引用快照、刷新恢复、模型下载入口、审核后检索 v2、访客隔离、390px 移动端无横向溢出、重置演示。浏览器无 pageerror，零 /api/ 网络请求。
 - 本次 API 启用 GitHub Pages 返回 403 Resource not accessible by integration；项目所有者可在 Settings/Pages 选择 GitHub Actions 完成配置，不需要提供任何密钥。部署工作流亦会尝试自动启用，实际发布状态以 Actions 和公开 URL 验证为准。
+
+
+## 浏览器自带 API 与统一分类
+
+- 从 main 766ac10 同步后在 cloud/browser-api-unified-models 独立分支开发；提交前再次 fetch，未发现新的远端变更。
+- ModelSettings 恢复全部供应商与协议设置，可测试、保存、刷新恢复和单独清除。API 设置仅保存到 archmind-model-settings-v1，不进入知识、对话或检索记录。
+- Pages 对已配置 API 使用浏览器直连 HTTPS 地址；三协议、令牌参数、响应解析、未知引用标注、认证错误和网络/CORS 错误经过受控测试。真实供应商的可用性仍取决于用户凭据、账户模型权限和 CORS 策略，未使用用户真实 Key 进行付费请求。
+- 17 项前端行为检查通过（原 8 项 + 新 9 项），普通构建和 Pages 构建通过。后端 62 项通过，1 项 PostgreSQL 专用测试跳过；GitHub CI 继续验证 PostgreSQL。
+- 已有 SQLite 数据库分类回填验证通过：20 个开放模型新增统一分类，80 条事实与原有 20 个能力分类关联保留。数据迁移只追加分类与关联，不迁移或复制实体。
+- Chromium 实际页面 + 受控模型 HTTP 接口联调通过：测试连接、配置刷新恢复、连续两轮模型请求和历史、引用快照、401 和网络/CORS 失败无静态降级、清除设置保留聊天、同一分类树下的 20 个模型与官方下载、390px 配置弹窗。浏览器无 pageerror。
+- 静态知识数据版本升级采用追加合并，保留访客已有对话、审核操作、历史事实和检索 trace。

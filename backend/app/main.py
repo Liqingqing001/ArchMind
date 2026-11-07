@@ -15,6 +15,7 @@ from .knowledge import retrieve
 from .agent import router as agent_router
 from .conversations import router as conversations_router
 from .model_resources import model_resources
+from .taxonomy import link_open_models
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
@@ -262,6 +263,9 @@ def review(id: str, body: ReviewInput, db: DBSession = Depends(get_db)):
             current.valid_to = stamp
             db.flush()
         db.add(Fact(entity_id=change.entity_id, key=change.key, value=change.new_value, version=change.base_version + 1, snapshot_id=change.snapshot_id, evidence=change.evidence, valid_from=stamp, change_id=change.id))
+    if body.decision == "approved" and change.key == "官方下载入口":
+        db.flush()
+        link_open_models(db)
     change.status, change.reviewer, change.reviewed_at, change.review_note = body.decision, "管理员", now(), body.note
     save(db)
     return data(change)

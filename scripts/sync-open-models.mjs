@@ -13,7 +13,7 @@ const leaf = m => {
 const data = {
  schema_version: 1, batch_id: 'official-open-models-2026-11-07', checked_on: '2026-11-07',
  sources: models.map(m => ({id:m.id,title:m.name+' 官方模型卡',url:m.card_url,excerpts:[m.id,'License: '+m.license],checked_on:m.verified_on,capture_method:'web_tool_official_model_card',note:'模型仓库名与许可证标签的简短记录；不是完整网页。用途为编辑归纳，下载入口为该官方仓库文件列表。'})),
- entities: models.map(m => ({name:m.name,kind:'model',source:m.id,categories:[['AI 模型',...leaf(m)]],description:m.family+' · 开放权重模型 · '+m.description,facts:[
+ entities: models.map(m => ({name:m.name,kind:'model',source:m.id,categories:[['AI 模型',...leaf(m)],['AI 模型','开源与开放权重模型']],description:m.family+' · 开放权重模型 · '+m.description,facts:[
   {key:'模型用途',value:m.description,evidence:0},
   {key:'模型卡许可证',value:m.license+'；使用前以官方模型卡及完整协议为准。',evidence:1},
   {key:'官方下载入口',value:m.download_url,evidence:0},

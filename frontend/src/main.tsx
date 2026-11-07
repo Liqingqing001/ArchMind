@@ -13,7 +13,6 @@ import {
   ChevronRight,
   Clock3,
   Database,
-  Download,
   ExternalLink,
   FileCheck2,
   FileText,
@@ -146,7 +145,6 @@ function App() {
   const [filter, setFilter] = useState("");
   const [category, setCategory] = useState("");
   const [kind, setKind] = useState("");
-  const [openOnly, setOpenOnly] = useState(false);
   const [detail, setDetail] = useState<Row | null>(null);
   const [detailTab, setDetailTab] = useState("facts");
   const [snapshot, setSnapshot] = useState<Row | null>(null);
@@ -247,7 +245,6 @@ function App() {
     setFilter("");
     setCategory("");
     setKind("");
-    setOpenOnly(false);
   };
   const openForm = async (type: string, initial: Row = {}) => {
     setForm(
@@ -327,13 +324,10 @@ function App() {
       .flatMap((c) => descendants(c.id)),
   ];
   const openModels = entities.filter(e => e.model_resources);
-  const scopedEntities = openOnly ? openModels : entities;
   const modelCategory = categories.find(c => c.name === "AI 模型" && !c.parent_id);
-  const modelBranches = categories.filter(c => c.parent_id === modelCategory?.id);
-  const browseOpenModels = (categoryId = "") => {
-    go("entities"); setOpenOnly(true); setKind("model"); setCategory(categoryId);
-  };
-  const filtered = scopedEntities.filter(
+  const openModelCategory = categories.find(c => c.parent_id === modelCategory?.id && c.name === "开源与开放权重模型");
+  const browseOpenModels = () => { go("entities"); setCategory(openModelCategory?.id || modelCategory?.id || ""); };
+  const filtered = entities.filter(
     (e) =>
       (!filter ||
         `${e.name} ${e.description}`
@@ -350,7 +344,7 @@ function App() {
     depth = 0,
   ): React.ReactNode =>
     categories
-      .filter((c) => c.parent_id === parent && (!openOnly || openModels.some(e => e.category_ids.some((id: string) => descendants(c.id).includes(id)))))
+      .filter((c) => c.parent_id === parent)
       .map((c) => (
         <React.Fragment key={c.id}>
           <button
@@ -366,7 +360,7 @@ function App() {
             <span>{c.name}</span>
             <small>
               {
-                scopedEntities.filter((e) =>
+                entities.filter((e) =>
                   e.category_ids.some((id: string) =>
                     descendants(c.id).includes(id),
                   ),
@@ -594,12 +588,9 @@ function App() {
                     ))}
                   </div>
                   <section className="panel open-model-overview">
-                    <div><h2>开源与开放权重模型 <span>{openModels.length} 个</span></h2><p>已纳入知识库，按分类浏览模型资料、官方权重与许可证。</p></div>
+                    <div><h2>开源与开放权重模型 <span>{openModels.length} 个</span></h2><p>全部知识 → AI 模型 → 开源与开放权重模型；保留原有能力分类。</p></div>
                     <button className="button" onClick={() => browseOpenModels()}>浏览模型知识 <ArrowRight size={16} /></button>
-                    <div className="model-category-links">{modelBranches.map(c => {
-                      const count = openModels.filter(e => e.category_ids.some((id: string) => descendants(c.id).includes(id))).length;
-                      return count > 0 && <button key={c.id} onClick={() => browseOpenModels(c.id)}>{c.name}<b>{count}</b></button>;
-                    })}</div>
+
                   </section>
                   <div className="overview-grid">
                     <section className="panel ecology">
@@ -821,14 +812,14 @@ function App() {
                       </button>
                     </div>
                     <button
-                      className={`tree-item ${!category && !openOnly ? "selected" : ""}`}
-                      onClick={() => { setCategory(""); setOpenOnly(false); setKind(""); }}
+                      className={`tree-item ${!category ? "selected" : ""}`}
+                      onClick={() => { setCategory(""); setKind(""); }}
                     >
                       <Layers3 size={14} />
                       <span>全部知识</span>
                       <small>{entities.length}</small>
                     </button>
-                    <button className={`tree-item ${openOnly && !category ? "selected" : ""}`} onClick={() => browseOpenModels()}><Download size={14} /><span>开源与开放权重</span><small>{openModels.length}</small></button>
+
                     {categoryTree()}
                   </aside>
                   <section className="panel entity-panel">
@@ -841,9 +832,7 @@ function App() {
                           onChange={(e) => setFilter(e.target.value)}
                         />
                       </label>
-                      <select aria-label="知识范围" value={openOnly ? "open" : "all"} onChange={e => { setOpenOnly(e.target.value === "open"); setCategory(""); setKind(e.target.value === "open" ? "model" : ""); }}>
-                        <option value="all">全部知识</option><option value="open">开源与开放权重</option>
-                      </select>
+
                       <select
                         className="mobile-category"
                         aria-label="知识分类"
@@ -1543,7 +1532,7 @@ function App() {
                         ? "只读检索口令已配置"
                         : "尚未配置 KNOWLEDGE_TOKEN",
                     ],
-                    ["模型服务", "在模型 API 配置页连接 · 密钥仅保存在当前页面会话"],
+                    ["模型服务", "右上角连接模型 · 配置单独保存在本地浏览器"],
                     ["向量检索", "尚未启用 · 下一阶段接入 pgvector"],
                     [
                       "自动巡检",
