@@ -22,7 +22,7 @@ class TitleInput(BaseModel):
 
 def summary(row):
     last = row.messages[-1] if row.messages else {}
-    return {"id": row.id, "title": row.title, "revision": row.revision,
+    return {"id": row.id, "title": row.title, "title_mode": row.title_mode, "revision": row.revision,
         "created_at": row.created_at, "updated_at": row.updated_at,
         "message_count": len(row.messages), "preview": last.get("content", "")[:100]}
 
@@ -42,7 +42,7 @@ def list_conversations(db=Depends(get_db)):
 
 @router.post("", status_code=201)
 def create_conversation(body: TitleInput, db=Depends(get_db)):
-    row = Conversation(title=body.title)
+    row = Conversation(title=body.title, title_mode='auto' if body.title=='新对话' else 'manual')
     db.add(row)
     db.commit()
     return {**summary(row), "messages": row.messages}
@@ -59,7 +59,7 @@ def rename_conversation(id: str, body: TitleInput, db=Depends(get_db)):
     get_conversation(db, id)
     # Update only title, so a concurrent reply cannot be overwritten.
     db.execute(update(Conversation).where(Conversation.id == id, Conversation.deleted_at.is_(None))
-        .values(title=body.title, updated_at=now()))
+        .values(title=body.title, title_mode='manual', updated_at=now()))
     db.commit()
     db.expire_all()
     return summary(get_conversation(db, id))

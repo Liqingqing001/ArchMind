@@ -1,0 +1,327 @@
+[
+  {
+    "id": "novel_website",
+    "goal": "低成本AI写小说并做一个网站",
+    "delivery": "无偏好",
+    "requirements": "长篇连贯且可商用",
+    "caps": [
+      "text_generation",
+      "code_generation"
+    ],
+    "routes": [
+      "api",
+      "local",
+      "platform"
+    ],
+    "include": [
+      "DeepSeek-V4.1-Flash-1017",
+      "Qwen3-8B",
+      "DeepSeek 网页版",
+      "Open WebUI",
+      "Cloudflare Workers",
+      "v0"
+    ],
+    "exclude": [
+      "ComfyUI",
+      "MiniMax-H3",
+      "whisper-large-v3"
+    ]
+  },
+  {
+    "id": "negative_video",
+    "goal": "我不要生成视频，只写小说并做网站",
+    "delivery": "无偏好",
+    "requirements": "成本低",
+    "caps": [
+      "text_generation",
+      "code_generation"
+    ],
+    "routes": [
+      "api",
+      "local",
+      "platform"
+    ],
+    "include": [
+      "DeepSeek-V4.1-Flash-1017",
+      "Qwen3-8B"
+    ],
+    "exclude": [
+      "ComfyUI",
+      "MiniMax-H3",
+      "Veo 3.1"
+    ]
+  },
+  {
+    "id": "api_only",
+    "goal": "写小说网站",
+    "delivery": "不想本地部署，只用API",
+    "requirements": "成本低",
+    "caps": [
+      "text_generation",
+      "code_generation"
+    ],
+    "routes": [
+      "api"
+    ],
+    "include": [
+      "DeepSeek-V4.1-Flash-1017",
+      "Cloudflare Workers"
+    ],
+    "exclude": [
+      "Qwen3-8B",
+      "DeepSeek 网页版",
+      "v0"
+    ]
+  },
+  {
+    "id": "offline",
+    "goal": "写小说网站",
+    "delivery": "无偏好",
+    "requirements": "数据不得出网",
+    "caps": [
+      "text_generation",
+      "code_generation"
+    ],
+    "routes": [
+      "local"
+    ],
+    "include": [
+      "Qwen3-8B",
+      "Open WebUI"
+    ],
+    "exclude": [
+      "DeepSeek-V4.1-Flash-1017",
+      "DeepSeek 网页版",
+      "Cloudflare Workers"
+    ]
+  },
+  {
+    "id": "platform_only",
+    "goal": "小说网站",
+    "delivery": "不要API，只用现成平台",
+    "requirements": "简单",
+    "caps": [
+      "text_generation",
+      "code_generation"
+    ],
+    "routes": [
+      "platform"
+    ],
+    "include": [
+      "DeepSeek 网页版",
+      "v0"
+    ],
+    "exclude": [
+      "Qwen3-8B",
+      "Cloudflare Workers",
+      "DeepSeek API"
+    ]
+  },
+  {
+    "id": "image",
+    "goal": "生成图片和海报",
+    "delivery": "无偏好",
+    "requirements": "商用",
+    "caps": [
+      "image_generation"
+    ],
+    "routes": [
+      "api",
+      "local",
+      "platform"
+    ],
+    "include": [
+      "GPT Image 2.6 Flare",
+      "FLUX.1-schnell",
+      "ComfyUI"
+    ],
+    "exclude": [
+      "DeepSeek-V4.1-Flash-1017",
+      "whisper-large-v3"
+    ]
+  },
+  {
+    "id": "transcribe",
+    "goal": "语音转文字",
+    "delivery": "无偏好",
+    "requirements": "批处理",
+    "caps": [
+      "audio_understanding"
+    ],
+    "routes": [
+      "api",
+      "local",
+      "platform"
+    ],
+    "include": [
+      "Gemini 3.5 Transcribe",
+      "whisper-large-v3"
+    ],
+    "exclude": [
+      "MiniMax speech-2.8-turbo",
+      "MiniMax-H3"
+    ]
+  },
+  {
+    "id": "understand_video",
+    "goal": "分析视频内容",
+    "delivery": "无偏好",
+    "requirements": "视频摘要",
+    "caps": [
+      "video_understanding"
+    ],
+    "routes": [
+      "api",
+      "local",
+      "platform"
+    ],
+    "include": [
+      "Qwen3.8-Flash",
+      "Qwen2.5-VL-7B-Instruct"
+    ],
+    "exclude": [
+      "MiniMax-H3",
+      "Veo 3.1",
+      "ComfyUI"
+    ]
+  },
+  {
+    "id": "speech",
+    "goal": "生成配音",
+    "delivery": "无偏好",
+    "requirements": "自然",
+    "caps": [
+      "audio_generation"
+    ],
+    "routes": [
+      "api",
+      "local",
+      "platform"
+    ],
+    "include": [
+      "MiniMax speech-2.8-turbo",
+      "CosyVoice2-0.5B"
+    ],
+    "exclude": [
+      "whisper-large-v3",
+      "DeepSeek-V4.1-Flash-1017"
+    ]
+  },
+  {
+    "id": "wrong_named_model",
+    "goal": "用Veo 3.1写小说",
+    "delivery": "只用API",
+    "requirements": "低成本",
+    "caps": [
+      "text_generation"
+    ],
+    "routes": [
+      "api"
+    ],
+    "include": [
+      "Veo 3.1",
+      "DeepSeek-V4.1-Flash-1017"
+    ],
+    "exclude": [
+      "Qwen3-8B"
+    ],
+    "references": [
+      "Veo 3.1"
+    ]
+  },
+  {
+    "id": "text_understanding",
+    "goal": "总结文字并分类",
+    "delivery": "无偏好",
+    "requirements": "准确",
+    "caps": [
+      "text_understanding"
+    ],
+    "routes": [
+      "api",
+      "local",
+      "platform"
+    ],
+    "include": [
+      "DeepSeek-V4.1-Flash-1017",
+      "Qwen3-8B",
+      "DeepSeek 网页版"
+    ],
+    "exclude": [
+      "MiniMax-H3",
+      "FLUX.1-schnell"
+    ]
+  },
+  {
+    "id": "code_website",
+    "goal": "开发一个网站",
+    "delivery": "无偏好",
+    "requirements": "低成本",
+    "caps": [
+      "code_generation"
+    ],
+    "routes": [
+      "api",
+      "local",
+      "platform"
+    ],
+    "include": [
+      "DeepSeek-V4.1-Flash-1017",
+      "Qwen2.5-Coder-7B-Instruct",
+      "v0",
+      "Cloudflare Workers"
+    ],
+    "exclude": [
+      "DeepSeek 网页版",
+      "MiniMax-H3"
+    ]
+  },
+  {
+    "id": "image_understanding",
+    "goal": "识别图片内容",
+    "delivery": "无偏好",
+    "requirements": "准确",
+    "caps": [
+      "image_understanding"
+    ],
+    "routes": [
+      "api",
+      "local",
+      "platform"
+    ],
+    "include": [
+      "Qwen3.8-Flash",
+      "Qwen2.5-VL-7B-Instruct"
+    ],
+    "exclude": [
+      "FLUX.1-schnell",
+      "GPT Image 2.6 Flare",
+      "MiniMax-H3"
+    ]
+  },
+  {
+    "id": "video_generation",
+    "goal": "AI视频短剧",
+    "delivery": "无偏好",
+    "requirements": "角色一致",
+    "caps": [
+      "video_generation"
+    ],
+    "routes": [
+      "api",
+      "local",
+      "platform"
+    ],
+    "include": [
+      "MiniMax-H3",
+      "Wan2.1-T2V-1.3B",
+      "可灵 Kling",
+      "ComfyUI"
+    ],
+    "exclude": [
+      "DeepSeek 网页版",
+      "Qwen3-8B",
+      "whisper-large-v3"
+    ]
+  }
+]

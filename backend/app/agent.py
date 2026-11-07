@@ -12,7 +12,8 @@ from .collector import validate_url
 from .provider_protocols import request_parts, response_text
 from .conversations import get_conversation, summary
 from .web_search import SearchConnection, search_web, disabled_search, search_warnings, POLICY as SEARCH_POLICY, request_json as search_request_json, parse_results as parse_search_results
-from .solution_flow import POLICY, terms, rank_knowledge, previous_workflow, extraction_messages, apply_extraction, is_confirmation, clarification, editorial_guide
+from .solution_flow import POLICY, terms, rank_knowledge, previous_workflow, extraction_messages, apply_extraction, is_confirmation, clarification, editorial_guide, conversation_title
+from .recommendations import selection_context
 
 router = APIRouter(prefix="/api/agent", tags=["solution-agent"])
 
@@ -92,9 +93,9 @@ def retrieve_context(db, messages, workflow=None):
         .where(Fact.valid_to.is_(None), Entity.is_demo.is_(False), Source.is_demo.is_(False))).all()
     rows = [dict(fact_id=f.id,entity_id=e.id,entity_name=e.name,entity_kind=e.kind,key=f.key,value=f.value[:3000],evidence=f.evidence[:1500],version=f.version,snapshot_id=sn.id,snapshot_hash=sn.content_hash,source_id=s.id,source_url=s.url,source_name=s.name,fetched_at=sn.fetched_at,valid_from=f.valid_from,is_demo=False) for f,e,sn,s in joined]
     results = rank_knowledge(rows,[dict(id=e.id,description=e.description) for e in db.scalars(select(Entity))],
-        [dict(id=c.id,name=c.name) for c in db.scalars(select(Category))],
+        [dict(id=c.id,name=c.name,parent_id=c.parent_id) for c in db.scalars(select(Category))],
         [dict(entity_id=l.entity_id,category_id=l.category_id) for l in db.scalars(select(EntityCategory))],workflow,messages[-1].content)
-    trace = Trace(query=messages[-1].content,caller='agent',request_context={'purpose':'solution_chat','method':'scenario_keyword_v2','include_demo':False,'goal':workflow['fields']['goal']['value'],'scene':workflow['scene']},results=results)
+    trace = Trace(query=messages[-1].content,caller='agent',request_context={'purpose':'solution_chat','method':'capability_routes_v1','selection':selection_context(workflow),'include_demo':False,'goal':workflow['fields']['goal']['value'],'scene':workflow['scene']},results=results)
     db.add(trace);db.commit()
     return results,trace.id
 
@@ -159,10 +160,12 @@ def test_search(connection:SearchConnection):
 @router.post("/chat")
 def chat(body: ChatRequest, db=Depends(get_db)):
     conversation = None
+    original_title = None
     messages = body.messages
     previous_turns = []
     if body.conversation_id:
         conversation = get_conversation(db, body.conversation_id)
+        original_title = conversation.title
         if conversation.revision != body.revision:
             raise HTTPException(409, "对话已在另一页面更新，请重新打开后发送")
         previous_turns = list(conversation.messages)
@@ -206,7 +209,7 @@ def chat(body: ChatRequest, db=Depends(get_db)):
         scene = editorial_guide(workflow)
         prompt = [{'role':'system','content':POLICY['answer_prompt']+'\n'+SEARCH_POLICY['prompt']+('\n'+POLICY['continue_prompt'] if continuing else '')}]
         prompt.extend(m.model_dump() for m in messages[:-1])
-        prompt.append({'role':'user','content':json.dumps({'BRIEF':workflow['fields'],'EDITORIAL_GUIDE':scene,'EVIDENCE_JSON':evidence,'WEB_EVIDENCE_JSON':web['results'],'WEB_SEARCH':{k:v for k,v in web.items() if k!='results'},'USER_INPUT':user},ensure_ascii=False)})
+        prompt.append({'role':'user','content':json.dumps({'BRIEF':workflow['fields'],'SELECTION_CONTEXT':selection_context(workflow),'EDITORIAL_GUIDE':scene,'EVIDENCE_JSON':evidence,'WEB_EVIDENCE_JSON':web['results'],'WEB_SEARCH':{k:v for k,v in web.items() if k!='results'},'USER_INPUT':user},ensure_ascii=False)})
         completion = complete(body.connection,prompt)
         answer,finish = completion
         requested = set(re.findall(r'\[([KW]\d+)\]',answer));valid = {e['citation_id'] for e in evidence+web['results']};warnings = search_warnings(web)
@@ -232,7 +235,7 @@ def chat(body: ChatRequest, db=Depends(get_db)):
         saved = db.execute(update(Conversation).where(Conversation.id == conversation.id,
             Conversation.revision == body.revision, Conversation.deleted_at.is_(None))
             .values(messages=turns, revision=body.revision+1, updated_at=stamp,
-                title=case((Conversation.title == "新对话", body.messages[-1].content[:36]), else_=Conversation.title)))
+                title=case(((Conversation.title_mode == 'auto') & (Conversation.title == original_title), conversation_title(workflow)), else_=Conversation.title)))
         db.commit()
         if saved.rowcount != 1:
             raise HTTPException(409, "对话已更新或被删除，本次回复未覆盖已有记录，请重新打开对话")

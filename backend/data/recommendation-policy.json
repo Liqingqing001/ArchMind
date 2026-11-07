@@ -1,0 +1,477 @@
+{
+  "version": 1,
+  "capabilities": [
+    {
+      "id": "text_generation",
+      "label": "文本生成",
+      "cues": [
+        "小说",
+        "写作",
+        "文案",
+        "文章",
+        "文本生成",
+        "写故事",
+        "作文",
+        "剧本",
+        "聊天",
+        "客服"
+      ],
+      "categories": [
+        "大语言模型"
+      ],
+      "exclude_categories": [
+        "代码生成"
+      ],
+      "preferred_models": [
+        "DeepSeek-V4.1-Flash-1017",
+        "Qwen3-8B",
+        "Kimi K3.1 Pro"
+      ]
+    },
+    {
+      "id": "code_generation",
+      "label": "代码与网站",
+      "cues": [
+        "代码",
+        "编程",
+        "网站",
+        "网页",
+        "建站",
+        "应用开发",
+        "开发应用",
+        "小程序",
+        "coding"
+      ],
+      "categories": [
+        "代码生成"
+      ],
+      "exclude_categories": [],
+      "preferred_models": [
+        "DeepSeek-V4.1-Flash-1017",
+        "Qwen2.5-Coder-7B-Instruct",
+        "GPT-6.1 Sol"
+      ]
+    },
+    {
+      "id": "image_generation",
+      "label": "图片生成",
+      "cues": [
+        "生图",
+        "生成图片",
+        "图片生成",
+        "图像生成",
+        "画图",
+        "绘画",
+        "海报",
+        "文生图"
+      ],
+      "categories": [
+        "图像生成模型"
+      ],
+      "exclude_categories": [],
+      "preferred_models": [
+        "GPT Image 2.6 Flare",
+        "FLUX.1-schnell",
+        "Qwen-Image"
+      ]
+    },
+    {
+      "id": "audio_generation",
+      "label": "声音生成",
+      "cues": [
+        "配音",
+        "语音合成",
+        "生成声音",
+        "声音生成",
+        "音乐生成",
+        "tts"
+      ],
+      "categories": [
+        "语音合成"
+      ],
+      "exclude_categories": [],
+      "preferred_models": [
+        "MiniMax speech-2.8-turbo",
+        "CosyVoice2-0.5B",
+        "GLM-TTS"
+      ]
+    },
+    {
+      "id": "video_generation",
+      "label": "视频生成",
+      "cues": [
+        "短剧",
+        "生成视频",
+        "视频生成",
+        "文生视频",
+        "图生视频",
+        "做视频",
+        "做个视频",
+        "做一个视频",
+        "动漫"
+      ],
+      "categories": [
+        "视频生成模型"
+      ],
+      "exclude_categories": [],
+      "preferred_models": [
+        "MiniMax-H3",
+        "Wan2.1-T2V-1.3B",
+        "Seedance 2.5"
+      ]
+    },
+    {
+      "id": "text_understanding",
+      "label": "文字理解",
+      "cues": [
+        "总结",
+        "归纳",
+        "提取",
+        "分类",
+        "翻译",
+        "理解文字",
+        "分析文字"
+      ],
+      "categories": [
+        "大语言模型",
+        "翻译"
+      ],
+      "exclude_categories": [
+        "代码生成"
+      ],
+      "preferred_models": [
+        "DeepSeek-V4.1-Flash-1017",
+        "Qwen3-8B"
+      ]
+    },
+    {
+      "id": "image_understanding",
+      "label": "图片与文档理解",
+      "cues": [
+        "识图",
+        "图片识别",
+        "识别图片",
+        "图片理解",
+        "图像理解",
+        "理解图片",
+        "文档解析",
+        "ocr"
+      ],
+      "categories": [
+        "视觉理解",
+        "文档理解"
+      ],
+      "exclude_categories": [],
+      "preferred_models": [
+        "Qwen3.8-Flash",
+        "Qwen2.5-VL-7B-Instruct",
+        "GLM-OCR"
+      ]
+    },
+    {
+      "id": "audio_understanding",
+      "label": "声音理解",
+      "cues": [
+        "语音识别",
+        "语音转文字",
+        "音频转文字",
+        "转写",
+        "识别声音",
+        "音频理解",
+        "理解声音"
+      ],
+      "categories": [
+        "语音识别",
+        "声音理解"
+      ],
+      "exclude_categories": [],
+      "preferred_models": [
+        "Gemini 3.5 Transcribe",
+        "whisper-large-v3",
+        "GLM-ASR-2512"
+      ]
+    },
+    {
+      "id": "video_understanding",
+      "label": "视频理解",
+      "cues": [
+        "视频理解",
+        "理解视频",
+        "分析视频",
+        "视频分析",
+        "视频问答",
+        "视频摘要"
+      ],
+      "categories": [
+        "视频理解"
+      ],
+      "exclude_categories": [],
+      "preferred_models": [
+        "Qwen3.8-Flash",
+        "Qwen2.5-VL-7B-Instruct",
+        "Kimi K3.1 Pro"
+      ]
+    },
+    {
+      "id": "retrieval",
+      "label": "知识检索",
+      "cues": [
+        "知识库",
+        "rag",
+        "文档问答",
+        "向量检索"
+      ],
+      "categories": [
+        "文本嵌入",
+        "重排序"
+      ],
+      "exclude_categories": [],
+      "preferred_models": [
+        "text-embedding-v4",
+        "bge-m3",
+        "bge-reranker-v2-m3"
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "id": "api",
+      "name": "API 自建",
+      "cues": [
+        "api",
+        "接口",
+        "自建"
+      ],
+      "cost": "模型输入/输出用量 × 对应单价 + 网站托管/数据库；没有单价或用量就不给月费。"
+    },
+    {
+      "id": "local",
+      "name": "本地／云 GPU 部署",
+      "cues": [
+        "本地",
+        "自部署",
+        "gpu",
+        "私有化",
+        "离线"
+      ],
+      "cost": "现有或新增硬件 + 电费/维护；租云 GPU 另算运行时长、存储与网络，权重开放不等于零成本。"
+    },
+    {
+      "id": "platform",
+      "name": "现成平台",
+      "cues": [
+        "现成",
+        "平台",
+        "免部署",
+        "一站式",
+        "saas"
+      ],
+      "cost": "订阅/积分/额度与商用条件；网页会员不等于 API 配额，独立网站交付需另确认。"
+    }
+  ],
+  "constraint_fields": [
+    "接入状态",
+    "文档状态",
+    "开放状态",
+    "商业使用边界",
+    "许可边界",
+    "权重许可",
+    "模型卡许可证",
+    "下载条件",
+    "版本边界"
+  ],
+  "feature_fields": [
+    "模型用途",
+    "核心能力",
+    "生成任务",
+    "任务定位",
+    "输入方式",
+    "支持输入",
+    "输入输出",
+    "API 模型名",
+    "交互方式",
+    "服务范围",
+    "平台用途",
+    "工作流能力",
+    "运行方式",
+    "任务范围",
+    "服务形态",
+    "接入方式"
+  ],
+  "cost_fields": [
+    "费用边界",
+    "费用组成",
+    "计费方式",
+    "计费维度",
+    "报价入口",
+    "报价方式",
+    "商业使用边界",
+    "许可边界"
+  ],
+  "exact_code_models": [
+    "DeepSeek-V4.1-Flash-1017",
+    "GPT-6.1 Sol",
+    "GPT-6 Astra",
+    "MiniMax-M3.1-Flash",
+    "MiniMax-M3",
+    "Kimi K3.1 Pro",
+    "GLM-5.3"
+  ],
+  "platforms": [
+    {
+      "name": "DeepSeek 网页版",
+      "capabilities": [
+        "text_generation",
+        "text_understanding"
+      ],
+      "routes": [
+        "platform"
+      ],
+      "role": "platform"
+    },
+    {
+      "name": "Kimi 网页版",
+      "capabilities": [
+        "text_generation",
+        "text_understanding"
+      ],
+      "routes": [
+        "platform"
+      ],
+      "role": "platform"
+    },
+    {
+      "name": "v0",
+      "capabilities": [
+        "code_generation"
+      ],
+      "routes": [
+        "platform"
+      ],
+      "role": "platform"
+    },
+    {
+      "name": "可灵 Kling",
+      "capabilities": [
+        "video_generation"
+      ],
+      "routes": [
+        "platform"
+      ],
+      "role": "platform"
+    },
+    {
+      "name": "RunningHub",
+      "capabilities": [
+        "image_generation",
+        "video_generation",
+        "audio_generation"
+      ],
+      "routes": [
+        "platform"
+      ],
+      "role": "platform"
+    },
+    {
+      "name": "LiblibAI 工作流 API",
+      "capabilities": [
+        "image_generation",
+        "video_generation"
+      ],
+      "routes": [
+        "platform",
+        "api"
+      ],
+      "role": "platform"
+    },
+    {
+      "name": "DeepSeek API",
+      "capabilities": [
+        "text_generation",
+        "text_understanding",
+        "code_generation"
+      ],
+      "routes": [
+        "api"
+      ],
+      "role": "gateway"
+    },
+    {
+      "name": "Dify",
+      "capabilities": [
+        "text_generation",
+        "retrieval"
+      ],
+      "routes": [
+        "api"
+      ],
+      "role": "application"
+    },
+    {
+      "name": "Open WebUI",
+      "capabilities": [
+        "text_generation",
+        "text_understanding",
+        "code_generation"
+      ],
+      "routes": [
+        "local",
+        "api"
+      ],
+      "role": "runtime"
+    },
+    {
+      "name": "Ollama",
+      "capabilities": [
+        "text_generation",
+        "text_understanding",
+        "code_generation"
+      ],
+      "routes": [
+        "local"
+      ],
+      "role": "runtime"
+    },
+    {
+      "name": "ComfyUI",
+      "capabilities": [
+        "image_generation",
+        "video_generation",
+        "audio_generation"
+      ],
+      "routes": [
+        "local",
+        "api"
+      ],
+      "role": "runtime"
+    },
+    {
+      "name": "Cloudflare Workers",
+      "capabilities": [
+        "code_generation"
+      ],
+      "routes": [
+        "api"
+      ],
+      "role": "hosting"
+    }
+  ],
+  "question_overrides": {
+    "text_generation": {
+      "scale": "预计每天生成多少章、每章多少字？网站先自己用还是提供给其他人？",
+      "requirements": "最在意文风、长篇连贯、商用许可还是隐私？是否必须交付自己的独立网站？"
+    },
+    "code_generation": {
+      "requirements": "需要独立上线的网站还是先做页面原型？是否涉及登录、付费或私有数据？"
+    },
+    "audio_understanding": {
+      "scale": "每月大概转写多少小时音频？需要实时识别还是离线批处理？"
+    },
+    "video_understanding": {
+      "scale": "每段视频大概多长、多久处理一批？需要摘要、问答还是定位画面？"
+    },
+    "image_generation": {
+      "scale": "预计每月生成多少张图片、什么尺寸？先试用也可以。"
+    }
+  }
+}

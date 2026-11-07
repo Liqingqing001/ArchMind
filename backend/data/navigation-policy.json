@@ -236,7 +236,12 @@
     "博查 Web Search API": "博查",
     "Amazon EC2 GPU 实例": "AWS",
     "Google Cloud GPU": "Google Cloud",
-    "Azure GPU 虚拟机": "Microsoft Azure"
+    "Azure GPU 虚拟机": "Microsoft Azure",
+    "DeepSeek 网页版": "DeepSeek",
+    "Kimi 网页版": "月之暗面",
+    "v0": "Vercel",
+    "Cloudflare Workers": "Cloudflare",
+    "Open WebUI": "Open WebUI"
   },
   "vendor_relations": [
     "开发模型",
@@ -277,6 +282,30 @@
         "工具与平台",
         "应用与产品",
         "云端工作流"
+      ]
+    },
+    {
+      "category": "文本创作平台",
+      "path": [
+        "工具与平台",
+        "应用与产品",
+        "文本创作平台"
+      ]
+    },
+    {
+      "category": "网站构建平台",
+      "path": [
+        "工具与平台",
+        "应用与产品",
+        "网站构建平台"
+      ]
+    },
+    {
+      "category": "网站托管与函数",
+      "path": [
+        "工具与平台",
+        "云服务与 API",
+        "网站托管与函数"
       ]
     }
   ]

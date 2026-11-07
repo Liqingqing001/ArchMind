@@ -36,7 +36,7 @@ assert.ok(
 assert.equal(node(["理解类", "理解视频"]).entity_ids.length, 10);
 assert.equal(
   new Set(navigation.nodes.flatMap((n) => n.direct_entity_ids)).size,
-  167,
+  172,
 );
 for (const n of navigation.nodes) {
   assert.equal(new Set(n.entity_ids).size, n.entity_ids.length);

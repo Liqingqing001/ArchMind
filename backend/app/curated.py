@@ -63,7 +63,7 @@ def import_curated(db,dataset):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--apply',action='store_true',help='Commit the reviewed public dataset; default is a rolled-back preview')
-    parser.add_argument('--dataset',choices=['official-knowledge-2026-11-07.json','open-model-knowledge-2026-11-07.json','video-workflow-knowledge-2026-11-07.json','infrastructure-knowledge-2026-11-07.json'],default='infrastructure-knowledge-2026-11-07.json')
+    parser.add_argument('--dataset',choices=json.loads((Path(__file__).resolve().parent.parent/'data/public-datasets.json').read_text()),default='infrastructure-knowledge-2026-11-07.json')
     args=parser.parse_args()
     dataset=json.loads((Path(__file__).resolve().parent.parent/'data'/args.dataset).read_text(encoding='utf-8'))
     with Session() as db:

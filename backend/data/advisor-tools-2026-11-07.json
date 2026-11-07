@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "batch_id": "advisor-tools-2026-11-07",
+  "checked_on": "2026-11-07",
+  "sources": [
+    {
+      "id": "DeepSeek 网页版",
+      "title": "DeepSeek 官方网站",
+      "url": "https://www.deepseek.com/",
+      "excerpts": [
+        "DeepSeek 网页版",
+        "和 DeepSeek 对话"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "official_page_editorial_review",
+      "note": "本轮官方短摘录，非完整页面；未做实际付费调用、托管部署或小说效果评测。"
+    },
+    {
+      "id": "Kimi 网页版",
+      "title": "Kimi 官方网页",
+      "url": "https://www.kimi.com/",
+      "excerpts": [
+        "New chat",
+        "Ask anything, or task an agent"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "official_page_editorial_review",
+      "note": "本轮官方短摘录，非完整页面；未做实际付费调用、托管部署或小说效果评测。"
+    },
+    {
+      "id": "v0",
+      "title": "v0 官方文档与价格说明",
+      "url": "https://v0.app/docs",
+      "excerpts": [
+        "full-stack applications",
+        "Vercel",
+        "no longer available to new users",
+        "current signup offer"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "official_page_editorial_review",
+      "note": "本轮官方短摘录，非完整页面；未做实际付费调用、托管部署或小说效果评测。",
+      "additional_urls": [
+        "https://v0.app/docs/pricing"
+      ]
+    },
+    {
+      "id": "Cloudflare Workers",
+      "title": "Cloudflare Workers 官方文档",
+      "url": "https://developers.cloudflare.com/workers/",
+      "excerpts": [
+        "A serverless platform",
+        "Build APIs",
+        "CPU time",
+        "Requests"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "official_page_editorial_review",
+      "note": "本轮官方短摘录，非完整页面；未做实际付费调用、托管部署或小说效果评测。",
+      "additional_urls": [
+        "https://developers.cloudflare.com/workers/platform/pricing/"
+      ]
+    },
+    {
+      "id": "Open WebUI",
+      "title": "Open WebUI 官方 README",
+      "url": "https://github.com/open-webui/open-webui/blob/main/README.md",
+      "excerpts": [
+        "self-hosted platform",
+        "Connect local models through Ollama",
+        "OpenAI-compatible APIs",
+        "requires preserving the Open WebUI branding"
+      ],
+      "checked_on": "2026-11-07",
+      "capture_method": "official_page_editorial_review",
+      "note": "本轮官方短摘录，非完整页面；未做实际付费调用、托管部署或小说效果评测。"
+    }
+  ],
+  "entities": [
+    {
+      "name": "DeepSeek 网页版",
+      "kind": "product",
+      "source": "DeepSeek 网页版",
+      "categories": [
+        [
+          "AI 应用与产品",
+          "文本创作平台"
+        ]
+      ],
+      "description": "DeepSeek 官方网页对话入口；可用于验证文本创作需求，不等于独立网站交付。",
+      "facts": [
+        {
+          "key": "官方入口",
+          "value": "https://chat.deepseek.com/",
+          "evidence": 0
+        },
+        {
+          "key": "交互方式",
+          "value": "官方提供网页对话入口；创作质量、额度与使用条款需实际核对。",
+          "evidence": 1
+        }
+      ]
+    },
+    {
+      "name": "Kimi 网页版",
+      "kind": "product",
+      "source": "Kimi 网页版",
+      "categories": [
+        [
+          "AI 应用与产品",
+          "文本创作平台"
+        ]
+      ],
+      "description": "Kimi 网页对话与任务入口；文本创作效果需用自己的样本比较。",
+      "facts": [
+        {
+          "key": "官方入口",
+          "value": "https://www.kimi.com/",
+          "evidence": 0
+        },
+        {
+          "key": "交互方式",
+          "value": "网页提供聊天与任务入口；当前资料未核验会员套餐和 API 配额。",
+          "evidence": 1
+        }
+      ]
+    },
+    {
+      "name": "v0",
+      "kind": "product",
+      "source": "v0",
+      "categories": [
+        [
+          "AI 应用与产品",
+          "网站构建平台"
+        ]
+      ],
+      "description": "通过自然语言构建和发布网站、应用的产品；不是免费无限量模型 API。",
+      "facts": [
+        {
+          "key": "平台用途",
+          "value": "可通过提示词构建网站、组件和全栈应用。",
+          "evidence": 0
+        },
+        {
+          "key": "发布入口",
+          "value": "官方文档介绍一键发布到 Vercel；需另核对实际托管和数据库费用。",
+          "evidence": 1
+        },
+        {
+          "key": "费用边界",
+          "value": "套餐、积分额度与新用户优惠需查看账号；Premium 方案已停止向新用户开放，不应默认推荐其旧月价。",
+          "evidence": 2
+        }
+      ]
+    },
+    {
+      "name": "Cloudflare Workers",
+      "kind": "cloud",
+      "source": "Cloudflare Workers",
+      "categories": [
+        [
+          "云计算与基础设施",
+          "网站托管与函数"
+        ]
+      ],
+      "description": "网站与 API 的无服务器部署候选；不等于免费 GPU 或任意本地模型推理环境。",
+      "facts": [
+        {
+          "key": "服务形态",
+          "value": "提供应用部署与 API 运行环境；需核对目标框架和运行限制。",
+          "evidence": 0
+        },
+        {
+          "key": "费用组成",
+          "value": "Workers 请求与 CPU 用量属于计费维度，外部模型 API、数据库和存储另行核算。",
+          "evidence": 2
+        }
+      ]
+    },
+    {
+      "name": "Open WebUI",
+      "kind": "project",
+      "source": "Open WebUI",
+      "categories": [
+        [
+          "开源项目",
+          "AI 应用模板",
+          "聊天界面"
+        ]
+      ],
+      "description": "可自托管的模型聊天界面，适合验证小说创作工具；不能代替完整业务网站。",
+      "facts": [
+        {
+          "key": "接入方式",
+          "value": "连接 Ollama 本地模型，或使用 OpenAI 兼容 API；具体模型模板与运行条件需另核对。",
+          "evidence": 1
+        },
+        {
+          "key": "部署形态",
+          "value": "可自托管并离线运行，所用模型和依赖也必须满足离线条件。",
+          "evidence": 0
+        },
+        {
+          "key": "许可边界",
+          "value": "仓库包含 Open WebUI License 和历史许可证代码；需保留品牌标识并核对 LICENSE 与历史条款，不按无条件改名许可处理。",
+          "evidence": 3
+        }
+      ]
+    }
+  ]
+}

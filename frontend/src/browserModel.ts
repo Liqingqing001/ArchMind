@@ -1,3 +1,4 @@
+import { selectionContext } from "./recommendations.ts";
 import { disabledSearch, searchPolicy, searchWarnings } from "./webSearch.ts";
 import type { WebSearch } from "./webSearch.ts";
 import { solutionPolicy, editorialGuide } from "./solutionFlow.ts";
@@ -178,7 +179,11 @@ export function parseBrowserReply(
       .filter((c: any) => c.type === "output_text")
       .map((c: any) => c.text)
       .join("\n");
-    if (data.status === "incomplete") finish = data.incomplete_details?.reason === "content_filter" ? "content_filter" : "length";
+    if (data.status === "incomplete")
+      finish =
+        data.incomplete_details?.reason === "content_filter"
+          ? "content_filter"
+          : "length";
   } else {
     content = data.choices?.[0]?.message?.content;
     if (Array.isArray(content))
@@ -253,7 +258,28 @@ export async function completeBrowser(
     return {
       ...parseBrowserReply(request.connection.protocol, data),
       connection: request.connection,
-      diagnostics:{finish_reason:parseBrowserReply(request.connection.protocol,data).finish,output_limit:request.payload.max_tokens||request.payload.max_completion_tokens||request.payload.max_output_tokens,usage:Object.fromEntries(Object.entries((data as any)?.usage||{}).filter(([k,v])=>['input_tokens','output_tokens','prompt_tokens','completion_tokens','total_tokens'].includes(k)&&Number.isInteger(v)&&Number(v)>=0))},
+      diagnostics: {
+        finish_reason: parseBrowserReply(request.connection.protocol, data)
+          .finish,
+        output_limit:
+          request.payload.max_tokens ||
+          request.payload.max_completion_tokens ||
+          request.payload.max_output_tokens,
+        usage: Object.fromEntries(
+          Object.entries((data as any)?.usage || {}).filter(
+            ([k, v]) =>
+              [
+                "input_tokens",
+                "output_tokens",
+                "prompt_tokens",
+                "completion_tokens",
+                "total_tokens",
+              ].includes(k) &&
+              Number.isInteger(v) &&
+              Number(v) >= 0,
+          ),
+        ),
+      },
     };
   } catch (error) {
     if (
@@ -289,31 +315,45 @@ export function groundedMessages(context: {
   retrieved: unknown[];
   workflow?: Workflow;
   continuing?: boolean;
-  web_search?:WebSearch;
+  web_search?: WebSearch;
 }): ModelMessage[] {
   return [
     {
       role: "system",
-      content: solutionPolicy.answer_prompt+'\n'+searchPolicy.prompt+(context.continuing?'\n'+solutionPolicy.continue_prompt:''),
+      content:
+        solutionPolicy.answer_prompt +
+        "\n" +
+        searchPolicy.prompt +
+        (context.continuing ? "\n" + solutionPolicy.continue_prompt : ""),
     },
     ...context.history,
     {
       role: "user",
-      content:JSON.stringify({BRIEF:context.workflow?.fields||{},EDITORIAL_GUIDE:editorialGuide(context.workflow),EVIDENCE_JSON:context.retrieved,WEB_EVIDENCE_JSON:context.web_search?.results||[],WEB_SEARCH:{...context.web_search,results:undefined},USER_INPUT:context.prompt}),
+      content: JSON.stringify({
+        BRIEF: context.workflow?.fields || {},
+        SELECTION_CONTEXT: selectionContext(context.workflow),
+        EDITORIAL_GUIDE: editorialGuide(context.workflow),
+        EVIDENCE_JSON: context.retrieved,
+        WEB_EVIDENCE_JSON: context.web_search?.results || [],
+        WEB_SEARCH: { ...context.web_search, results: undefined },
+        USER_INPUT: context.prompt,
+      }),
     },
   ];
 }
 export function groundedResult(
   answer: string,
   finish: string,
-  context: { retrieved: any[]; trace_id: string; web_search?:WebSearch },
+  context: { retrieved: any[]; trace_id: string; web_search?: WebSearch },
   model: string,
 ) {
   const requested = new Set(
     [...answer.matchAll(/\[([KW]\d+)\]/g)].map((m) => m[1]),
   );
-  const web=context.web_search||disabledSearch();
-  const valid = new Set([...context.retrieved,...web.results].map((r) => r.citation_id));
+  const web = context.web_search || disabledSearch();
+  const valid = new Set(
+    [...context.retrieved, ...web.results].map((r) => r.citation_id),
+  );
   const warnings: string[] = searchWarnings(web);
   if ([...requested].some((c) => !valid.has(c))) {
     answer = answer.replace(/\[([KW]\d+)\]/g, (whole, key) =>
@@ -324,14 +364,17 @@ export function groundedResult(
   const citations = context.retrieved.filter((r) =>
     requested.has(r.citation_id),
   );
-  const web_citations=web.results.filter(r=>requested.has(r.citation_id));
-  if (!context.retrieved.length&&!web.results.length)
+  const web_citations = web.results.filter((r) => requested.has(r.citation_id));
+  if (!context.retrieved.length && !web.results.length)
     warnings.push("本轮没有匹配的已发布知识，产品结论需要进一步核验。");
-  else if (!citations.length&&!web_citations.length)
+  else if (!citations.length && !web_citations.length)
     warnings.push("已检索资料，但模型没有标注有效引用，请核对来源。");
   if (finish === "length")
-    warnings.push("模型因输出上限停止，当前回复不完整。可点击“续写剩余内容”；若仍截断，请提高输出上限。");
-  if(finish==="content_filter")warnings.push("模型服务限制了本轮输出，请调整请求；这不是长度截断。");
+    warnings.push(
+      "模型因输出上限停止，当前回复不完整。可点击“续写剩余内容”；若仍截断，请提高输出上限。",
+    );
+  if (finish === "content_filter")
+    warnings.push("模型服务限制了本轮输出，请调整请求；这不是长度截断。");
   return {
     answer,
     citations,
@@ -339,7 +382,8 @@ export function groundedResult(
     trace_id: context.trace_id,
     warnings,
     model,
-    finish_reason:finish,
-    web_search:web,web_citations,
+    finish_reason: finish,
+    web_search: web,
+    web_citations,
   };
 }

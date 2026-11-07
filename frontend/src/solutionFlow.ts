@@ -1,4 +1,10 @@
 import policy from "../../backend/data/solution-policy.json" with { type: "json" };
+import {
+  rankRecommendations,
+  selectionContext,
+  recommendationPolicy,
+  previewTitle,
+} from "./recommendations.ts";
 export { policy as solutionPolicy };
 type Row = Record<string, any>;
 export type Workflow = {
@@ -7,6 +13,7 @@ export type Workflow = {
   fields: Record<string, { value: string; evidence: string }>;
   scene: string | null;
   missing: string[];
+  suggested_title?: string;
 };
 export const emptyWorkflow = (): Workflow => ({
   version: 1,
@@ -96,7 +103,31 @@ export function applyExtraction(
     : previous.phase === "generated" && !changed
       ? "generated"
       : "ready";
+  if (
+    typeof parsed.title === "string" &&
+    parsed.title.trim() &&
+    Array.from(parsed.title.trim()).length <= 32 &&
+    !/[\n\r<>\[\]{}]/.test(parsed.title)
+  )
+    next.suggested_title = parsed.title.trim();
+  else if (changed) delete next.suggested_title;
   return next;
+}
+export function conversationTitle(workflow?: Workflow, fallback = "") {
+  const title =
+    workflow?.suggested_title || workflow?.fields.goal?.value || fallback;
+  return (
+    Array.from(
+      title
+        .replace(
+          /^(?:我想|我希望|请帮我|帮我|我要|想要|想)(?:用AI|使用AI|用 AI)?/,
+          "",
+        )
+        .replace(/^[ ，。！？]+|[ ，。！？]+$/g, ""),
+    )
+      .slice(0, 32)
+      .join("") || "新对话"
+  );
 }
 export function isConfirmation(
   previous: Workflow,
@@ -110,6 +141,14 @@ export function isConfirmation(
   );
 }
 export function clarification(workflow: Workflow) {
+  const primary = selectionContext(workflow).capabilities[0]?.id || "";
+  const targeted =
+    (
+      recommendationPolicy.question_overrides as Record<
+        string,
+        Record<string, string>
+      >
+    )[primary] || {};
   const scene = policy.scenes.find((s) => s.id === workflow.scene),
     summary = policy.slots
       .filter((s) => workflow.fields[s.id])
@@ -123,7 +162,9 @@ export function clarification(workflow: Workflow) {
       (id) =>
         (scene && "questions" in scene
           ? (scene.questions as Record<string, string>)?.[id]
-          : null) || policy.slots.find((s) => s.id === id)!.question,
+          : null) ||
+        targeted[id] ||
+        policy.slots.find((s) => s.id === id)!.question,
     );
   return `${summary ? "已记下你的条件。我们再确认关键条件：" : "我们先把需求聊清楚。"}\n\n${questions.map((q, i) => `${i + 1}. ${q}`).join("\n")}`;
 }
@@ -146,6 +187,15 @@ export function rankKnowledge(
   workflow: Workflow,
   prompt: string,
 ) {
+  const recommendations = rankRecommendations(
+    rows,
+    entities,
+    categories,
+    links,
+    workflow,
+    prompt,
+  );
+  if (recommendations !== null) return recommendations;
   const goal = workflow.fields.goal?.value || prompt,
     scene = sceneFor(goal),
     query = searchTerms(
@@ -162,7 +212,9 @@ export function rankKnowledge(
           policy.unavailable_markers.some((marker) =>
             r.value.toLowerCase().includes(marker),
           ) &&
-          !(goal + " " + prompt).toLowerCase().includes(r.entity_name.toLowerCase()),
+          !(goal + " " + prompt)
+            .toLowerCase()
+            .includes(r.entity_name.toLowerCase()),
       )
       .map((r) => r.entity_id),
   );
@@ -312,7 +364,13 @@ export function previewExtraction(prompt: string, previous: Workflow) {
   if (/不确定|不知道|无偏好/.test(prompt))
     for (const id of previous.missing.slice(0, 2))
       if (!updates[id]) set(id, "暂不确定，方案须注明假设");
-  return JSON.stringify({ updates });
+  return JSON.stringify({
+    updates,
+    title: previewTitle({
+      ...previous,
+      fields: { ...previous.fields, ...updates },
+    }),
+  });
 }
 
 export function editorialGuide(workflow?: Workflow) {
