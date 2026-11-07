@@ -3,6 +3,7 @@ import copy
 import json
 import re
 from pathlib import Path
+from .recommendations import rank_recommendations, selection_context, POLICY as RECOMMENDATIONS
 
 POLICY = json.loads((Path(__file__).resolve().parent.parent/'data/solution-policy.json').read_text(encoding='utf-8'))
 
@@ -49,7 +50,17 @@ def apply_extraction(previous, raw, prompt):
     result['scene'] = scene['id'] if scene else None
     result['missing'] = [s['id'] for s in POLICY['slots'] if s['id'] not in result['fields']]
     result['phase'] = 'collecting' if result['missing'] else 'generated' if previous['phase']=='generated' and not changed else 'ready'
+    title = parsed.get('title')
+    if isinstance(title,str) and 0 < len(title.strip()) <= 32 and not re.search(r'[\n\r<>\[\]{}]',title):
+        result['suggested_title'] = title.strip()
+    elif changed:
+        result.pop('suggested_title',None)
     return result
+
+
+def conversation_title(workflow):
+    title = workflow.get('suggested_title') or workflow['fields'].get('goal',{}).get('value','')
+    return re.sub(r'^(?:我想|我希望|请帮我|帮我|我要|想要|想)(?:用AI|使用AI|用 AI)?', '',title).strip(' ，。！？')[:32] or '新对话'
 
 
 def is_confirmation(previous,prompt,action=None):
@@ -58,10 +69,12 @@ def is_confirmation(previous,prompt,action=None):
 
 def clarification(workflow):
     scene = next((s for s in POLICY['scenes'] if s['id']==workflow['scene']),{})
+    capabilities = selection_context(workflow)['capabilities']
+    targeted = RECOMMENDATIONS['question_overrides'].get(capabilities[0]['id'],{}) if capabilities else {}
     summary = '\n'.join(f"- {s['label']}：{workflow['fields'][s['id']]['value']}" for s in POLICY['slots'] if s['id'] in workflow['fields'])
     if workflow['phase']=='ready':
         return f'我理解的需求是：\n\n{summary}\n\n现在为你生成简版方案吗？你也可以直接修改上面的条件。'
-    questions = [scene.get('questions',{}).get(key) or next(s['question'] for s in POLICY['slots'] if s['id']==key) for key in workflow['missing'][:2]]
+    questions = [scene.get('questions',{}).get(key) or targeted.get(key) or next(s['question'] for s in POLICY['slots'] if s['id']==key) for key in workflow['missing'][:2]]
     return ('已记下你的条件。我们再确认关键条件：' if summary else '我们先把需求聊清楚。')+'\n\n'+'\n'.join(f'{i+1}. {q}' for i,q in enumerate(questions))
 
 
@@ -77,6 +90,9 @@ def terms(text):
 
 
 def rank_knowledge(rows,entities,categories,links,workflow,prompt):
+    recommended = rank_recommendations(rows,entities,categories,links,workflow,prompt)
+    if recommended is not None:
+        return recommended
     goal = workflow['fields'].get('goal',{}).get('value') or prompt
     scene = scene_for(goal)
     query = terms(goal+' '+prompt+' '+workflow['fields'].get('requirements',{}).get('value',''))

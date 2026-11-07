@@ -1,8 +1,21 @@
+import { selectionContext, previewRecommendation } from "../recommendations.ts";
 import { disabledSearch } from "../webSearch.ts";
 import type { WebSearch } from "../webSearch.ts";
-import { previousWorkflow, applyExtraction, previewExtraction, isConfirmation, clarification, rankKnowledge, solutionPolicy } from "../solutionFlow.ts";
+import {
+  previousWorkflow,
+  applyExtraction,
+  previewExtraction,
+  isConfirmation,
+  clarification,
+  rankKnowledge,
+  solutionPolicy,
+  conversationTitle,
+} from "../solutionFlow.ts";
 import type { Workflow } from "../solutionFlow.ts";
-import { buildKnowledgeNavigation, entityVendor } from "../knowledgeNavigation.ts";
+import {
+  buildKnowledgeNavigation,
+  entityVendor,
+} from "../knowledgeNavigation.ts";
 /** Browser-only implementation of the existing API contract. Never calls a model or crawler. */
 type Row = Record<string, any>;
 export type DemoState = Record<string, any> & {
@@ -108,7 +121,7 @@ export function createDemoStore(initial: Row) {
     model_resources: Row | null;
   } => ({
     ...e,
-    vendor_name: entityVendor(e,state.entities,state.relations),
+    vendor_name: entityVendor(e, state.entities, state.relations),
     category_ids: state.links
       .filter((l) => l.entity_id === e.id)
       .map((l) => l.category_id),
@@ -253,6 +266,7 @@ export function createDemoStore(initial: Row) {
   const summary = (c: Row) => ({
     id: c.id,
     title: c.title,
+    title_mode: c.title_mode || (c.title === "新对话" ? "auto" : "manual"),
     revision: c.revision,
     created_at: c.created_at,
     updated_at: c.updated_at,
@@ -273,23 +287,80 @@ export function createDemoStore(initial: Row) {
     if (c.revision !== body.revision)
       fail("对话已在另一页面更新，请重新打开后发送");
     const prompt = text(body.messages?.at(-1)?.content, 6000);
-    const previous = previousWorkflow(c.messages),workflow=override||previous;
-    const latest=[...c.messages].reverse().find((m:Row)=>m.role==='assistant')?.result||{};
-    const continuing=body.action==='continue';
-    if(continuing&&(previous.phase!=='generated'||latest.finish_reason!=='length'))fail('当前没有需要续写的已确认方案');
-    const retrieved = continuing?latest.retrieved||[]:workflow.phase==='generated'?rankKnowledge(state.facts.filter(f=>!f.valid_to).map(citation),state.entities,state.categories,state.links,workflow,prompt):[];
-    const t = continuing?{id:latest.trace_id}:workflow.phase==='generated'?trace(prompt,retrieved,'agent',{purpose:browser?'browser_solution_chat':'demo_solution_chat',simulated:!browser,method:'scenario_keyword_v2',include_demo:false,request_id:c.id,goal:workflow.fields.goal?.value,scene:workflow.scene}):{id:''};
+    const previous = previousWorkflow(c.messages),
+      workflow = override || previous;
+    const latest =
+      [...c.messages].reverse().find((m: Row) => m.role === "assistant")
+        ?.result || {};
+    const continuing = body.action === "continue";
+    if (
+      continuing &&
+      (previous.phase !== "generated" || latest.finish_reason !== "length")
+    )
+      fail("当前没有需要续写的已确认方案");
+    const retrieved = continuing
+      ? latest.retrieved || []
+      : workflow.phase === "generated"
+        ? rankKnowledge(
+            state.facts.filter((f) => !f.valid_to).map(citation),
+            state.entities,
+            state.categories,
+            state.links,
+            workflow,
+            prompt,
+          )
+        : [];
+    const t = continuing
+      ? { id: latest.trace_id }
+      : workflow.phase === "generated"
+        ? trace(prompt, retrieved, "agent", {
+            purpose: browser ? "browser_solution_chat" : "demo_solution_chat",
+            simulated: !browser,
+            method: "capability_routes_v1",
+            selection: selectionContext(workflow),
+            include_demo: false,
+            request_id: c.id,
+            goal: workflow.fields.goal?.value,
+            scene: workflow.scene,
+          })
+        : { id: "" };
     let history = c.messages
       .slice(-18)
-      .map((m: Row) => ({ role: m.role, content: continuing?m.content.slice(-12000):m.content }));
+      .map((m: Row) => ({
+        role: m.role,
+        content: continuing ? m.content.slice(-12000) : m.content,
+      }));
     while (
       history.length &&
       history.reduce((n: number, m: Row) => n + m.content.length, 0) > 34000
     )
       history = history.slice(2);
-    const legacy=c.messages.filter((m:Row)=>m.role==='user').map((m:Row)=>m.content).join("\n");
-    const extractionInput=Object.keys(previous.fields).length||!legacy?prompt:legacy.slice(0,16000)+"\n"+legacy.slice(-16000)+"\n本轮："+prompt;
-    return { web_search:continuing?latest.web_search||disabledSearch():disabledSearch(), prompt, extractionInput, retrieved, trace_id: t.id, history, previous, workflow, continuing, lastQuestion:c.messages.at(-1)?.content||"" };
+    const legacy = c.messages
+      .filter((m: Row) => m.role === "user")
+      .map((m: Row) => m.content)
+      .join("\n");
+    const extractionInput =
+      Object.keys(previous.fields).length || !legacy
+        ? prompt
+        : legacy.slice(0, 16000) +
+          "\n" +
+          legacy.slice(-16000) +
+          "\n本轮：" +
+          prompt;
+    return {
+      web_search: continuing
+        ? latest.web_search || disabledSearch()
+        : disabledSearch(),
+      prompt,
+      extractionInput,
+      retrieved,
+      trace_id: t.id,
+      history,
+      previous,
+      workflow,
+      continuing,
+      lastQuestion: c.messages.at(-1)?.content || "",
+    };
   };
   const commitChat = (body: Row, result: Row) => {
     const c = conversation(body.conversation_id);
@@ -307,26 +378,74 @@ export function createDemoStore(initial: Row) {
         created_at: time,
       },
     );
-    if (c.title === "新对话") c.title = prompt.slice(0, 36);
+    if (
+      (c.title_mode || (c.title === "新对话" ? "auto" : "manual")) === "auto"
+    ) {
+      c.title = conversationTitle(result.workflow, prompt);
+      c.title_mode = "auto";
+    }
     c.revision++;
     c.updated_at = time;
     return { ...result, conversation: conversationView(c) };
   };
   const chat = (body: Row) => {
-    const context=prepareChat(body),previous=context.previous;
-    const workflow=isConfirmation(previous,context.prompt,body.action)?{...previous,phase:'generated' as const}:applyExtraction(previous,previewExtraction(context.extractionInput,previous),context.extractionInput);
-    const ready=prepareChat(body,false,workflow),scene=solutionPolicy.scenes.find(s=>s.id===workflow.scene);
-    const citations=ready.retrieved.filter((r:Row)=>r.task==='视频生成'||!scene).slice(0,2);
-    const route=scene?.routes[/现成|免部署|一站式/.test(workflow.fields.delivery?.value||'')?0:/API|api|工作流/.test(workflow.fields.delivery?.value||'')?1:0]||scene?.routes[0];
-    const answer=workflow.phase!=='generated'?clarification(workflow):`> 交互演示：未调用大模型，以下是编辑路线建议，不是实测案例。\n\n推荐先采用「${route?.name||'小范围验证'}」。${route?.steps||'用一小批样本验证目标，再扩充。'}\n\n理由：先按已确认的预算、操作经验和使用方式验证效果。\n\n费用边界：${route?.boundary||'当前资料不足以核算价格，需核验实际用量与报价。'}\n\n下一步：先做一个小样，再决定是否扩充。${citations.length?'\n\n可核对的资料：'+citations.map((r:Row)=>`${r.entity_name} · ${r.key} [${r.citation_id}]`).join('；'):''}`;
-    return commitChat(body,{answer,citations:workflow.phase==='generated'?citations:[],retrieved:ready.retrieved,trace_id:ready.trace_id,warnings:body.search_requested&&workflow.phase==='generated'?['当前为交互演示，未调用联网；连接文本模型后可结合网页生成真实回答。']:[],model:'本地交互演示',workflow,finish_reason:'stop'});
+    const context = prepareChat(body),
+      previous = context.previous;
+    const workflow = isConfirmation(previous, context.prompt, body.action)
+      ? { ...previous, phase: "generated" as const }
+      : applyExtraction(
+          previous,
+          previewExtraction(context.extractionInput, previous),
+          context.extractionInput,
+        );
+    const ready = prepareChat(body, false, workflow),
+      scene = solutionPolicy.scenes.find((s) => s.id === workflow.scene);
+    const citations = ready.retrieved
+      .filter((r: Row) => r.task === "视频生成" || !scene)
+      .slice(0, 2);
+    const route =
+      scene?.routes[
+        /现成|免部署|一站式/.test(workflow.fields.delivery?.value || "")
+          ? 0
+          : /API|api|工作流/.test(workflow.fields.delivery?.value || "")
+            ? 1
+            : 0
+      ] || scene?.routes[0];
+    const preview =
+      workflow.phase === "generated"
+        ? previewRecommendation(workflow, ready.retrieved)
+        : null;
+    const answer =
+      workflow.phase !== "generated"
+        ? clarification(workflow)
+        : `> 交互演示：未调用大模型，以下是编辑路线建议，不是实测案例。\n\n推荐先采用「${route?.name || "小范围验证"}」。${route?.steps || "用一小批样本验证目标，再扩充。"}\n\n理由：先按已确认的预算、操作经验和使用方式验证效果。\n\n费用边界：${route?.boundary || "当前资料不足以核算价格，需核验实际用量与报价。"}\n\n下一步：先做一个小样，再决定是否扩充。${citations.length ? "\n\n可核对的资料：" + citations.map((r: Row) => `${r.entity_name} · ${r.key} [${r.citation_id}]`).join("；") : ""}`;
+    return commitChat(body, {
+      answer: preview?.answer || answer,
+      citations:
+        preview?.citations || (workflow.phase === "generated" ? citations : []),
+      retrieved: ready.retrieved,
+      trace_id: ready.trace_id,
+      warnings:
+        body.search_requested && workflow.phase === "generated"
+          ? [
+              "当前为交互演示，未调用联网；连接文本模型后可结合网页生成真实回答。",
+            ]
+          : [],
+      model: "本地交互演示",
+      workflow,
+      finish_reason: "stop",
+    });
   };
   const request = (method: string, input: string, body: Row = {}): any => {
     const parsed = new URL(input, "https://demo.invalid"),
       path = parsed.pathname,
       params = parsed.searchParams;
     let match: RegExpMatchArray | null;
-    if (method === "GET" && path === "/knowledge/navigation") return buildKnowledgeNavigation(state.entities.map(entityView),state.categories);
+    if (method === "GET" && path === "/knowledge/navigation")
+      return buildKnowledgeNavigation(
+        state.entities.map(entityView),
+        state.categories,
+      );
     if (method === "GET" && path === "/config")
       return {
         auth_enabled: false,
@@ -578,6 +697,8 @@ export function createDemoStore(initial: Row) {
           c = {
             id: id(),
             title: text(body.title || "新对话", 120),
+            title_mode:
+              !body.title || body.title === "新对话" ? "auto" : "manual",
             revision: 0,
             created_at: time,
             updated_at: time,
@@ -600,6 +721,7 @@ export function createDemoStore(initial: Row) {
       if (method === "GET") return conversationView(c);
       if (method === "PATCH") {
         c.title = text(body.title, 120);
+        c.title_mode = "manual";
         c.updated_at = stamp();
         return summary(c);
       }
@@ -621,9 +743,11 @@ export function createDemoStore(initial: Row) {
         throw error;
       }
     },
-    prepareBrowserChat: (body: Row, workflow?: Workflow) => copy(prepareChat(body, true, workflow)),
-    attachWebTrace:(traceId:string,web:WebSearch)=>{
-      const t=find('traces',traceId);t.request_context={...t.request_context,web_search:copy(web)};
+    prepareBrowserChat: (body: Row, workflow?: Workflow) =>
+      copy(prepareChat(body, true, workflow)),
+    attachWebTrace: (traceId: string, web: WebSearch) => {
+      const t = find("traces", traceId);
+      t.request_context = { ...t.request_context, web_search: copy(web) };
     },
     commitBrowserChat: (body: Row, result: Row) =>
       copy(commitChat(body, result)),

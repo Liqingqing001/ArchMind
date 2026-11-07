@@ -7,7 +7,7 @@ import { validateDataset } from './import-official-knowledge.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const digest = value => createHash('sha256').update(value).digest('hex');
 const id = value => digest(value).slice(0, 32);
-const datasets = ['official-knowledge-2026-11-07.json', 'open-model-knowledge-2026-11-07.json', 'video-workflow-knowledge-2026-11-07.json', 'infrastructure-knowledge-2026-11-07.json']
+const datasets = JSON.parse(readFileSync(resolve(root, 'backend/data/public-datasets.json'), 'utf8'))
   .map(name => JSON.parse(readFileSync(resolve(root, 'backend/data', name), 'utf8')));
 const data = { metadata: { schema_version: 1, checked_on: '2026-11-07', fingerprint: digest(JSON.stringify(datasets)), provenance: 'checked_in_public_excerpts_not_live_collection' }, categories: [], entities: [], links: [], relations: [], sources: [], snapshots: [], facts: [], changes: [], runs: [] };
 const ensureCategory = path => {

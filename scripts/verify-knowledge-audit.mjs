@@ -80,5 +80,5 @@ assert.ok(
   ),
 );
 console.log(
-  "PASS: all 140 baseline entities / 305 fields / 85 sources accounted for; current corpus and audit agree.",
+  "PASS: 2026-11-07 audit snapshot: all 140 baseline entities / 305 fields / 85 sources accounted for; its datasets still agree.",
 );
