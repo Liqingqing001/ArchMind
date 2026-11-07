@@ -92,7 +92,12 @@ def rank_knowledge(rows,entities,categories,links,workflow,prompt):
         e = by_id.get(row['entity_id'],{})
         tags = ' '.join(cats.get(l['category_id'],'') for l in links if l['entity_id']==row['entity_id'])
         text = f"{row['entity_name']} {e.get('description','')} {row['key']} {row['value']} {tags}".lower()
-        task = (next((t['name'] for t in scene['tasks'] if row['entity_name'].lower() in t['terms']),None) or next((t['name'] for t in scene['tasks'] if any(term in text for term in t['terms'])),'')) if scene else ''
+        def matches_task(t):
+            if 'categories' in t or 'entities' in t:
+                labels=[cats.get(l['category_id'],'') for l in links if l['entity_id']==row['entity_id']]
+                return (not t.get('kinds') or row['entity_kind'] in t['kinds']) and (any(c in labels for c in t.get('categories',[])) or row['entity_name'] in t.get('entities',[]))
+            return any(term in text for term in t['terms'])
+        task = (next((t['name'] for t in scene['tasks'] if row['entity_name'].lower() in t['terms']),None) or next((t['name'] for t in scene['tasks'] if matches_task(t)),'')) if scene else ''
         if task=='算力' and not re.search('gpu|自部署|本地',workflow['fields'].get('delivery',{}).get('value',''),re.I):
             continue
         if scene and not task:

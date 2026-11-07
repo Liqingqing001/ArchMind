@@ -79,3 +79,13 @@ def test_legacy_conversation_bootstraps_real_user_history(client,db,monkeypatch)
     result=request(client,'接着聊',conversation_id=row['id'],revision=0).json()
     assert result['workflow']['fields']['budget']['value']=='每月1000元'
     assert len(result['conversation']['messages'])==4
+
+
+def test_gpu_task_classification_uses_service_category_instead_of_negated_gpu_word():
+    w=empty_workflow();w['fields']={'goal':{'value':'GPU租赁'},'delivery':{'value':'云GPU自部署'}}
+    entities=[{'id':'a','description':'调用API不等于租GPU'},{'id':'b','description':'GPU云主机'},{'id':'c','description':'通用工作流'}]
+    rows=[dict(entity_id='a',entity_name='火山方舟',entity_kind='api',key='能力',value='在线推理',is_demo=False),dict(entity_id='b',entity_name='AnyGPU',entity_kind='cloud',key='能力',value='租GPU',is_demo=False),dict(entity_id='c',entity_name='Dify',entity_kind='framework',key='能力',value='通用工作流',is_demo=False)]
+    categories=[{'id':'gpu','name':'GPU租赁与算力'},{'id':'api','name':'模型API与推理'}]
+    links=[{'entity_id':'a','category_id':'api'},{'entity_id':'b','category_id':'gpu'}]
+    found=rank_knowledge(rows,entities,categories,links,w,'生成方案')
+    assert {r['entity_name']:r['task'] for r in found}=={'火山方舟':'模型 API 与托管推理','AnyGPU':'GPU算力'}

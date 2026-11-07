@@ -181,7 +181,19 @@ export function rankKnowledge(
           scene?.tasks.find((t) =>
             t.terms.includes(r.entity_name.toLowerCase()),
           ) ||
-          scene?.tasks.find((t) => t.terms.some((term) => text.includes(term)))
+          scene?.tasks.find((t) =>
+            matchesSceneTask(
+              t,
+              { ...e, name: r.entity_name, kind: r.entity_kind },
+              text,
+              links
+                .filter((l) => l.entity_id === r.entity_id)
+                .map(
+                  (l) =>
+                    categories.find((c) => c.id === l.category_id)?.name || "",
+                ),
+            ),
+          )
         )?.name || "";
       if (scene && !task) return null;
       if (
@@ -301,4 +313,19 @@ export function editorialGuide(workflow?: Workflow) {
       index === null ? scene.routes : [scene.routes[index] || scene.routes[0]],
     gaps: scene.gaps,
   };
+}
+
+export function matchesSceneTask(
+  task: Row,
+  entity: Row,
+  text: string,
+  labels: string[],
+) {
+  if (task.categories || task.entities)
+    return (
+      (!task.kinds || task.kinds.includes(entity.kind)) &&
+      ((task.categories || []).some((c: string) => labels.includes(c)) ||
+        (task.entities || []).includes(entity.name))
+    );
+  return task.terms.some((term: string) => text.includes(term));
 }

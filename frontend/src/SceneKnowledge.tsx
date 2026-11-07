@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
-import { solutionPolicy } from "./solutionFlow";
+import { solutionPolicy, matchesSceneTask } from "./solutionFlow";
 import type { KnowledgeNavigation } from "./knowledgeNavigation";
 type Row = Record<string, any>;
 export function SceneKnowledge({
@@ -37,47 +37,28 @@ export function SceneKnowledge({
         </div>
       </section>
     );
-  const allowed = new Set(
-    navigation.nodes
-      .filter((n) =>
-        n.path.some((p) =>
-          scene.tasks.some((t) =>
-            t.terms.some((term) => p.toLowerCase().includes(term)),
-          ),
-        ),
-      )
-      .flatMap((n) => n.entity_ids),
-  );
+  const taskFor = (entity: Row) => {
+    const paths = navigation.nodes
+      .filter((n) => n.entity_ids.includes(entity.id))
+      .flatMap((n) => n.path);
+    const text = (
+      entity.name +
+      " " +
+      entity.description +
+      " " +
+      paths.join(" ")
+    ).toLowerCase();
+    return (
+      scene.tasks.find((t) => t.terms.includes(entity.name.toLowerCase())) ||
+      scene.tasks.find((t) => matchesSceneTask(t, entity, text, paths))
+    );
+  };
   const relevant = entities.filter(
-    (e) =>
-      !e.is_demo &&
-      e.kind !== "vendor" &&
-      (allowed.has(e.id) ||
-        scene.tasks.some((t) =>
-          t.terms.some((term) =>
-            (e.name + " " + e.description).toLowerCase().includes(term),
-          ),
-        )),
+    (e) => !e.is_demo && e.kind !== "vendor" && taskFor(e),
   );
   const grouped = scene.tasks.map((task) => ({
     task,
-    items: relevant.filter((entity) => {
-      const paths = navigation.nodes
-        .filter((n) => n.entity_ids.includes(entity.id))
-        .map((n) => n.path.join(" "))
-        .join(" ");
-      const text = (
-        entity.name +
-        " " +
-        entity.description +
-        " " +
-        paths
-      ).toLowerCase();
-      const selected =
-        scene.tasks.find((t) => t.terms.includes(entity.name.toLowerCase())) ||
-        scene.tasks.find((t) => t.terms.some((term) => text.includes(term)));
-      return selected?.name === task.name;
-    }),
+    items: relevant.filter((e) => taskFor(e)?.name === task.name),
   }));
   return (
     <section className="panel scene-knowledge">
