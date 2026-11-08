@@ -110,7 +110,10 @@ export function searchQueries(
   const hint = policy.query_hints.find((h) =>
     h.cues.some((c) => goal.toLowerCase().includes(c)),
   );
-  const query = goal + " 官方 文档 " + (hint?.topic || "技术选型");
+  const query =
+    hint && "discovery" in hint
+      ? goal + " " + hint.discovery
+      : goal + " 官方 文档 " + (hint?.topic || "技术选型");
   const follow = /^(?:生成|确认|可以|好的|好|开始|现在生成|请续写)/.test(
     current,
   )
@@ -205,9 +208,13 @@ export function parseSearchResults(
         ? row.raw_content
         : null;
     const summary = row.summary || row.content || row.snippet;
-    const text = raw && typeof summary==='string' && summary.trim()
-      ? '搜索摘要：'+summary.slice(0,800)+'\n页面摘录：'+raw.slice(0,800)
-      : raw || summary;
+    const text =
+      raw && typeof summary === "string" && summary.trim()
+        ? "搜索摘要：" +
+          summary.slice(0, 800) +
+          "\n页面摘录：" +
+          raw.slice(0, 800)
+        : raw || summary;
     if (typeof text !== "string" || !text.trim()) continue;
     const host = new URL(url).hostname;
     results.push({
@@ -244,14 +251,20 @@ export function combineSearch(
   errors: string[],
 ): WebSearch {
   const unique = new Map<string, WebResult>();
-  for (const row of batches.flat())
-    if (!unique.has(row.url)) unique.set(row.url, row);
-  const results = [...unique.values()]
-    .sort(
+  // Reserve room for both platform discovery and technical/cost research.
+  const ordered = batches.map((batch) =>
+    [...batch].sort(
       (a, b) =>
         Number(b.source_type === "official") -
         Number(a.source_type === "official"),
-    )
+    ),
+  );
+  for (let i = 0; i < Math.max(0, ...ordered.map((batch) => batch.length)); i++)
+    for (const batch of ordered) {
+      const row = batch[i];
+      if (row && !unique.has(row.url)) unique.set(row.url, row);
+    }
+  const results = [...unique.values()]
     .slice(0, policy.max_results)
     .map((r, i) => ({ ...r, citation_id: `W${i + 1}` }));
   return {

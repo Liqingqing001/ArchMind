@@ -316,6 +316,7 @@ export function groundedMessages(context: {
   workflow?: Workflow;
   continuing?: boolean;
   web_search?: WebSearch;
+  saved_solution_cases?: unknown[];
 }): ModelMessage[] {
   return [
     {
@@ -333,6 +334,7 @@ export function groundedMessages(context: {
         BRIEF: context.workflow?.fields || {},
         SELECTION_CONTEXT: selectionContext(context.workflow),
         EDITORIAL_GUIDE: editorialGuide(context.workflow),
+        SAVED_SOLUTION_CASES: context.saved_solution_cases || [],
         EVIDENCE_JSON: context.retrieved,
         WEB_EVIDENCE_JSON: context.web_search?.results || [],
         WEB_SEARCH: { ...context.web_search, results: undefined },
@@ -340,6 +342,68 @@ export function groundedMessages(context: {
       }),
     },
   ];
+}
+/** One bounded revision when a completed draft ignored every available web source. */
+export async function completeGroundedBrowser(
+  connection: Connection,
+  context: Parameters<typeof groundedMessages>[0],
+  fetcher: typeof fetch = fetch,
+) {
+  const messages = groundedMessages(context);
+  const first = await completeBrowser(connection, messages, undefined, fetcher);
+  const repair = { attempted: false, adopted: false };
+  const webIds = new Set(
+    (context.web_search?.results || []).map((row) => row.citation_id),
+  );
+  const usesWeb = (answer: string) =>
+    [...answer.matchAll(/\[(W\d+)\]/g)].some((match) => webIds.has(match[1]));
+  if (
+    !context.continuing &&
+    first.finish === "stop" &&
+    webIds.size &&
+    !usesWeb(first.answer)
+  ) {
+    repair.attempted = true;
+    try {
+      const revised = await completeBrowser(
+        connection,
+        [
+          ...messages,
+          { role: "assistant", content: first.answer },
+          {
+            role: "user",
+            content: JSON.stringify({
+              REVISION_REQUEST: solutionPolicy.grounding_repair_prompt,
+            }),
+          },
+        ],
+        undefined,
+        fetcher,
+      );
+      if (revised.finish === "stop" && usesWeb(revised.answer)) {
+        repair.adopted = true;
+        return {
+          ...revised,
+          grounding_repair: repair,
+          grounding_warnings: [] as string[],
+        };
+      }
+    } catch {
+      /* Keep the complete first answer; never masquerade as a successful synthesis. */
+    }
+    return {
+      ...first,
+      grounding_repair: repair,
+      grounding_warnings: [
+        "已尝试补充网页整合，但未取得带有效网页引用的完整修订，保留首版方案；请核对下方网页或继续追问。",
+      ],
+    };
+  }
+  return {
+    ...first,
+    grounding_repair: repair,
+    grounding_warnings: [] as string[],
+  };
 }
 export function groundedResult(
   answer: string,
@@ -369,6 +433,10 @@ export function groundedResult(
     warnings.push("本轮没有匹配的已发布知识，产品结论需要进一步核验。");
   else if (!citations.length && !web_citations.length)
     warnings.push("已检索资料，但模型没有标注有效引用，请核对来源。");
+  if (web.results.length && !web_citations.length)
+    warnings.push(
+      "本轮检索到了网页，但正文未引用网页依据，不能视为已经结合联网结果；可展开下方资料核对或要求补充比较。",
+    );
   if (finish === "length")
     warnings.push(
       "模型因输出上限停止，当前回复不完整。可点击“续写剩余内容”；若仍截断，请提高输出上限。",

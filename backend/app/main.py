@@ -14,6 +14,7 @@ from .collector import collect, propose
 from .knowledge import retrieve
 from .agent import router as agent_router
 from .conversations import router as conversations_router
+from .solution_cases import router as cases_router
 from .model_resources import model_resources
 from .taxonomy import link_open_models
 from .navigation import knowledge_navigation, vendor_names
@@ -38,6 +39,7 @@ def auth(request: Request):
 app = FastAPI(title="ArchMind · AI Knowledge API", version="0.1.0", dependencies=[Depends(auth)])
 app.include_router(agent_router)
 app.include_router(conversations_router)
+app.include_router(cases_router)
 
 
 @app.exception_handler(RequestValidationError)

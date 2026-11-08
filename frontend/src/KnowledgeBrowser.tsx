@@ -1,3 +1,5 @@
+import { SavedSolutions } from "./SavedSolutions";
+import { modelAccess } from "./modelAccess";
 import { SceneKnowledge } from "./SceneKnowledge";
 import { useMemo, useRef, useState } from "react";
 import {
@@ -28,10 +30,16 @@ export function KnowledgeBrowser({
   onClearKind: () => void;
   onOpen: (id: string) => void;
 }) {
-  const [view,setView]=useState<"scene"|"capability">("scene");
+  const [view, setView] = useState<"scene" | "capability">("capability");
   const [selected, setSelected] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const [query, setQuery] = useState("");
+  const [accessFilter, setAccessFilter] = useState("all");
+  const matchesAccess = (e: Row) =>
+    accessFilter === "all" ||
+    (accessFilter === "downloadable"
+      ? !!e.model_resources
+      : modelAccess(e.model_resources)?.id === accessFilter);
   const panel = useRef<HTMLElement>(null);
   const nodes = navigation.nodes,
     current = nodes.find((n) => n.id === selected);
@@ -42,7 +50,9 @@ export function KnowledgeBrowser({
   const members = (node: KnowledgeNode) =>
     node.entity_ids
       .map((id) => byId.get(id))
-      .filter((e): e is Row => !!e && (!kind || e.kind === kind));
+      .filter(
+        (e): e is Row => !!e && (!kind || e.kind === kind) && matchesAccess(e),
+      );
   const count = (node: KnowledgeNode) => members(node).length;
   const children = (id: string | null) =>
     nodes
@@ -53,7 +63,7 @@ export function KnowledgeBrowser({
       );
   const scope = current
     ? members(current)
-    : entities.filter((e) => !kind || e.kind === kind);
+    : entities.filter((e) => (!kind || e.kind === kind) && matchesAccess(e));
   const needle = query.trim().toLowerCase();
   const matches = scope.filter((e) =>
     `${e.name} ${e.description} ${e.vendor_name || ""}`
@@ -61,7 +71,7 @@ export function KnowledgeBrowser({
       .includes(needle),
   );
   const childNodes = children(current?.id || null).filter(
-    (n) => !kind || count(n) > 0,
+    (n) => (!kind && accessFilter === "all") || count(n) > 0,
   );
   const select = (node: KnowledgeNode | null) => {
     setSelected(node?.id || null);
@@ -91,7 +101,7 @@ export function KnowledgeBrowser({
   const tree = (parent: string | null = null, depth = 0) => (
     <ul>
       {children(parent)
-        .filter((n) => !kind || count(n) > 0)
+        .filter((n) => (!kind && accessFilter === "all") || count(n) > 0)
         .map((node) => {
           const hasChildren = children(node.id).length > 0,
             open = expanded.has(node.id);
@@ -146,7 +156,12 @@ export function KnowledgeBrowser({
             {e.name}
             {e.is_demo && <span className="demo-tag">演示</span>}
             {e.model_resources && (
-              <span className="open-model-tag">开放权重</span>
+              <span
+                className="open-model-tag"
+                title={modelAccess(e.model_resources)?.note}
+              >
+                {modelAccess(e.model_resources)?.label}
+              </span>
             )}
           </h3>
           <p>{e.description || "尚未填写描述"}</p>
@@ -168,189 +183,245 @@ export function KnowledgeBrowser({
       grouped.set(vendor, [...(grouped.get(vendor) || []), e]);
     }
   return (
-    <><div className="knowledge-view-tabs" aria-label="知识浏览方式"><button className={view==="scene"&&!kind?"active":""} onClick={()=>{onClearKind();setView("scene");}}>按场景查看</button><button className={view==="capability"||kind?"active":""} onClick={()=>setView("capability")}>按能力浏览</button></div>{view==="scene"&&!kind?<SceneKnowledge entities={entities} navigation={navigation} onOpen={onOpen}/>:<div className="hierarchy-browser">
-      <aside className="panel knowledge-tree-panel">
-        <div className="knowledge-tree-heading">
-          <b>
-            <FolderTree size={16} />
-            知识目录
-          </b>
-          <button
-            onClick={() => {
-              setExpanded(new Set());
-              setSelected(null);
-              setQuery("");
-            }}
-          >
-            全部折叠
-          </button>
-        </div>
-        <nav aria-label="知识分类树">
-          <button
-            className={`knowledge-all ${!current ? "selected" : ""}`}
-            onClick={() => {
-              onClearKind();
-              select(null);
-            }}
-          >
-            <Layers3 size={15} />
-            <span>全部知识</span>
-            <small>{entities.length}</small>
-          </button>
-          {tree()}
-        </nav>
-        <p className="knowledge-tree-note">
-          能力 → 类型 → 厂家 → 模型
-          <br />
-          多能力模型共用同一条资料。
-        </p>
-      </aside>
-      <section className="panel knowledge-browser-panel" ref={panel}>
-        <nav className="knowledge-breadcrumb" aria-label="知识路径">
-          <button
-            onClick={() => {
-              onClearKind();
-              select(null);
-            }}
-          >
-            全部知识
-          </button>
-          {current?.path.map((part, i) => {
-            const node = nodes.find(
-              (n) =>
-                n.path.length === i + 1 &&
-                n.path.every((v, j) => v === current.path[j]),
-            );
-            return (
-              <span key={i}>
-                <ChevronRight size={12} />
-                <button
-                  aria-current={
-                    i === current.path.length - 1 ? "page" : undefined
-                  }
-                  onClick={() => node && select(node)}
-                >
-                  {part}
-                </button>
-              </span>
-            );
-          })}
-        </nav>
-        <header className="knowledge-branch-heading">
-          <div>
-            <h2>{current?.name || "按能力探索知识"}</h2>
-            <p>
-              {current?.description ||
-                (current?.path.length === 2 && childNodes.length
-                  ? "按子类与服务商逐层查看具体条目。"
-                  : current?.direct_entity_ids.length
-                    ? "打开条目查看事实、版本、来源与资料。"
-                    : "先选生成或理解，再按类型和厂家逐层浏览。")}
+    <>
+      <div className="knowledge-view-tabs" aria-label="知识浏览方式">
+        <button
+          className={view === "scene" && !kind ? "active" : ""}
+          onClick={() => {
+            onClearKind();
+            setView("scene");
+          }}
+        >
+          按场景查看
+        </button>
+        <button
+          className={view === "capability" || kind ? "active" : ""}
+          onClick={() => setView("capability")}
+        >
+          按能力浏览
+        </button>
+      </div>
+      {view === "scene" && !kind ? (
+        <>
+          <SavedSolutions />
+          <SceneKnowledge
+            entities={entities}
+            navigation={navigation}
+            onOpen={onOpen}
+          />
+        </>
+      ) : (
+        <div className="hierarchy-browser">
+          <aside className="panel knowledge-tree-panel">
+            <div className="knowledge-tree-heading">
+              <b>
+                <FolderTree size={16} />
+                知识目录
+              </b>
+              <button
+                onClick={() => {
+                  setExpanded(new Set());
+                  setSelected(null);
+                  setQuery("");
+                }}
+              >
+                全部折叠
+              </button>
+            </div>
+            <nav aria-label="知识分类树">
+              <button
+                className={`knowledge-all ${!current ? "selected" : ""}`}
+                onClick={() => {
+                  onClearKind();
+                  select(null);
+                }}
+              >
+                <Layers3 size={15} />
+                <span>全部知识</span>
+                <small>{entities.filter((e) => matchesAccess(e)).length}</small>
+              </button>
+              {tree()}
+            </nav>
+            <p className="knowledge-tree-note">
+              能力 → 类型 → 厂家 → 模型
+              <br />
+              多能力模型共用同一条资料。
             </p>
-          </div>
-          {current && (
-            <button
-              className="button small"
-              onClick={() =>
-                select(nodes.find((n) => n.id === current.parent_id) || null)
-              }
-            >
-              <ArrowLeft size={14} />
-              返回上一级
-            </button>
-          )}
-        </header>
-        <div className="filter-bar">
-          <label className="search-input">
-            <Search size={16} />
-            <input
-              aria-label="搜索当前知识分支"
-              placeholder="搜索名称、描述或厂家…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </label>
-          {kind && (
-            <button className="text-button" onClick={onClearKind}>
-              当前：{kinds[kind]} · 查看全部
-            </button>
-          )}
-          <span className="count">
-            {needle ? matches.length : scope.length} 个条目
-          </span>
-        </div>
-        {needle ? (
-          matches.length ? (
-            <div className="knowledge-search-groups">
-              {[...grouped].map(([vendor, rows]) => (
-                <section key={vendor}>
-                  <h3>
-                    <Building2 size={15} />
-                    {vendor}
-                    <small>{rows.length} 个</small>
-                  </h3>
-                  {cards(rows)}
-                </section>
-              ))}
-            </div>
-          ) : (
-            <div className="knowledge-empty">
-              <Search size={25} />
-              <h3>未找到匹配条目</h3>
-              <p>试试模型名或厂家名，或返回上一级扩大范围。</p>
-            </div>
-          )
-        ) : childNodes.length ? (
-          <div className="knowledge-group-grid">
-            {childNodes.map((node) => {
-              const entries = members(node),
-                hasChildren = children(node.id).length > 0;
-              return (
-                <button
-                  key={node.id}
-                  className={`knowledge-group-card ${!entries.length ? "is-empty" : ""}`}
-                  onClick={() => select(node)}
-                >
-                  {!hasChildren ? (
-                    <Building2 size={23} />
-                  ) : (
-                    <FolderTree size={23} />
-                  )}
-                  <span className="knowledge-group-count">
-                    {entries.length} 个条目
+          </aside>
+          <section className="panel knowledge-browser-panel" ref={panel}>
+            <nav className="knowledge-breadcrumb" aria-label="知识路径">
+              <button
+                onClick={() => {
+                  onClearKind();
+                  select(null);
+                }}
+              >
+                全部知识
+              </button>
+              {current?.path.map((part, i) => {
+                const node = nodes.find(
+                  (n) =>
+                    n.path.length === i + 1 &&
+                    n.path.every((v, j) => v === current.path[j]),
+                );
+                return (
+                  <span key={i}>
+                    <ChevronRight size={12} />
+                    <button
+                      aria-current={
+                        i === current.path.length - 1 ? "page" : undefined
+                      }
+                      onClick={() => node && select(node)}
+                    >
+                      {part}
+                    </button>
                   </span>
-                  <h3>{node.name}</h3>
-                  <p>
-                    {node.description ||
-                      (entries.length
-                        ? node.path.length === 2
-                          ? "按厂家继续浏览"
-                          : entries
-                              .slice(0, 3)
-                              .map((e) => e.name)
-                              .join(" · ")
-                        : "暂无已核验资料")}
-                  </p>
-                  <footer>
-                    {hasChildren
-                      ? `${children(node.id).length} 个分组 · 继续展开`
-                      : "查看具体资料"}
-                    <ChevronRight size={15} />
-                  </footer>
+                );
+              })}
+            </nav>
+            <div className="knowledge-access-filter">
+              <label>
+                模型开放方式{" "}
+                <select
+                  value={accessFilter}
+                  onChange={(e) => setAccessFilter(e.target.value)}
+                >
+                  <option value="all">全部条目</option>
+                  <option value="downloadable">
+                    可下载权重（适合评估自部署）
+                  </option>
+                  <option value="open_source">
+                    开源模型（MIT / Apache 等许可）
+                  </option>
+                  <option value="open_weights">
+                    开放权重（专用或受限许可）
+                  </option>
+                </select>
+              </label>
+              <small>
+                保留能力 → 类型 →
+                厂家层级；可下载不代表免费商用或当前硬件能运行。
+              </small>
+            </div>
+            <header className="knowledge-branch-heading">
+              <div>
+                <h2>{current?.name || "按能力探索知识"}</h2>
+                <p>
+                  {current?.description ||
+                    (current?.path.length === 2 && childNodes.length
+                      ? "按子类与服务商逐层查看具体条目。"
+                      : current?.direct_entity_ids.length
+                        ? "打开条目查看事实、版本、来源与资料。"
+                        : "先选生成或理解，再按类型和厂家逐层浏览。")}
+                </p>
+              </div>
+              {current && (
+                <button
+                  className="button small"
+                  onClick={() =>
+                    select(
+                      nodes.find((n) => n.id === current.parent_id) || null,
+                    )
+                  }
+                >
+                  <ArrowLeft size={14} />
+                  返回上一级
                 </button>
-              );
-            })}
-          </div>
-        ) : scope.length ? (
-          cards(scope)
-        ) : (
-          <div className="knowledge-empty">
-            <BookOpen size={26} />
-            <h3>这个分支暂无已核验条目</h3>
-            <p>保留能力层级，后续登记可靠资料后会显示在这里。</p>
-          </div>
-        )}
-      </section>
-    </div>}</>
+              )}
+            </header>
+            <div className="filter-bar">
+              <label className="search-input">
+                <Search size={16} />
+                <input
+                  aria-label="搜索当前知识分支"
+                  placeholder="搜索名称、描述或厂家…"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </label>
+              {kind && (
+                <button className="text-button" onClick={onClearKind}>
+                  当前：{kinds[kind]} · 查看全部
+                </button>
+              )}
+              <span className="count">
+                {needle ? matches.length : scope.length} 个条目
+              </span>
+            </div>
+            {needle ? (
+              matches.length ? (
+                <div className="knowledge-search-groups">
+                  {[...grouped].map(([vendor, rows]) => (
+                    <section key={vendor}>
+                      <h3>
+                        <Building2 size={15} />
+                        {vendor}
+                        <small>{rows.length} 个</small>
+                      </h3>
+                      {cards(rows)}
+                    </section>
+                  ))}
+                </div>
+              ) : (
+                <div className="knowledge-empty">
+                  <Search size={25} />
+                  <h3>未找到匹配条目</h3>
+                  <p>试试模型名或厂家名，或返回上一级扩大范围。</p>
+                </div>
+              )
+            ) : childNodes.length ? (
+              <div className="knowledge-group-grid">
+                {childNodes.map((node) => {
+                  const entries = members(node),
+                    hasChildren = children(node.id).length > 0;
+                  return (
+                    <button
+                      key={node.id}
+                      className={`knowledge-group-card ${!entries.length ? "is-empty" : ""}`}
+                      onClick={() => select(node)}
+                    >
+                      {!hasChildren ? (
+                        <Building2 size={23} />
+                      ) : (
+                        <FolderTree size={23} />
+                      )}
+                      <span className="knowledge-group-count">
+                        {entries.length} 个条目
+                      </span>
+                      <h3>{node.name}</h3>
+                      <p>
+                        {node.description ||
+                          (entries.length
+                            ? node.path.length === 2
+                              ? "按厂家继续浏览"
+                              : entries
+                                  .slice(0, 3)
+                                  .map((e) => e.name)
+                                  .join(" · ")
+                            : "暂无已核验资料")}
+                      </p>
+                      <footer>
+                        {hasChildren
+                          ? `${children(node.id).length} 个分组 · 继续展开`
+                          : "查看具体资料"}
+                        <ChevronRight size={15} />
+                      </footer>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : scope.length ? (
+              cards(scope)
+            ) : (
+              <div className="knowledge-empty">
+                <BookOpen size={26} />
+                <h3>这个分支暂无已核验条目</h3>
+                <p>保留能力层级，后续登记可靠资料后会显示在这里。</p>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
+    </>
   );
 }
