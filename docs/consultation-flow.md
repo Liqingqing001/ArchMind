@@ -40,3 +40,17 @@ python -m app.curated --dataset video-workflow-knowledge-2026-11-07.json --apply
 输入视频短剧意向 → 补预算／使用方式 → 补经验／规模与关键要求 → 摘要确认 → 简版方案 → 修改预算重新确认。另测超过四轮仍保留最初目标、刷新恢复、会话隔离、模型错误不降级、截断续写证据固定及手机布局。模型端交互验收使用受控响应，不代表所有供应商的真实生成效果已验证。
 
 当前面向新手的回答约 450～800 字，按适用性排序解释至多三条路线与链接。完成后的评价和场景参考见 [方案沉淀](solution-cases.md)。
+
+## “没有偏好”澄清修复（2026-11-08）
+
+使用方式仍待回答时，独立的“没有偏好／无偏好”回答会由两端共享规则补记，即使模型漏提取也继续询问后续条件。带序号的回答只匹配对应问题；反问、引述、画风偏好不补记为部署偏好。模型提取到的明确选择优先。静态演示不再把一句“不知道”同时填进两个字段，也不把“比较三条路线”直接当成选择 API。收集完成仍需用户确认生成。
+
+MiniMax-H3 补充资料来自[官方模型卡](https://huggingface.co/MiniMaxAI/MiniMax-H3)和[许可问答](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/docs/QA-about-License.md)。它继续归属视频生成能力，以“开放权重”标注；本地路线检索携带许可地域与组件部署边界。未验证实际硬件、显存、速度或费用。完整后端已有库可预览后导入：
+
+```bash
+cd backend
+python -m app.curated --dataset minimax-h3-open-weights-2026-11-08.json
+python -m app.curated --dataset minimax-h3-open-weights-2026-11-08.json --apply
+```
+
+Pages 自动追加五条事实到同一实体，保留旧来源、历史版本与浏览器记录。公开资料现有 171 个真实实体、470 条事实、21 个可下载模型。增补数据必须显式标记 `supplement`，构建器拒绝同名新实体或覆盖已有字段。

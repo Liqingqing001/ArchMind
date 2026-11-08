@@ -212,7 +212,7 @@ export function rankRecommendations(
     const first = (keys: string[]) =>
       keys.flatMap((key) => facts.filter((f) => f.key === key))[0];
     const constraint = first(policy.constraint_fields),
-      feature = first(policy.feature_fields) || facts[0],
+      feature = (route === "local" ? facts.find(f => f.key === "部署方式") : null) || first(policy.feature_fields) || facts[0],
       cost = first(policy.cost_fields);
     const selected: Row[] = [];
     for (const f of [constraint, feature, cost, ...facts]) {

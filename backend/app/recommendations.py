@@ -94,7 +94,7 @@ def rank_recommendations(rows,entities,categories,links,workflow,prompt):
         if not entity or len(chosen)>=12:continue
         seen.add(entity['id']);facts=entity['facts']
         constraint=next((f for key in POLICY['constraint_fields'] for f in facts if f['key']==key),None)
-        feature=next((f for key in POLICY['feature_fields'] for f in facts if f['key']==key),facts[0])
+        feature=(next((f for f in facts if f['key']=='部署方式'),None) if route=='local' else None) or next((f for key in POLICY['feature_fields'] for f in facts if f['key']==key),facts[0])
         cost=next((f for key in POLICY['cost_fields'] for f in facts if f['key']==key),None)
         selected=[]
         for f in [constraint,feature,cost,*facts]:

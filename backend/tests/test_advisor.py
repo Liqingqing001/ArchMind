@@ -23,6 +23,10 @@ def test_server_uses_same_capability_and_route_cases(db):
         assert [r['id'] for r in context['routes']]==c['routes'],c['id']
         rows,_=agent.retrieve_context(db,[agent.Message(role='user',content='生成简版方案')],w)
         names={r['entity_name'] for r in rows}
+        if c['id']=='video_generation':
+            h3=[r for r in rows if r['entity_name']=='MiniMax-H3']
+            assert all(r['recommendation_route']=='local' for r in h3)
+            assert {r['key'] for r in h3}=={'许可边界','部署方式'}
         assert set(c['include'])<=names,(c['id'],names)
         assert not set(c['exclude'])&names,c['id']
         for name in c.get('references',[]):
