@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "batch_id": "minimax-h3-open-weights-2026-11-08",
+  "checked_on": "2026-11-08",
+  "supplement": true,
+  "sources": [
+    {
+      "id": "minimax-h3-card",
+      "title": "MiniMax-H3 官方模型卡与许可问答",
+      "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3",
+      "checked_on": "2026-11-08",
+      "capture_method": "official_page_editorial_review",
+      "note": "官方资料中文编辑归纳，非完整网页；未下载权重或验证 GPU 实测成本。",
+      "additional_urls": [
+        "https://huggingface.co/MiniMaxAI/MiniMax-H3/tree/main",
+        "https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/docs/QA-about-License.md",
+        "https://www.minimax.io/news/minimax-h3-open-source"
+      ],
+      "excerpts": [
+        "官方下载仓库：https://huggingface.co/MiniMaxAI/MiniMax-H3；文件入口：https://huggingface.co/MiniMaxAI/MiniMax-H3/tree/main。",
+        "模型卡标注 minimax-h3-community-license-agreement；H3 采用 MiniMax H3 Community License Agreement。",
+        "H3-Base 支持本地部署生成 768p 音视频；H3-Context-IR 与 H3-Regenerate-2K 尚未包含在本次开放权重中，完整官方 2K 流程需结合托管 API。",
+        "官方许可问答注明：当前开放权重许可地域限于欧盟、英国、韩国和美国；其他地区的组织可以申请正式授权，不能把 API 可用范围视为权重许可范围。"
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "name": "MiniMax-H3",
+      "kind": "model",
+      "description": "MiniMax 视频生成模型；补充官方开放权重、部署与许可信息。",
+      "source": "minimax-h3-card",
+      "categories": [
+        [
+          "AI 模型",
+          "视频生成模型",
+          "文生视频"
+        ],
+        [
+          "AI 模型",
+          "视频生成模型",
+          "图生视频"
+        ],
+        [
+          "AI 模型",
+          "开源与开放权重模型"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "官方下载入口",
+          "value": "https://huggingface.co/MiniMaxAI/MiniMax-H3/tree/main",
+          "evidence": 0
+        },
+        {
+          "key": "官方模型仓库",
+          "value": "https://huggingface.co/MiniMaxAI/MiniMax-H3",
+          "evidence": 0
+        },
+        {
+          "key": "模型卡许可证",
+          "value": "minimax-h3-community-license-agreement",
+          "evidence": 1
+        },
+        {
+          "key": "部署方式",
+          "value": "H3-Base 支持本地部署生成 768p 音视频；H3-Context-IR 与 H3-Regenerate-2K 尚未包含在本次开放权重中，完整官方 2K 流程需结合托管 API。",
+          "evidence": 2
+        },
+        {
+          "key": "许可边界",
+          "value": "官方许可问答注明：当前开放权重许可地域限于欧盟、英国、韩国和美国；其他地区的组织可以申请正式授权，不能把 API 可用范围视为权重许可范围。",
+          "evidence": 3
+        }
+      ]
+    }
+  ]
+}

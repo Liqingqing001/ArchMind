@@ -1,0 +1,68 @@
+{
+  "turns": [
+    {
+      "prompt": "我想用 AI 写小说并做一个网站，希望成本低，请先帮我确认需求，再比较 API 自建、本地模型和现成平台。",
+      "updates": {
+        "goal": "AI 写小说并做一个网站"
+      },
+      "missing": [
+        "budget",
+        "delivery",
+        "experience",
+        "scale",
+        "requirements"
+      ]
+    },
+    {
+      "prompt": "预算尽可能越低越好。没有偏好。",
+      "updates": {
+        "budget": "预算尽可能越低越好"
+      },
+      "missing": [
+        "experience",
+        "scale",
+        "requirements"
+      ]
+    },
+    {
+      "prompt": "没有偏好，我会部署或者编程。",
+      "updates": {
+        "experience": "我会部署或者编程"
+      },
+      "missing": [
+        "scale",
+        "requirements"
+      ]
+    },
+    {
+      "prompt": "第一个问题是没有偏好。不知道生成多少，先自己用。",
+      "updates": {
+        "scale": "不知道生成多少，先自己用"
+      },
+      "missing": [
+        "requirements"
+      ]
+    },
+    {
+      "prompt": "你不是说没有偏好也可以吗？",
+      "updates": {},
+      "missing": [
+        "requirements"
+      ]
+    },
+    {
+      "prompt": "无特别要求，先跑通。",
+      "updates": {
+        "requirements": "无特别要求，先跑通"
+      },
+      "missing": []
+    }
+  ],
+  "negative": [
+    "你不是说没有偏好也可以吗？",
+    "画风没有偏好",
+    "不是没有偏好，我只用本地",
+    "他说“没有偏好”",
+    "第一个问题是没有偏好"
+  ]
+}

@@ -24,6 +24,19 @@ def extraction_messages(previous, prompt, last_question=''):
     return [{'role':'system','content':POLICY['extraction_prompt']}, {'role':'user','content':json.dumps(dict(BRIEF=previous['fields'],LAST_QUESTION=last_question,USER_INPUT=prompt),ensure_ascii=False)}]
 
 
+def delivery_answer(previous, prompt):
+    """Keep an explicit no-preference answer when model extraction omits it."""
+    for part in re.split(r'[，,。；;！!？?\n]', prompt):
+        evidence = part.strip()
+        numbered = re.match(r'^第([一二12])个问题', evidence)
+        if numbered and (previous['missing'] + [None, None])[0 if numbered[1] in '一1' else 1] != 'delivery':
+            continue
+        scoped = re.search(r'使用方式|部署方式|部署|平台选择', evidence)
+        if ('delivery' in previous['missing'][:2] or scoped) and re.fullmatch(POLICY['delivery_no_preference_pattern'], evidence):
+            return dict(value='无偏好', evidence=evidence)
+    return None
+
+
 def apply_extraction(previous, raw, prompt):
     try:
         parsed = json.loads(re.sub(r'\s*```$', '', re.sub(r'^```(?:json)?\s*', '', raw.strip())))
@@ -31,6 +44,9 @@ def apply_extraction(previous, raw, prompt):
         raise ValueError('需求识别未返回有效 JSON，请重试；尚未生成方案。')
     if not isinstance(parsed, dict) or not isinstance(parsed.get('updates'), dict):
         raise ValueError('需求识别格式无效，请重试；尚未生成方案。')
+    delivery = delivery_answer(previous, prompt)
+    if delivery and not parsed['updates'].get('delivery'):
+        parsed['updates']['delivery'] = delivery
     result = copy.deepcopy(previous)
     changed = False
     for slot in POLICY['slots']:

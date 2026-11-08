@@ -49,6 +49,19 @@ export function extractionMessages(
     },
   ];
 }
+/** Resolve explicit delivery answers even when the model omits this slot. */
+function deliveryAnswer(previous: Workflow, prompt: string) {
+  const pattern = new RegExp(policy.delivery_no_preference_pattern);
+  for (const part of prompt.split(/[，,。；;！!？?\n]/)) {
+    const evidence = part.trim();
+    const numbered = evidence.match(/^第([一二12])个问题/);
+    if (numbered && previous.missing[/[一1]/.test(numbered[1]) ? 0 : 1] !== "delivery") continue;
+    const scoped = /使用方式|部署方式|部署|平台选择/.test(evidence);
+    if ((previous.missing.slice(0, 2).includes("delivery") || scoped) && pattern.test(evidence))
+      return { value: "无偏好", evidence };
+  }
+  return null;
+}
 export function applyExtraction(
   previous: Workflow,
   raw: string,
@@ -65,11 +78,14 @@ export function applyExtraction(
     throw Error("需求识别未返回有效 JSON，请重试；尚未生成方案。");
   }
   if (
+    !parsed ||
     !parsed.updates ||
     typeof parsed.updates !== "object" ||
     Array.isArray(parsed.updates)
   )
     throw Error("需求识别格式无效，请重试；尚未生成方案。");
+  const delivery = deliveryAnswer(previous, prompt);
+  if (delivery && !parsed.updates.delivery) parsed.updates.delivery = delivery;
   const next = structuredClone(previous);
   let changed = false;
   for (const slot of policy.slots) {
@@ -343,7 +359,7 @@ export function previewExtraction(prompt: string, previous: Workflow) {
         /[^，。]*(?:\d+\s*(?:元|块|美元|人民币)|不确定)[^，。]*/,
       )?.[0] || prompt,
     );
-  if (/现成|平台|API|api|自部署|本地|云.?GPU|无偏好/.test(prompt))
+  if (!/比较|对比/.test(prompt) && /现成|平台|API|api|自部署|本地|云.?GPU/.test(prompt))
     set(
       "delivery",
       prompt.match(
@@ -361,9 +377,14 @@ export function previewExtraction(prompt: string, previous: Workflow) {
     set("scale", prompt);
   if (/风格|写实|一致|隐私|商用|无特别|质量|速度/.test(prompt))
     set("requirements", prompt);
-  if (/不确定|不知道|无偏好/.test(prompt))
-    for (const id of previous.missing.slice(0, 2))
-      if (!updates[id]) set(id, "暂不确定，方案须注明假设");
+  // A bare unknown answers one question, not every missing condition.
+  if (/^(?:不确定|不知道)[。！!]?\s*$/.test(prompt.trim())) {
+    const id = previous.missing[0];
+    if (id && id !== "goal" && !updates[id]) set(id, "暂不确定，方案须注明假设");
+  }
+  if (/先自己用|不知道生成多少|个人试用/.test(prompt)) set("scale", prompt);
+  const delivery = deliveryAnswer(previous, prompt);
+  if (delivery) updates.delivery = delivery;
   return JSON.stringify({
     updates,
     title: previewTitle({

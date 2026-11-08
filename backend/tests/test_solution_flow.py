@@ -89,3 +89,33 @@ def test_gpu_task_classification_uses_service_category_instead_of_negated_gpu_wo
     links=[{'entity_id':'a','category_id':'api'},{'entity_id':'b','category_id':'gpu'}]
     found=rank_knowledge(rows,entities,categories,links,w,'生成方案')
     assert {r['entity_name']:r['task'] for r in found}=={'火山方舟':'模型 API 与托管推理','AnyGPU':'GPU算力'}
+
+
+def test_exact_novel_conversation_advances_when_model_omits_delivery(client, db, monkeypatch):
+    fixture=json.loads((Path(__file__).parent/'fixtures/clarification-no-preference.json').read_text())
+    row=client.post('/api/conversations',json={'title':'新对话'}).json()
+    for revision, turn in enumerate(fixture['turns']):
+        raw=json.dumps({'updates':{key:dict(value=value,evidence=value) for key,value in turn['updates'].items()}},ensure_ascii=False)
+        monkeypatch.setattr(agent,'complete',lambda *a,**k:(raw,'stop'))
+        response=request(client,turn['prompt'],conversation_id=row['id'],revision=revision)
+        assert response.status_code==200, response.text
+        result=response.json()
+        assert result['workflow']['missing']==turn['missing']
+        assert result['retrieved']==[]
+        if revision:
+            assert result['workflow']['fields']['delivery']['value']=='无偏好'
+            assert '你倾向现成平台' not in result['answer']
+    assert result['workflow']['phase']=='ready'
+    assert '现在为你生成简版方案吗' in result['answer']
+    assert result['workflow']==previous_workflow(client.get('/api/conversations/'+row['id']).json()['messages'])
+
+
+def test_no_preference_only_resolves_the_matching_question():
+    fixture=json.loads((Path(__file__).parent/'fixtures/clarification-no-preference.json').read_text())
+    w=apply_extraction(empty_workflow(),'{"updates":{"goal":{"value":"写小说","evidence":"写小说"}}}','写小说')
+    for prompt in fixture['negative']:
+        assert 'delivery' in apply_extraction(w,'{"updates":{}}',prompt)['missing'], prompt
+    for prompt in ['没有偏好','无偏好','部署方式没有偏好','第二个问题是没有偏好']:
+        assert apply_extraction(w,'{"updates":{}}',prompt)['fields']['delivery']['value']=='无偏好'
+    raw=json.dumps({'updates':{'delivery':dict(value='本地',evidence='只用本地')}})
+    assert apply_extraction(w,raw,'没有偏好，但这次只用本地')['fields']['delivery']['value']=='本地'

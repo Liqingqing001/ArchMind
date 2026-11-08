@@ -58,6 +58,11 @@ for (const c of cases) {
       rows.some((r) => r.entity_name === name),
       `${c.id}: missing ${name}`,
     );
+  if (c.id === "video_generation") {
+    const h3 = rows.filter(r => r.entity_name === "MiniMax-H3");
+    assert.ok(h3.every(r => r.recommendation_route === "local"));
+    assert.deepEqual(new Set(h3.map(r => r.key)), new Set(["许可边界", "部署方式"]));
+  }
   for (const name of c.exclude)
     assert.ok(
       !rows.some((r) => r.entity_name === name),

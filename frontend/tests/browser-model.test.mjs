@@ -234,7 +234,7 @@ test("one real category contains all open-weight models without losing capabilit
   );
   assert.ok(open);
   const models = db.request("GET", "/entities?category_id=" + open.id);
-  assert.equal(models.length, 20);
+  assert.equal(models.length, 21);
   assert.ok(models.every((e) => e.category_ids.length >= 2));
   assert.equal(db.request("GET", "/entities").length, 172);
   const qwen = models.find((e) => e.name === "Qwen3-8B");
@@ -263,7 +263,7 @@ test("new category data preserves existing browser history, traces and review ed
   assert.equal(next.request("GET", "/conversations/"+c.id).messages[1].result.workflow.phase,"collecting");
   assert.equal(
     next.request("GET", "/entities?category_id=" + category.id).length,
-    20,
+    21,
   );
   assert.equal(
     next.request("GET", "/changes").find((x) => x.id === pending.id).status,

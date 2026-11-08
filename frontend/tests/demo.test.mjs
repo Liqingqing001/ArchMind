@@ -19,7 +19,7 @@ const snapshot = seed.snapshots.find(
 
 test("public export contains the updated catalog with traceable excerpts and model downloads", () => {
   assert.equal(seed.entities.filter((e) => !e.is_demo).length, 171);
-  assert.equal(seed.facts.filter((f) => f.entity_id !== atlas.id).length, 465);
+  assert.equal(seed.facts.filter((f) => f.entity_id !== atlas.id).length, 470);
   for (const f of seed.facts)
     assert.ok(
       seed.snapshots
@@ -29,10 +29,28 @@ test("public export contains the updated catalog with traceable excerpts and mod
   const models = setup()
     .request("GET", "/entities")
     .filter((e) => e.model_resources);
-  assert.equal(models.length, 20);
+  assert.equal(models.length, 21);
   assert.ok(
     models.every((e) => e.model_resources.download_url.startsWith("https://")),
   );
+});
+
+test("H3 supplement keeps one entity with sourced downloads, license and local deployment boundaries", () => {
+  const db = setup();
+  const models = db.request("GET", "/entities").filter(e => e.name === "MiniMax-H3");
+  assert.equal(models.length, 1);
+  const h3 = models[0];
+  assert.equal(h3.model_resources.download_url, "https://huggingface.co/MiniMaxAI/MiniMax-H3/tree/main");
+  assert.equal(h3.model_resources.license, "minimax-h3-community-license-agreement");
+  const facts = seed.facts.filter(f => f.entity_id === h3.id);
+  assert.equal(facts.length, 8);
+  assert.equal(new Set(facts.map(f => f.key)).size, 8);
+  for (const key of ["官方下载入口", "许可边界", "部署方式"]) {
+    const fact = facts.find(f => f.key === key);
+    const snapshot = seed.snapshots.find(s => s.id === fact.snapshot_id);
+    assert.equal(seed.sources.find(s => s.id === snapshot.source_id).url, "https://huggingface.co/MiniMaxAI/MiniMax-H3");
+  }
+  assert.ok(facts.find(f => f.key === "部署方式").value.includes("H3-Regenerate-2K 尚未包含"));
 });
 
 test("console and Agent consume the same current facts; demo is opt-in for Agent", () => {

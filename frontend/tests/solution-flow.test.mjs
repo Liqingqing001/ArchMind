@@ -152,3 +152,34 @@ assert.throws(
 console.log(
   "PASS: enforced confirmation, evidence-checked extraction, edits, persistent brief, scenario routing, shared ranking fixtures and no premature recommendations",
 );
+
+// Model deliberately omits delivery: the user's exact conversation must still progress.
+const regression = JSON.parse(readFileSync(new URL("../../backend/tests/fixtures/clarification-no-preference.json", import.meta.url), "utf8"));
+let novel = emptyWorkflow();
+for (const [i, turn] of regression.turns.entries()) {
+  const updates = Object.fromEntries(Object.entries(turn.updates).map(([key, value]) => [key, {value, evidence:value}]));
+  novel = applyExtraction(novel, JSON.stringify({updates}), turn.prompt);
+  assert.deepEqual(novel.missing, turn.missing);
+  if (i > 0) {
+    assert.equal(novel.fields.delivery.value, "无偏好");
+    assert.ok(!clarification(novel).includes("你倾向现成平台"));
+  }
+  assert.ok(!isConfirmation(novel, turn.prompt));
+}
+assert.equal(novel.phase, "ready");
+assert.ok(clarification(novel).includes("现在为你生成简版方案吗"));
+const pending = applyExtraction(emptyWorkflow(), JSON.stringify({updates:{goal:{value:"写小说",evidence:"写小说"}}}), "写小说");
+for (const prompt of regression.negative) {
+  assert.ok(applyExtraction(pending, '{"updates":{}}', prompt).missing.includes("delivery"), prompt);
+}
+for (const prompt of ["没有偏好", "无偏好", "部署方式没有偏好", "第二个问题是没有偏好"]) {
+  assert.equal(applyExtraction(pending, '{"updates":{}}', prompt).fields.delivery.value, "无偏好");
+}
+assert.equal(applyExtraction(pending, JSON.stringify({updates:{delivery:{value:"本地",evidence:"只用本地"}}}), "没有偏好，但这次只用本地").fields.delivery.value, "本地");
+let preview = emptyWorkflow();
+for (const turn of regression.turns) preview = applyExtraction(preview, previewExtraction(turn.prompt, preview), turn.prompt);
+assert.equal(preview.phase, "ready");
+assert.equal(preview.fields.delivery.value, "无偏好");
+const unknown = applyExtraction(pending, previewExtraction("不知道", pending), "不知道");
+assert.ok(unknown.fields.budget && !unknown.fields.delivery);
+console.log("PASS: exact novel conversation, omitted extraction, scoped no preference, negative phrases and confirmation gate.");
