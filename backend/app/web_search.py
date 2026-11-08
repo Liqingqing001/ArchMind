@@ -45,7 +45,7 @@ def search_queries(workflow,prompt,secrets=()):
     goal=clean(workflow['fields'].get('goal',{}).get('value') or prompt)[:110]
     current=clean(prompt)
     hint=next((h for h in POLICY['query_hints'] if any(c in goal.lower() for c in h['cues'])),{})
-    query=goal+' 官方 文档 '+hint.get('topic','技术选型')
+    query=goal+' '+hint['discovery'] if hint.get('discovery') else goal+' 官方 文档 '+hint.get('topic','技术选型')
     follow='' if re.search(r'^(?:生成|确认|可以|好的|好|开始|现在生成|请续写)',current) else current[:70]
     return list(dict.fromkeys(q.strip()[:190] for q in [query,goal+' '+(follow or hint.get('details') or '部署 计费 使用限制 官方')]))[:POLICY['max_queries']]
 
@@ -135,10 +135,12 @@ def search_web(connection,workflow,prompt,secrets=()):
             except (ValueError,TypeError):
                 errors.append('联网检索失败，请检查搜索服务密钥、额度或网络')
     unique={}
-    for batch in batches:
-        for row in batch:
-            unique.setdefault(row['url'],row)
-    results=sorted(unique.values(),key=lambda r:r['source_type']!='official')[:POLICY['max_results']]
+    ordered=[sorted(batch,key=lambda r:r['source_type']!='official') for batch in batches]
+    for i in range(max([len(batch) for batch in ordered],default=0)):
+        for batch in ordered:
+            if i<len(batch):
+                row=batch[i];unique.setdefault(row['url'],row)
+    results=list(unique.values())[:POLICY['max_results']]
     for i,row in enumerate(results):
         row['citation_id']=f'W{i+1}'
     return dict(status=('partial' if results else 'error') if errors else 'ok' if results else 'empty',provider=connection.provider,searched_at=at,queries=queries,results=results,errors=errors)

@@ -1,3 +1,4 @@
+import { modelAccess } from "./modelAccess";
 import { WebEvidence } from "./WebEvidence";
 import React, { useState, useEffect, useCallback } from "react";
 import { createRoot } from "react-dom/client";
@@ -201,14 +202,14 @@ function App() {
   useEffect(() => {
     const close = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !busy) {
-        setModal(null);
-        setSnapshot(null);
-        setDetail(null);
+        if (snapshot) setSnapshot(null);
+        else if (modal) setModal(null);
+        else setDetail(null);
       }
     };
     window.addEventListener("keydown", close);
     return () => window.removeEventListener("keydown", close);
-  }, [busy]);
+  }, [busy, modal, snapshot]);
   const action = async (fn: () => Promise<unknown>, message = "") => {
     setBusy(true);
     setError("");
@@ -1435,6 +1436,7 @@ function App() {
                 <span>
                   {kinds[detail.kind]}{" "}
                   {detail.is_demo && <span className="demo-tag">演示</span>}
+                  {detail.model_resources && <span className="open-model-tag">{modelAccess(detail.model_resources)?.label}</span>}
                 </span>
               </div>
             </div>

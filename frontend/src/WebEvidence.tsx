@@ -14,6 +14,11 @@ export function WebEvidence({
       <summary>
         <Globe2 size={14} />
         本轮联网依据 ·{" "}
+        {citations.length
+          ? `正文引用 ${citations.length} 条 · `
+          : web.results.length
+            ? "正文尚未引用 · "
+            : ""}{" "}
         {
           {
             ok: "已取得网页",

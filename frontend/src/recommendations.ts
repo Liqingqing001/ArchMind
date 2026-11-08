@@ -3,7 +3,7 @@ export { policy as recommendationPolicy };
 type Row = Record<string, any>;
 const negative = () =>
   /(?:不需要|不要|不想|不用|不做|不考虑|无需|禁止|不允许|不生成|不涉及|而不是)[^，。；;！!？?\n]*/g;
-const positive = (text: string) =>
+export const positive = (text: string) =>
   text
     .toLowerCase()
     .replace(/(但|而是|只做|只想|只要|只用|只写|只生成|只理解|改成)/g, "，$1")

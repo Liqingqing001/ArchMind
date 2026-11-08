@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, ConfigDict, field_validator
 from sqlalchemy import select, update
 from .db import get_db, now
 from .models import Conversation
+from .solution_cases import feedback_for
 
 router = APIRouter(prefix="/api/conversations", tags=["conversations"])
 
@@ -45,13 +46,13 @@ def create_conversation(body: TitleInput, db=Depends(get_db)):
     row = Conversation(title=body.title, title_mode='auto' if body.title=='新对话' else 'manual')
     db.add(row)
     db.commit()
-    return {**summary(row), "messages": row.messages}
+    return {**summary(row), "messages": row.messages, "feedback": feedback_for(db, row.id)}
 
 
 @router.get("/{id}")
 def read_conversation(id: str, db=Depends(get_db)):
     row = get_conversation(db, id)
-    return {**summary(row), "messages": row.messages}
+    return {**summary(row), "messages": row.messages, "feedback": feedback_for(db, row.id)}
 
 
 @router.patch("/{id}")
@@ -81,4 +82,4 @@ def restore_conversation(id: str, db=Depends(get_db)):
     db.execute(update(Conversation).where(Conversation.id == id).values(deleted_at=None, updated_at=now()))
     db.commit()
     db.expire_all()
-    return {**summary(get_conversation(db, id)), "messages": get_conversation(db, id).messages}
+    return {**summary(get_conversation(db, id)), "messages": get_conversation(db, id).messages, "feedback": feedback_for(db, id)}

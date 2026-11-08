@@ -1,3 +1,4 @@
+import { solutionSnapshot, caseReferences } from "../solutionCases.ts";
 import { selectionContext, previewRecommendation } from "../recommendations.ts";
 import { disabledSearch } from "../webSearch.ts";
 import type { WebSearch } from "../webSearch.ts";
@@ -30,6 +31,7 @@ export type DemoState = Record<string, any> & {
   runs: Row[];
   traces: Row[];
   conversations: Row[];
+  solution_cases: Row[];
 };
 const copy = <T>(value: T): T => structuredClone(value);
 const stamp = () => new Date().toISOString();
@@ -68,6 +70,7 @@ export function createDemoStore(initial: Row) {
     ...initial,
     traces: initial.traces || [],
     conversations: initial.conversations || [],
+    solution_cases: initial.solution_cases || [],
   }) as DemoState;
   const find = (table: string, key: string): Row =>
     state[table].find((row: Row) => row.id === key) ||
@@ -281,6 +284,20 @@ export function createDemoStore(initial: Row) {
   const conversationView = (c: Row) => ({
     ...summary(c),
     messages: c.messages,
+    feedback: Object.fromEntries(
+      state.solution_cases
+        .filter((row) => row.conversation_id === c.id)
+        .map((row) => [
+          row.message_id,
+          {
+            rating: row.rating,
+            case_id: row.id,
+            saved: row.rating !== "bad",
+            scene_id: row.scene_id,
+            scene_name: row.scene_name,
+          },
+        ]),
+    ),
   });
   const prepareChat = (body: Row, browser = false, override?: Workflow) => {
     const c = conversation(body.conversation_id);
@@ -310,6 +327,15 @@ export function createDemoStore(initial: Row) {
             prompt,
           )
         : [];
+    const savedCases = continuing
+      ? latest.saved_solution_cases || []
+      : caseReferences(
+          [...state.solution_cases].sort((a, b) =>
+            b.updated_at.localeCompare(a.updated_at),
+          ),
+          workflow,
+          c.id,
+        );
     const t = continuing
       ? { id: latest.trace_id }
       : workflow.phase === "generated"
@@ -322,14 +348,13 @@ export function createDemoStore(initial: Row) {
             request_id: c.id,
             goal: workflow.fields.goal?.value,
             scene: workflow.scene,
+            saved_solution_cases: savedCases,
           })
         : { id: "" };
-    let history = c.messages
-      .slice(-18)
-      .map((m: Row) => ({
-        role: m.role,
-        content: continuing ? m.content.slice(-12000) : m.content,
-      }));
+    let history = c.messages.slice(-18).map((m: Row) => ({
+      role: m.role,
+      content: continuing ? m.content.slice(-12000) : m.content,
+    }));
     while (
       history.length &&
       history.reduce((n: number, m: Row) => n + m.content.length, 0) > 34000
@@ -360,6 +385,7 @@ export function createDemoStore(initial: Row) {
       workflow,
       continuing,
       lastQuestion: c.messages.at(-1)?.content || "",
+      saved_solution_cases: savedCases,
     };
   };
   const commitChat = (body: Row, result: Row) => {
@@ -686,6 +712,54 @@ export function createDemoStore(initial: Row) {
     if (path === "/agent/test")
       fail("模型连接测试由浏览器直连适配器处理，不进入知识与会话存储。");
     if (method === "POST" && path === "/agent/chat") return chat(body);
+    if (path === "/solution-cases" && method === "GET")
+      return state.solution_cases
+        .filter(
+          (row) =>
+            row.rating !== "bad" &&
+            (!params.get("scene_id") ||
+              row.scene_id === params.get("scene_id")),
+        )
+        .sort((a, b) => b.updated_at.localeCompare(a.updated_at))
+        .slice(0, 200);
+    if (
+      method === "POST" &&
+      (match = path.match(
+        /^\/conversations\/([^/]+)\/messages\/([^/]+)\/feedback$/,
+      ))
+    ) {
+      if (
+        !body ||
+        Object.keys(body).some((key) => key !== "rating") ||
+        !["good", "okay", "bad"].includes(body.rating)
+      )
+        fail("请选择有效的方案评价");
+      const c = conversation(match[1]),
+        snapshot = solutionSnapshot(c, match[2]);
+      let row = state.solution_cases.find(
+        (row) => row.conversation_id === c.id && row.message_id === match![2],
+      );
+      if (!row) {
+        row = {
+          ...snapshot,
+          id: id(),
+          rating: body.rating,
+          created_at: stamp(),
+          updated_at: stamp(),
+        };
+        state.solution_cases.push(row);
+      } else {
+        row.rating = body.rating;
+        row.updated_at = stamp();
+      }
+      return {
+        rating: row.rating,
+        case_id: row.id,
+        saved: row.rating !== "bad",
+        scene_id: row.scene_id,
+        scene_name: row.scene_name,
+      };
+    }
     if (path === "/conversations") {
       if (method === "GET")
         return state.conversations

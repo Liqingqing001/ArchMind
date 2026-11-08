@@ -366,3 +366,44 @@
     display: none;
   }
 }
+
+/* Entity details must sit above the global header, while forms remain above details. */
+.drawer-backdrop {
+  z-index: 60;
+}
+.drawer > header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #fffcf9;
+  padding-top: max(16px, env(safe-area-inset-top));
+}
+.knowledge-access-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 10px 0 16px;
+}
+.knowledge-access-filter label {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+}
+.knowledge-access-filter select {
+  max-width: 100%;
+  font-size: 12px;
+}
+.knowledge-access-filter small {
+  color: #805c6f;
+  font-size: 11px;
+}
+
+.overlay {
+  z-index: 80;
+}
+.snapshot-overlay {
+  z-index: 90;
+}

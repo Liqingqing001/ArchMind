@@ -10,7 +10,7 @@ import { upgradeDemoState } from "./stateUpgrade";
 import {
   completeBrowser,
   testBrowserConnection,
-  groundedMessages,
+  completeGroundedBrowser,
   groundedResult,
 } from "../browserModel";
 const STORAGE = "archmind-pages-state-v1";
@@ -147,18 +147,19 @@ export async function demoApi<T>(
           engine.attachWebTrace(prepared.trace_id, prepared.web_search),
         );
       }
-      const reply = await completeBrowser(
-        body.connection,
-        groundedMessages(prepared),
+      const reply = await completeGroundedBrowser(body.connection, prepared);
+      const grounded = groundedResult(
+        reply.answer,
+        reply.finish,
+        prepared,
+        reply.connection.model,
       );
       result = {
-        ...groundedResult(
-          reply.answer,
-          reply.finish,
-          prepared,
-          reply.connection.model,
-        ),
+        ...grounded,
+        warnings: [...grounded.warnings, ...reply.grounding_warnings],
+        grounding_repair: reply.grounding_repair,
         workflow,
+        saved_solution_cases: prepared.saved_solution_cases,
         diagnostics: reply.diagnostics,
       };
     }

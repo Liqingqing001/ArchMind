@@ -1,3 +1,6 @@
+import { SolutionFeedback } from "./SolutionFeedback";
+import { eligibleSolution, linkEvidence } from "./solutionCases";
+import type { SolutionFeedback as Feedback } from "./solutionCases";
 import { selectionContext } from "./recommendations";
 import { WebEvidence } from "./WebEvidence";
 import { SearchSettings } from "./SearchSettings";
@@ -67,6 +70,8 @@ type Answer = {
   diagnostics?: Record<string, any>;
   web_search?: WebSearch;
   web_citations?: WebResult[];
+  saved_solution_cases?: Record<string, any>[];
+  grounding_repair?: { attempted: boolean; adopted: boolean };
 };
 type Turn = {
   id: string;
@@ -83,7 +88,10 @@ type Summary = {
   message_count: number;
   preview: string;
 };
-type Conversation = Summary & { messages: Turn[] };
+type Conversation = Summary & {
+  messages: Turn[];
+  feedback?: Record<string, Feedback>;
+};
 const suggestions = [
   {
     title: "低成本小说网站",
@@ -105,8 +113,14 @@ const suggestions = [
 function Reply({
   turn,
   openSnapshot,
+  conversationId,
+  feedback,
+  onFeedback,
 }: {
   turn: Turn;
+  conversationId: string;
+  feedback?: Feedback;
+  onFeedback: (value: Feedback) => void;
   openSnapshot: (id: string) => void;
 }) {
   const [copied, setCopied] = useState(false);
@@ -147,7 +161,10 @@ function Reply({
               ),
             }}
           >
-            {turn.content}
+            {linkEvidence(turn.content, [
+              ...(turn.result?.citations || []),
+              ...(turn.result?.web_citations || []),
+            ])}
           </Markdown>
         </div>
       )}
@@ -173,6 +190,14 @@ function Reply({
             )}
           </div>
           {copyError && <p role="status">{copyError}</p>}
+          {eligibleSolution(turn) && (
+            <SolutionFeedback
+              conversationId={conversationId}
+              messageId={turn.id}
+              feedback={feedback}
+              onSaved={onFeedback}
+            />
+          )}
           {!!turn.result.trace_id && (
             <details className="reply-sources">
               <summary>
@@ -218,6 +243,22 @@ function Reply({
             web={turn.result.web_search}
             citations={turn.result.web_citations}
           />
+          {!!turn.result.saved_solution_cases?.length && (
+            <details className="reply-sources">
+              <summary>
+                本轮参考的已沉淀方案（{turn.result.saved_solution_cases.length}
+                ）
+              </summary>
+              {turn.result.saved_solution_cases.map((row) => (
+                <p key={row.id}>
+                  {row.title} · {row.scene}
+                  <br />
+                  <small>{row.status}</small>
+                </p>
+              ))}
+            </details>
+          )}
+
           {turn.result.diagnostics &&
             turn.result.workflow?.phase === "generated" && (
               <details className="reply-status">
@@ -232,6 +273,15 @@ function Reply({
                   · 输出上限：{turn.result.diagnostics.output_limit || "未记录"}{" "}
                   tokens
                 </p>
+                {turn.result.grounding_repair?.attempted && (
+                  <p>
+                    网页整合追加修订：
+                    {turn.result.grounding_repair.adopted
+                      ? "已采用修订方案"
+                      : "未成功，保留首稿"}
+                    （额外一次模型调用）
+                  </p>
+                )}
                 <p>
                   服务商用量：
                   {Object.entries(turn.result.diagnostics.usage || {})
@@ -868,6 +918,25 @@ export function AgentWorkspace({
                   <Reply
                     key={turn.id}
                     turn={turn}
+                    conversationId={current!.id}
+                    feedback={current!.feedback?.[turn.id]}
+                    onFeedback={(value) =>
+                      setDocuments((documents) => {
+                        const saved = documents[current!.id];
+                        return saved
+                          ? {
+                              ...documents,
+                              [saved.id]: {
+                                ...saved,
+                                feedback: {
+                                  ...saved.feedback,
+                                  [turn.id]: value,
+                                },
+                              },
+                            }
+                          : documents;
+                      })
+                    }
                     openSnapshot={openSnapshot}
                   />
                 ))}

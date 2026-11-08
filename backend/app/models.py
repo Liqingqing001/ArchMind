@@ -134,3 +134,24 @@ class Trace(Base):
     request_context: Mapped[dict] = mapped_column(JSON, default=dict)
     results: Mapped[list] = mapped_column(JSON)
     created_at: Mapped[str] = mapped_column(String(40), default=now)
+
+
+class SolutionCase(Base):
+    __tablename__ = "solution_cases"
+    __table_args__ = (UniqueConstraint("conversation_id", "message_id"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    conversation_id: Mapped[str] = mapped_column(ForeignKey("conversations.id"))
+    message_id: Mapped[str] = mapped_column(String(36))
+    rating: Mapped[str] = mapped_column(String(12))
+    scene_id: Mapped[str] = mapped_column(String(40), index=True)
+    scene_name: Mapped[str] = mapped_column(String(120))
+    title: Mapped[str] = mapped_column(String(120))
+    answer: Mapped[str] = mapped_column(Text)
+    brief: Mapped[dict] = mapped_column(JSON, default=dict)
+    references: Mapped[list] = mapped_column(JSON, default=list)
+    trace_id: Mapped[str] = mapped_column(String(36), default="")
+    model: Mapped[str] = mapped_column(String(200), default="")
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    evidence_status: Mapped[str] = mapped_column(String(40), default="user_endorsed_unverified")
+    created_at: Mapped[str] = mapped_column(String(40), default=now)
+    updated_at: Mapped[str] = mapped_column(String(40), default=now)
