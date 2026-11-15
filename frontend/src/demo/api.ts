@@ -154,7 +154,7 @@ export async function demoApi<T>(
       const grounded = groundedResult(
         reply.answer,
         reply.finish,
-        prepared,
+        {...prepared,diagnostics:reply.diagnostics},
         reply.connection.model,
       );
       result = {

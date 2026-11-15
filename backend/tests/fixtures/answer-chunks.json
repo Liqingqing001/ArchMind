@@ -1,0 +1,16 @@
+[
+  {"existing":"建议选择实时语音","incoming":"模型，先验证中文和打断。[K1]","expected":"建议选择实时语音模型，先验证中文和打断。[K1]"},
+  {"existing":"见[官方文档](https://example.com/rea","incoming":"ltime)，支持情况待核验。[W1]","expected":"见[官方文档](https://example.com/realtime)，支持情况待核验。[W1]"},
+  {"existing":"见[官方文档](https://example.","incoming":"com/realtime)。","expected":"见[官方文档](https://example.com/realtime)。"},
+  {"existing":"见[官方文档](https://example.com/realtime?","incoming":"lang=zh)。","expected":"见[官方文档](https://example.com/realtime?lang=zh)。"},
+  {"existing":"```js\nconst x = 1.","incoming":"25;\n```","expected":"```js\nconst x = 1.25;\n```"},
+  {"existing":"已核对，来源[W","incoming":"1]。","expected":"已核对，来源[W1]。"},
+  {"existing":"开头。这里是需要保留的完整引用段落[K1]","incoming":"这里是需要保留的完整引用段落[K1]，后续补充。","expected":"开头。这里是需要保留的完整引用段落[K1]，后续补充。"},
+  {"existing":"同一段没有变化","incoming":"同一段没有变化","expected":"同一段没有变化"},
+  {"existing":"已经有第一段完整的结论。","incoming":"已经有第一段完整的结论。\n\n下一段。","expected":"已经有第一段完整的结论。\n\n下一段。"},
+  {"existing":"结论。","incoming":"下一步先做小样。","expected":"结论。\n\n下一步先做小样。"},
+  {"existing":"| A | B |","incoming":"| C | D |","expected":"| A | B |\n| C | D |"},
+  {"existing":"```js\nconst x = ","incoming":"1;\n```","expected":"```js\nconst x = 1;\n```"},
+  {"existing":"```js\nreturn (fn(x)","incoming":")\n```","expected":"```js\nreturn (fn(x))\n```"},
+  {"existing":"🧪这是包含表情符号的重复内容，测试拼接","incoming":"🧪这是包含表情符号的重复内容，测试拼接完成。","expected":"🧪这是包含表情符号的重复内容，测试拼接完成。"}
+]

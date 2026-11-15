@@ -92,7 +92,7 @@ def test_explanation_does_not_pay_for_an_unnecessary_citation_repair(monkeypatch
     def complete(*args):
         calls.append(args);return '这就是两种接入方式的区别。','stop'
     monkeypatch.setattr(agent,'complete',complete)
-    _,repair,warnings=agent.complete_grounded(None,[],{'results':[{'citation_id':'W1'}]},require_web=False)
+    _,repair,warnings=agent.complete_grounded(agent.ModelConnection(**CONNECTION),[],{'results':[{'citation_id':'W1'}]},require_web=False)
     assert len(calls)==1 and not repair['attempted'] and not warnings
 
 

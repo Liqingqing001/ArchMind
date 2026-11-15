@@ -1,4 +1,5 @@
 import json
+from test_solution_agent import CONNECTION
 from sqlalchemy import select, func
 from app import agent
 from app.models import Conversation, SolutionCase, Fact
@@ -79,10 +80,10 @@ def test_web_ignored_draft_gets_one_bounded_revision_and_explicit_fallback(monke
     def complete(*args,**kwargs):
         calls.append(args[1]);return ('只用了库内[K1]','stop') if len(calls)==1 else ('创作平台及使用方向[W1]','stop')
     monkeypatch.setattr(agent,'complete',complete)
-    answer,repair,warnings=agent.complete_grounded(None,[],web)
+    answer,repair,warnings=agent.complete_grounded(agent.ModelConnection(**CONNECTION),[],web)
     assert '[W1]' in answer[0] and repair=={'attempted':True,'adopted':True} and not warnings and len(calls)==2
     calls.clear();monkeypatch.setattr(agent,'complete',lambda *a,**k:('完整首稿','stop'))
-    answer,repair,warnings=agent.complete_grounded(None,[],web)
+    answer,repair,warnings=agent.complete_grounded(agent.ModelConnection(**CONNECTION),[],web)
     assert answer[0]=='完整首稿' and repair['attempted'] and not repair['adopted'] and warnings
-    answer,repair,warnings=agent.complete_grounded(None,[],web,continuing=True)
+    answer,repair,warnings=agent.complete_grounded(agent.ModelConnection(**CONNECTION),[],web,continuing=True)
     assert not repair['attempted']

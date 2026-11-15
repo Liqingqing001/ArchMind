@@ -4,6 +4,8 @@ import type { WebSearch } from "./webSearch.ts";
 import { solutionPolicy, editorialGuide, answerContext } from "./solutionFlow.ts";
 import type { Workflow } from "./solutionFlow.ts";
 import type { Connection } from "./modelProviders.ts";
+import { generationPolicy, mergeChunk, continuationMessages, newGenerationBudget, recordUsage, incompleteWarning } from "./answerChunks.ts";
+import type { GenerationBudget, ContinuationInfo } from "./answerChunks.ts";
 export const MODEL_SETTINGS_KEY = "archmind-model-settings-v1";
 export const MODEL_SETTINGS_EVENT = "archmind-model-settings-changed";
 export type SavedModel = { provider: string; connection: Connection };
@@ -55,6 +57,7 @@ export function normalizeConnection(input: Connection): Connection {
     input.max_output_tokens > 8192
   )
     throw new Error("输出上限应为 256 到 8192 tokens");
+  if (input.auto_continue !== undefined && typeof input.auto_continue !== "boolean") throw new Error("自动补写设置无效");
   return {
     base_url: base,
     api_key: key,
@@ -65,6 +68,7 @@ export function normalizeConnection(input: Connection): Connection {
         ? "max_completion_tokens"
         : "max_tokens",
     max_output_tokens: input.max_output_tokens,
+    auto_continue: input.auto_continue !== false,
   };
 }
 export function loadModelSettings(storage?: StorageLike): SavedModel | null {
@@ -309,6 +313,49 @@ export async function testBrowserConnection(connection: Connection) {
     base_url: result.connection.base_url,
   };
 }
+function generationDiagnostics<T extends {finish: string; diagnostics: Record<string,any>}>(reply: T, budget: GenerationBudget) {
+  return {...reply.diagnostics, finish_reason:reply.finish, usage:{...budget.usage}, model_calls:budget.calls,
+    automatic_continuation:{...reply.diagnostics.automatic_continuation, attempts:budget.attempts} as ContinuationInfo};
+}
+/** Continue only length-truncated prose; extraction and connection tests use one call. */
+export async function completeBrowserInParts(
+  connection: Connection,
+  messages: ModelMessage[],
+  fetcher: typeof fetch = fetch,
+  budget: GenerationBudget = newGenerationBudget(),
+) {
+  budget.calls++;
+  const first=await completeBrowser(connection,messages,undefined,fetcher);
+  recordUsage(budget,first.diagnostics);
+  let {answer,finish}=first;
+  const enabled=first.connection.auto_continue !== false;
+  let segments=1, reason=finish === "stop" ? "not_needed" : !enabled ? "disabled" : finish;
+  while(enabled && finish === "length") {
+    if(Array.from(answer).length >= generationPolicy.stop_after_chars) {reason="size_limit";break;}
+    if(budget.remaining<=0) {reason="round_limit";break;}
+    budget.remaining--;budget.attempts++;budget.calls++;
+    let part: Awaited<ReturnType<typeof completeBrowser>>;
+    try {
+      part=await completeBrowser(first.connection,continuationMessages(messages,answer,budget.remaining),Math.min(first.connection.max_output_tokens,generationPolicy.continuation_tokens),fetcher);
+    } catch {
+      reason="error";break;
+    }
+    recordUsage(budget,part.diagnostics);
+    const merged=mergeChunk(answer,part.answer);
+    if(merged === answer) {
+      if(part.finish === "content_filter") {finish="content_filter";reason="content_filter";}
+      else reason="no_progress";
+      break;
+    }
+    answer=merged;finish=part.finish;segments++;
+    reason=finish === "stop" ? "completed" : finish;
+  }
+  const reply={...first,answer,finish,diagnostics:{...first.diagnostics,
+    initial_finish_reason:first.finish,
+    automatic_continuation:{enabled,segments,completed:finish === "stop",stop_reason:reason},
+  }};
+  return {...reply,diagnostics:generationDiagnostics(reply,budget)};
+}
 export function groundedMessages(context: {
   history: ModelMessage[];
   prompt: string;
@@ -351,7 +398,8 @@ export async function completeGroundedBrowser(
   fetcher: typeof fetch = fetch,
 ) {
   const messages = groundedMessages(context);
-  const first = await completeBrowser(connection, messages, undefined, fetcher);
+  const budget = newGenerationBudget();
+  const first = await completeBrowserInParts(connection, messages, fetcher, budget);
   const repair = { attempted: false, adopted: false };
   const webIds = new Set(
     (context.web_search?.results || []).map((row) => row.citation_id),
@@ -367,7 +415,7 @@ export async function completeGroundedBrowser(
   ) {
     repair.attempted = true;
     try {
-      const revised = await completeBrowser(
+      const revised = await completeBrowserInParts(
         connection,
         [
           ...messages,
@@ -379,13 +427,14 @@ export async function completeGroundedBrowser(
             }),
           },
         ],
-        undefined,
         fetcher,
+        budget,
       );
       if (revised.finish === "stop" && usesWeb(revised.answer)) {
         repair.adopted = true;
         return {
           ...revised,
+          diagnostics: generationDiagnostics(revised,budget),
           grounding_repair: repair,
           grounding_warnings: [] as string[],
         };
@@ -395,6 +444,7 @@ export async function completeGroundedBrowser(
     }
     return {
       ...first,
+      diagnostics: generationDiagnostics(first,budget),
       grounding_repair: repair,
       grounding_warnings: [
         "已尝试补充网页整合，但未取得带有效网页引用的完整修订，保留首版方案；请核对下方网页或继续追问。",
@@ -403,6 +453,7 @@ export async function completeGroundedBrowser(
   }
   return {
     ...first,
+    diagnostics: generationDiagnostics(first,budget),
     grounding_repair: repair,
     grounding_warnings: [] as string[],
   };
@@ -410,7 +461,7 @@ export async function completeGroundedBrowser(
 export function groundedResult(
   answer: string,
   finish: string,
-  context: { retrieved: any[]; trace_id: string; web_search?: WebSearch; workflow?: Workflow },
+  context: { retrieved: any[]; trace_id: string; web_search?: WebSearch; workflow?: Workflow; diagnostics?: {automatic_continuation?: ContinuationInfo} },
   model: string,
 ) {
   const requested = new Set(
@@ -441,9 +492,7 @@ export function groundedResult(
       "本轮检索到了网页，但正文未引用网页依据，不能视为已经结合联网结果；可展开下方资料核对或要求补充比较。",
     );
   if (finish === "length")
-    warnings.push(
-      "模型因输出上限停止，当前回复不完整。可点击“续写剩余内容”；若仍截断，请提高输出上限。",
-    );
+    warnings.push(incompleteWarning(context.diagnostics));
   if (finish === "content_filter")
     warnings.push("模型服务限制了本轮输出，请调整请求；这不是长度截断。");
   return {

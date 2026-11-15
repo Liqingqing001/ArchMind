@@ -15,6 +15,7 @@ from .conversations import get_conversation, summary
 from .web_search import SearchConnection, search_web, disabled_search, search_warnings, reusable_search, POLICY as SEARCH_POLICY, request_json as search_request_json, parse_results as parse_search_results
 from .solution_flow import POLICY, terms, rank_knowledge, previous_workflow, extraction_messages, apply_extraction, is_confirmation, clarification, editorial_guide, conversation_title, answer_context
 from .recommendations import selection_context
+from .answer_chunks import POLICY as GENERATION_POLICY, merge_chunk, continuation_messages, new_budget, record_usage, incomplete_warning
 
 router = APIRouter(prefix="/api/agent", tags=["solution-agent"])
 
@@ -25,7 +26,8 @@ class ModelConnection(BaseModel):
     model: str = Field(min_length=1, max_length=200)
     token_parameter: Literal["max_tokens", "max_completion_tokens"] = "max_tokens"
     protocol: Literal["chat_completions", "responses", "anthropic"] = "chat_completions"
-    max_output_tokens: int = Field(default=2400, ge=256, le=8192)
+    max_output_tokens: int = Field(default=GENERATION_POLICY['default_output_tokens'], ge=256, le=8192)
+    auto_continue: bool = True
 
     @field_validator("base_url")
     @classmethod
@@ -141,8 +143,59 @@ def complete(connection, messages, max_tokens=None):
         raise HTTPException(502, "模型未返回文本正文，请检查接口协议；推理模型可尝试增大输出上限")
 
 
+def generation_diagnostics(completion, budget):
+    diagnostics = dict(getattr(completion,'diagnostics',{}))
+    info = dict(diagnostics.get('automatic_continuation',{}))
+    info['attempts'] = budget['attempts']
+    return {**diagnostics,'finish_reason':completion[1],'usage':dict(budget['usage']),
+            'model_calls':budget['calls'],'automatic_continuation':info}
+
+
+def complete_in_parts(connection, messages, budget=None):
+    budget = budget if budget is not None else new_budget()
+    budget['calls'] += 1
+    first = complete(connection,messages)
+    record_usage(budget,getattr(first,'diagnostics',{}))
+    answer,finish = first
+    enabled = getattr(connection,'auto_continue',True)
+    segments = 1
+    reason = 'not_needed' if finish=='stop' else 'disabled' if not enabled else finish
+    while enabled and finish == 'length':
+        if len(answer) >= GENERATION_POLICY['stop_after_chars']:
+            reason = 'size_limit';break
+        if budget['remaining'] <= 0:
+            reason = 'round_limit';break
+        budget['remaining'] -= 1;budget['attempts'] += 1;budget['calls'] += 1
+        try:
+            part = complete(connection,continuation_messages(messages,answer,budget['remaining']),
+                            max_tokens=min(connection.max_output_tokens,GENERATION_POLICY['continuation_tokens']))
+        except HTTPException:
+            reason = 'error';break
+        record_usage(budget,getattr(part,'diagnostics',{}))
+        merged = merge_chunk(answer,part[0])
+        if merged == answer:
+            if part[1] == 'content_filter':
+                finish = 'content_filter';reason = 'content_filter'
+            else:
+                reason = 'no_progress'
+            break
+        answer,finish = merged,part[1]
+        segments += 1
+        reason = 'completed' if finish=='stop' else finish
+    result = Completion(answer,finish,{
+        **getattr(first,'diagnostics',{}),'output_limit':connection.max_output_tokens,
+        'initial_finish_reason':first[1],
+        'automatic_continuation':dict(enabled=enabled,segments=segments,completed=finish=='stop',stop_reason=reason),
+    })
+    return Completion(answer,finish,generation_diagnostics(result,budget))
+
+
 def complete_grounded(connection, messages, web, continuing=False, require_web=True):
-    first = complete(connection, messages)
+    # Both drafts share the same continuation allowance: at most two extra parts.
+    budget = new_budget()
+    first = complete_in_parts(connection, messages, budget)
+    def final(completion,repair,warnings):
+        return Completion(*completion,generation_diagnostics(completion,budget)),repair,warnings
     repair = dict(attempted=False, adopted=False)
     web_ids = {row['citation_id'] for row in web['results']}
     def uses_web(answer):
@@ -150,16 +203,16 @@ def complete_grounded(connection, messages, web, continuing=False, require_web=T
     if require_web and not continuing and first[1] == 'stop' and web_ids and not uses_web(first[0]):
         repair['attempted'] = True
         try:
-            revised = complete(connection, [*messages,
+            revised = complete_in_parts(connection, [*messages,
                 dict(role='assistant',content=first[0]),
-                dict(role='user',content=json.dumps(dict(REVISION_REQUEST=POLICY['grounding_repair_prompt']),ensure_ascii=False))])
+                dict(role='user',content=json.dumps(dict(REVISION_REQUEST=POLICY['grounding_repair_prompt']),ensure_ascii=False))],budget)
             if revised[1] == 'stop' and uses_web(revised[0]):
                 repair['adopted'] = True
-                return revised, repair, []
+                return final(revised, repair, [])
         except HTTPException:
             pass
-        return first, repair, ['已尝试补充网页整合，但未取得带有效网页引用的完整修订，保留首版方案；请核对下方网页或继续追问。']
-    return first, repair, []
+        return final(first, repair, ['已尝试补充网页整合，但未取得带有效网页引用的完整修订，保留首版方案；请核对下方网页或继续追问。'])
+    return final(first, repair, [])
 
 
 @router.post("/test")
@@ -256,7 +309,7 @@ def chat(body: ChatRequest, db=Depends(get_db)):
         if finish=='content_filter':
             warnings.append('模型服务限制了本轮输出，请调整请求；这不是长度截断。')
         if finish=='length':
-            warnings.append('模型因输出上限停止，当前回复不完整。可点击“续写剩余内容”；若仍截断，请提高输出上限。')
+            warnings.append(incomplete_warning(getattr(completion,'diagnostics',{})))
         result = dict(grounding_repair=grounding_repair,saved_solution_cases=saved_cases,web_search=web,web_citations=web_citations,answer=answer,citations=citations,retrieved=evidence,trace_id=trace_id,warnings=warnings,model=body.connection.model,workflow=workflow,finish_reason=finish,diagnostics=getattr(completion,'diagnostics',{'finish_reason':finish,'output_limit':body.connection.max_output_tokens}))
     if conversation:
         stamp = now()
