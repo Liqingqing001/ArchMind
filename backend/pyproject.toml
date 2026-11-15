@@ -8,3 +8,8 @@ dev = ["pytest>=8,<10"]
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+
+# Editable installs run from this checkout; data/ and migrations/ are not Python packages.
+[tool.setuptools.packages.find]
+include = ["app*"]
+namespaces = false
