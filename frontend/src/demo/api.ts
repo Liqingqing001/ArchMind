@@ -1,4 +1,4 @@
-import { searchWeb, testBrowserSearch } from "../webSearch";
+import { searchWeb, testBrowserSearch, reusableSearch } from "../webSearch";
 import {
   extractionMessages,
   applyExtraction,
@@ -98,7 +98,7 @@ export async function demoApi<T>(
       isConfirmation(workflow, context.prompt, body.action) ||
       body.action === "continue"
     )
-      workflow = { ...workflow, phase: "generated" };
+      workflow = { ...workflow, phase: "generated", ...(body.action === "continue" ? {} : {response_mode: "solution" as const}) };
     else {
       const extraction = await completeBrowser(
         body.connection,
@@ -117,10 +117,12 @@ export async function demoApi<T>(
         workflow,
         extraction.answer,
         context.extractionInput,
+        context.lastQuestion,
       );
     }
+    const reuse = body.action !== "continue" && !!body.web_search?.enabled && reusableSearch(context.latest_web_search, workflow);
     const prepared = await transaction((engine) =>
-      engine.prepareBrowserChat(call, workflow),
+      engine.prepareBrowserChat({...call, reuse_evidence: reuse}, workflow),
     );
     let result;
     if (workflow.phase !== "generated")
@@ -136,7 +138,8 @@ export async function demoApi<T>(
         diagnostics: { stage: "requirements" },
       };
     else {
-      if (!prepared.continuing) {
+      if (reuse) prepared.web_search = {...prepared.web_search, reused: true};
+      if (!prepared.continuing && !reuse) {
         prepared.web_search = await searchWeb(
           body.web_search,
           workflow,

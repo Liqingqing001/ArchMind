@@ -94,20 +94,20 @@ type Conversation = Summary & {
 };
 const suggestions = [
   {
-    title: "低成本小说网站",
-    text: "我想用 AI 写小说并做一个网站，希望成本低，请先帮我确认需求，再比较 API 自建、本地模型和现成平台。",
+    title: "实时语音模型",
+    text: "找一个实时语音交互的模型，先比较适合中文对话的候选和接入方式。",
   },
   {
     title: "企业知识问答",
-    text: "为 50 人团队设计一个本地部署的中文文档知识库问答方案，请先帮我确认预算和部署约束。",
+    text: "为 50 人团队设计一个本地部署的中文文档知识库问答方案，先给初步建议，并说明需要进一步确认的条件。",
   },
   {
     title: "开源模型选型",
     text: "我想使用开源模型做中文对话和文档检索，请结合知识库比较技术路线，并给出官方下载入口。",
   },
   {
-    title: "AI 视频短剧",
-    text: "我想做 AI 视频短剧，先帮我确认需求，再决定适合哪条路线。",
+    title: "图像生成与编辑",
+    text: "比较适合生成中文海报和修改产品图片的模型，给出官方文档和关键限制。",
   },
 ];
 function Reply({
@@ -817,28 +817,39 @@ export function AgentWorkspace({
               }
             >
               <Globe2 size={15} />
-              <span>联网检索{searchConnection.enabled ? "：开" : "：关"}</span>
+              <span>{searchConnection.enabled ? "官网检索：自动" : "连接搜索"}</span>
             </button>
             <button
               className="model-switch"
               onClick={() => setSettingsOpen(true)}
             >
               <span
-                className={configured ? "model-ready-dot" : "model-empty-dot"}
+                className={hasConnection ? "model-ready-dot" : "model-empty-dot"}
               />
               <span>{hasConnection ? connection.model : "连接模型"}</span>
               <Settings2 size={16} />
             </button>
           </div>
         </header>
+        {(!hasConnection || !searchConnection.enabled) && (
+          <div className="research-onboarding" role="note">
+            <span>{!hasConnection
+              ? "当前为知识库预览。连接模型与搜索服务，即可查官网、比较候选。"
+              : "官网核验未启用：当前仅参考库内资料。搜索服务需要独立的 API Key。"}</span>
+            <div>
+              {!hasConnection && <button className="text-button" onClick={()=>setSettingsOpen(true)}>连接模型</button>}
+              {!searchConnection.enabled && <button className="text-button" onClick={()=>setSearchSettingsOpen(true)}>配置搜索</button>}
+            </div>
+          </div>
+        )}
         {current?.messages.at(-1)?.result?.workflow && (
           <details className="requirements-summary">
             <summary>
               {
                 {
-                  collecting: "正在澄清需求",
-                  ready: "需求已整理，等待确认",
-                  generated: "已生成方案",
+                  collecting: "待明确目标",
+                  ready: "已有需求摘要，可直接继续",
+                  generated: current.messages.at(-1)?.result?.workflow?.response_mode === "discovery" ? "候选与比较" : current.messages.at(-1)?.result?.workflow?.response_mode === "explanation" ? "继续讨论" : "初步方案",
                 }[current.messages.at(-1)!.result!.workflow!.phase]
               }{" "}
               · 已记录{" "}
@@ -866,7 +877,7 @@ export function AgentWorkspace({
                 .capabilities.map((c) => c.label)
                 .join(" · ") || "待确认"}
             </p>
-            <p>直接在聊天中修改条件，修改后会再次请你确认。</p>
+            <p>条件可以边聊边补充，未知项不会阻止选型。直接在聊天中修改即可。</p>
           </details>
         )}
         <div
@@ -891,11 +902,11 @@ export function AgentWorkspace({
                   <span className="start-icon">
                     <Sparkles size={25} />
                   </span>
-                  <h2>选对模型和工具，算清成本方向。</h2>
+                  <h2>说出需求，先找到合适的候选。</h2>
                   <p>
                     {isDemo
-                      ? "可直接体验资料与引用；连接自己的 API 后，使用真实模型生成方案。"
-                      : "说说你想做什么、预算多少，我会比较合适的模型、项目和使用路线。"}
+                      ? "连接模型与搜索后，参考知识库、核验官网，逐步形成方案。"
+                      : "先比较模型与官方依据，再逐步细化接入、成本和落地方案。"}
                   </p>
                   <div className="start-suggestions">
                     {suggestions.map((s) => (
@@ -948,7 +959,7 @@ export function AgentWorkspace({
                     </article>
                     <div className="chat-progress" role="status">
                       <Loader2 className="spin" size={18} />
-                      正在整理需求与回复…<span>{elapsed}s</span>
+                      {hasConnection && searchConnection.enabled ? "正在检索资料、整理回答…" : "正在整理回答…"}<span>{elapsed}s</span>
                     </div>
                   </>
                 )}
@@ -961,7 +972,7 @@ export function AgentWorkspace({
                       className="button primary"
                       onClick={(e) => send(e, "generate", "生成简版方案")}
                     >
-                      确认需求，生成简版方案
+                      根据已有条件生成方案
                     </button>
                     <span>也可以继续聊天修改条件</span>
                   </div>
@@ -1087,9 +1098,9 @@ export function AgentWorkspace({
             <span>
               {isDemo
                 ? hasConnection
-                  ? "浏览器直连你的模型 · 使用当前本地知识与引用"
-                  : "尚未配置 API，本轮使用静态演示 · 可在右上角连接模型"
-                : "基于已发布知识回答 · 重要结论请核对引用来源"}
+                  ? (searchConnection.enabled ? "选型自动检索官网 · 重要结论请核对引用" : "仅参考库内资料 · 尚未联网核验")
+                  : "知识库预览 · 未调用模型或搜索服务"
+                : (searchConnection.enabled ? "选型自动检索官网 · 重要结论请核对引用" : "仅参考库内资料 · 尚未联网核验")}
             </span>
             <span className="composer-keyboard-hint">
               Ctrl + Enter 发送 · Enter 换行

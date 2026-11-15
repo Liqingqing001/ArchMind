@@ -149,7 +149,7 @@ test("evidence ownership, duplicate proposals and stale candidate conflicts are 
   );
 });
 
-test("conversation starts by clarifying, persists through reconstruction, and never saves provider keys", () => {
+test("conversation previews knowledge immediately, persists, and never saves provider keys", () => {
   let db = setup();
   const c = db.request("POST", "/conversations", { title: "新对话" });
   const result = db.request("POST", "/agent/chat", {
@@ -158,9 +158,10 @@ test("conversation starts by clarifying, persists through reconstruction, and ne
     messages: [{ role: "user", content: "企业知识问答 RAG 本地部署" }],
     connection: { api_key: "must-never-be-saved" },
   });
-  assert.equal(result.workflow.phase,"collecting");
-  assert.equal(result.citations.length,0);
-  assert.match(result.answer,/预算/);
+  assert.equal(result.workflow.phase,"generated");
+  assert.ok(result.retrieved.length);
+  assert.match(result.answer,/知识库预览/);
+  assert.match(result.answer,/未联网/);
   for (const citation of result.citations)
     assert.match(
       result.answer,

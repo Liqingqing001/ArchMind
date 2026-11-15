@@ -41,7 +41,12 @@ def test_server_history_isolated_and_requirements_persist(client, db, monkeypatc
     seen = []
     def complete(connection, messages, **kwargs):
         seen.append(messages)
-        return json.dumps({"updates":{"goal":{"value":json.loads(messages[-1]["content"])["USER_INPUT"],"evidence":json.loads(messages[-1]["content"])["USER_INPUT"]}}}), "stop"
+        payload=json.loads(messages[-1]['content'])
+        if 'EVIDENCE_JSON' in payload:
+            return '根据当前会话继续回答。','stop'
+        if payload['BRIEF'].get('goal'):
+            return '{"updates":{},"intent":"explanation"}','stop'
+        return json.dumps({"updates":{"goal":{"value":payload['USER_INPUT'],"evidence":payload['USER_INPUT']}}}), "stop"
     monkeypatch.setattr(agent, "complete", complete)
     first, second = create(client), create(client)
     first_reply = send(client, first, "甲会话上下文窗口").json()

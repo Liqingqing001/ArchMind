@@ -254,6 +254,16 @@ export function previewTitle(workflow: Row) {
 }
 export function previewRecommendation(workflow: Row, retrieved: Row[]) {
   const context = selectionContext(workflow);
+  const maas = retrieved.filter(r=>r.key === "模型与能力").slice(0,3);
+  if (maas.length) {
+    const citations: Row[]=[];
+    const sections = maas.map(feature=>{
+      const boundary = retrieved.find(r=>r.entity_id === feature.entity_id && r.key === "选型边界");
+      citations.push(feature); if(boundary) citations.push(boundary);
+      return `**${feature.entity_name}**\n\n${feature.value} [${feature.citation_id}]${boundary ? `\n\n限制：${boundary.value} [${boundary.citation_id}]` : ""}\n\n[官方文档](${feature.source_url})`;
+    });
+    return {answer:`> 知识库预览：未连接模型，也未联网。下面是库内候选，不代表最新排名或实测结果。连接模型与搜索服务后，可按你的需求核验官网并比较。\n\n${sections.join("\n\n")}\n\n你可以继续说明使用场景，例如客服或口语陪练。`,citations};
+  }
   if (
     !context.capabilities.length ||
     context.capabilities[0].id === "retrieval"
@@ -288,7 +298,7 @@ export function previewRecommendation(workflow: Row, retrieved: Row[]) {
         ? "有独立网站目标，优先比较 API 自建，避免一开始购买推理硬件。"
         : "按你的使用约束比较以下模型和工具。";
   return {
-    answer: `> 交互演示：以下为按知识能力与路线匹配的静态候选，未调用大模型。\n\n${lead}\n\n${sections.join("\n\n")}`,
+    answer: `> 知识库预览：未连接模型，也未联网。以下仅展示库内匹配条目，连接模型与搜索服务后可获得实时选型回答。\n\n${lead}\n\n${sections.join("\n\n")}`,
     citations,
   };
 }

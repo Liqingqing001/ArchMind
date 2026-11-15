@@ -1,0 +1,8 @@
+[
+  {"prompt":"找一个实时语音交互的模型","updates":{"goal":"实时语音交互"},"intent":"discovery","mode":"discovery","phase":"generated"},
+  {"prompt":"为什么选这个，解释一下","updates":{},"intent":"explanation","mode":"explanation","phase":"generated"},
+  {"prompt":"预算每月200元","updates":{"budget":"每月200元"},"intent":"explanation","mode":"discovery","phase":"generated"},
+  {"prompt":"这个模型现在的价格是多少","updates":{},"intent":"explanation","mode":"discovery","phase":"generated"},
+  {"prompt":"请设计企业语音客服系统","updates":{"goal":"企业语音客服系统"},"intent":"solution","mode":"solution","phase":"generated"},
+  {"prompt":"换成找一个图像生成模型","updates":{"goal":"图像生成模型"},"intent":"discovery","mode":"discovery","phase":"generated"}
+]

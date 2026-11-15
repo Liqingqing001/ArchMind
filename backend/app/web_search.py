@@ -3,11 +3,14 @@ import json
 import re
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from datetime import datetime, timezone, timedelta
+from types import SimpleNamespace
 from typing import Literal
 from urllib.parse import urlsplit,urlunsplit,unquote
 import httpx
 from pydantic import BaseModel,ConfigDict,Field,SecretStr,model_validator
 from .db import now
+from .collector import fetch as fetch_public_page, normalized
 
 POLICY=json.loads((Path(__file__).resolve().parent.parent/'data/web-search-policy.json').read_text(encoding='utf-8'))
 
@@ -30,6 +33,19 @@ def disabled_search():
     return dict(status='disabled',provider=None,searched_at=None,queries=[],results=[],errors=[])
 
 
+def reusable_search(web, workflow):
+    if workflow.get('response_mode') != 'explanation' or not web or web.get('status') not in ('ok','partial') or not web.get('results'):
+        return False
+    try:
+        at = datetime.fromisoformat(web['searched_at'].replace('Z','+00:00'))
+        if at.tzinfo is None:
+            at = at.replace(tzinfo=timezone.utc)
+        age = datetime.now(timezone.utc) - at
+        return timedelta(0) <= age <= timedelta(minutes=POLICY['reuse_minutes'])
+    except (ValueError, TypeError, KeyError):
+        return False
+
+
 def redact(text,secrets):
     for key in secrets:
         if len(key)>=4:
@@ -45,6 +61,11 @@ def search_queries(workflow,prompt,secrets=()):
     goal=clean(workflow['fields'].get('goal',{}).get('value') or prompt)[:110]
     current=clean(prompt)
     hint=next((h for h in POLICY['query_hints'] if any(c in goal.lower() for c in h['cues'])),{})
+    if hint.get('queries'):
+        detail = clean(workflow['fields'].get('requirements',{}).get('value',''))[:35]
+        follow = '' if current == goal or re.search(r'^(?:生成|确认|可以|好的|好|开始|现在生成|请续写)',current) else current[:35]
+        subject = ' '.join(dict.fromkeys(s for s in [goal[:65], follow, detail] if s))
+        return [q.replace('{goal}', subject)[:300] for q in hint['queries']][:POLICY['max_queries']]
     query=goal+' '+hint['discovery'] if hint.get('discovery') else goal+' 官方 文档 '+hint.get('topic','技术选型')
     follow='' if re.search(r'^(?:生成|确认|可以|好的|好|开始|现在生成|请续写)',current) else current[:70]
     return list(dict.fromkeys(q.strip()[:190] for q in [query,goal+' '+(follow or hint.get('details') or '部署 计费 使用限制 官方')]))[:POLICY['max_queries']]
@@ -66,6 +87,9 @@ def safe_web_url(value,secrets=()):
 
 def request_parts(connection,query):
     payload=dict(query=query,search_depth='basic',max_results=4,include_answer=False,include_raw_content='text',auto_parameters=False) if connection.provider=='tavily' else dict(query=query,freshness='noLimit',summary=True,count=4)
+    domains = re.findall(r'site:([a-z0-9.-]+)', query)
+    if domains and connection.provider == 'tavily':
+        payload['include_domains'] = domains
     return POLICY['providers'][connection.provider]['url'],{'Authorization':'Bearer '+connection.api_key.get_secret_value(),'Content-Type':'application/json'},payload
 
 
@@ -89,7 +113,7 @@ def parse_results(provider,data,at,secrets=()):
             continue
         raw=row.get('raw_content') if isinstance(row.get('raw_content'),str) and row['raw_content'].strip() else None
         summary=row.get('summary') or row.get('content') or row.get('snippet')
-        text='搜索摘要：'+summary[:800]+'\n页面摘录：'+raw[:800] if raw and isinstance(summary,str) and summary.strip() else raw or summary
+        text='搜索摘要：'+summary[:600]+'\n页面摘录：'+raw[:POLICY['excerpt_chars']-620] if raw and isinstance(summary,str) and summary.strip() else raw or summary
         if not isinstance(text,str) or not text.strip():
             continue
         host=urlsplit(url).hostname
@@ -97,6 +121,32 @@ def parse_results(provider,data,at,secrets=()):
         published=row.get('published_date') or row.get('datePublished')
         results.append(dict(citation_id='',title=redact(title if isinstance(title,str) else host,secrets)[:180],url=url,excerpt=redact(text,secrets)[:POLICY['excerpt_chars']],searched_at=at,published_at=published[:60] if isinstance(published,str) and re.match(r'^\d{4}-\d{2}-\d{2}',published) else None,content_kind='page_excerpt' if raw else 'search_summary',source_type='official' if any(host==d or host.endswith('.'+d) for d in POLICY['official_domains']) else 'web'))
     return results
+
+
+def read_official_page(row, secrets):
+    """Read only allowlisted public HTTPS results, without provider credentials."""
+    url = safe_web_url(row['url'], secrets)
+    host = urlsplit(url).hostname if url else ''
+    if not host or not any(host == d or host.endswith('.'+d) for d in POLICY['official_domains']):
+        raise ValueError('非官网页面不自动读取')
+    raw, _ = fetch_public_page(SimpleNamespace(url=url, etag=None, last_modified=None))
+    content = normalized(raw) if raw else ''
+    if len(content.strip()) < 120:
+        raise ValueError('页面正文不足')
+    return {**row, 'excerpt':redact(content,secrets)[:POLICY['excerpt_chars']], 'content_kind':'page_excerpt', 'read_at':now()}
+
+
+def read_official_results(results, secrets):
+    targets = [(i,row) for i,row in enumerate(results) if row['source_type']=='official' and row['content_kind']=='search_summary'][:3]
+    failures = 0
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        futures = [(i,pool.submit(read_official_page,row,secrets)) for i,row in targets]
+        for i,future in futures:
+            try:
+                results[i] = future.result()
+            except (ValueError, OSError, httpx.HTTPError, TimeoutError):
+                failures += 1
+    return dict(attempted=len(targets), succeeded=len(targets)-failures, failed=failures)
 
 
 def request_json(connection,query):
@@ -127,7 +177,7 @@ def search_web(connection,workflow,prompt,secrets=()):
         return disabled_search()
     secrets=[connection.api_key.get_secret_value(),*secrets]
     queries=search_queries(workflow,prompt,secrets);at=now();batches=[];errors=[]
-    with ThreadPoolExecutor(max_workers=2) as pool:
+    with ThreadPoolExecutor(max_workers=POLICY['max_queries']) as pool:
         futures=[pool.submit(request_json,connection,q) for q in queries]
         for future in futures:
             try:
@@ -140,11 +190,19 @@ def search_web(connection,workflow,prompt,secrets=()):
         for batch in ordered:
             if i<len(batch):
                 row=batch[i];unique.setdefault(row['url'],row)
-    results=list(unique.values())[:POLICY['max_results']]
+    results=sorted(unique.values(),key=lambda r:r['source_type']!='official')[:POLICY['max_results']]
     for i,row in enumerate(results):
         row['citation_id']=f'W{i+1}'
-    return dict(status=('partial' if results else 'error') if errors else 'ok' if results else 'empty',provider=connection.provider,searched_at=at,queries=queries,results=results,errors=errors)
+    reading = read_official_results(results,secrets) if any('site:' in q for q in queries) else None
+    return dict(status=('partial' if results else 'error') if errors else 'ok' if results else 'empty',provider=connection.provider,searched_at=at,queries=queries,results=results,errors=errors, **({'page_reading':reading} if reading else {}))
 
 
 def search_warnings(web):
-    return ['联网检索失败，本轮仅使用库内资料；没有取得实时网页证据。',*web['errors']] if web['status']=='error' else ['部分联网检索失败，网页依据不完整。',*web['errors']] if web['status']=='partial' else ['本轮联网未找到可用网页，不代表相关产品不存在。'] if web['status']=='empty' else []
+    warnings = ['尚未启用联网检索，本轮仅参考库内资料，未核验最新能力与价格；可在对话顶部连接搜索服务。'] if web['status']=='disabled' else ['联网检索失败，本轮仅使用库内资料；没有取得实时网页证据。',*web['errors']] if web['status']=='error' else ['部分联网检索失败，网页依据不完整。',*web['errors']] if web['status']=='partial' else ['本轮联网未找到可用网页，不代表相关产品不存在。'] if web['status']=='empty' else []
+    if web['results'] and not any(r['source_type']=='official' for r in web['results']):
+        warnings.append('本轮未取得官网依据，候选能力与价格仍待官方核验。')
+    if web['results'] and all(r['content_kind']=='search_summary' for r in web['results']):
+        warnings.append('当前取得的是搜索摘要，尚未读取官网正文；不能据此确认完整参数或价格。')
+    if web.get('page_reading',{}).get('failed'):
+        warnings.append('部分官网正文读取失败，已保留搜索摘要；这些条目的完整参数仍待核验。')
+    return warnings

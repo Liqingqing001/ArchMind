@@ -196,7 +196,9 @@ test("unknown citations and truncation are clearly marked", () => {
   assert.equal(result.citations.length, 1);
   assert.match(result.answer, /引用待核验/);
   assert.ok(!result.answer.includes("[K99]"));
-  assert.equal(result.warnings.length, 2);
+  assert.ok(result.warnings.some(w=>w.includes("未知引用")));
+  assert.ok(result.warnings.some(w=>w.includes("输出上限")));
+  assert.ok(result.warnings.some(w=>w.includes("尚未启用联网")));
 });
 test("real provider preparation shares knowledge, keeps history and never stores its key", () => {
   const db = createDemoStore(seed),
