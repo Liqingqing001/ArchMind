@@ -20,7 +20,7 @@ const names = (n) =>
   n.entity_ids.map((id) => entities.find((e) => e.id === id).name);
 assert.deepEqual(
   navigation.nodes.filter((n) => !n.parent_id).map((n) => n.name),
-  ["生成类", "理解类", "检索与表征", "工具与平台", "其他知识"],
+  ["MaaS方案", "生成类", "理解类", "检索与表征", "工具与平台", "其他知识"],
 );
 assert.equal(node(["生成类", "大语言模型", "OpenAI"]).entity_ids.length, 3);
 assert.equal(node(["生成类", "大语言模型", "阿里云"]).entity_ids.length, 8);
@@ -36,7 +36,7 @@ assert.ok(
 assert.equal(node(["理解类", "理解视频"]).entity_ids.length, 10);
 assert.equal(
   new Set(navigation.nodes.flatMap((n) => n.direct_entity_ids)).size,
-  172,
+  data.entities.length,
 );
 for (const n of navigation.nodes) {
   assert.equal(new Set(n.entity_ids).size, n.entity_ids.length);

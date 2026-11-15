@@ -344,5 +344,45 @@
       "Qwen3-8B"
     ],
     "needs_website": false
+  },
+  {
+    "id": "maas_realtime_voice",
+    "goal": "实时语音客服",
+    "delivery": "API",
+    "requirements": "可打断",
+    "caps": [
+      "realtime_voice",
+      "text_generation"
+    ],
+    "routes": [
+      "api"
+    ],
+    "include": [
+      "火山引擎 · 豆包实时语音方案",
+      "阿里云百炼 · Qwen 实时音视频方案",
+      "腾讯云 · TRTC 实时语音客服方案"
+    ],
+    "exclude": [
+      "腾讯云 · 混元实时转写方案",
+      "MiniMax speech-2.8-turbo"
+    ]
+  },
+  {
+    "id": "maas_voice_offline",
+    "goal": "实时语音客服",
+    "delivery": "无偏好",
+    "requirements": "完全离线，数据不外传",
+    "caps": [
+      "realtime_voice",
+      "text_generation"
+    ],
+    "routes": [
+      "local"
+    ],
+    "include": [],
+    "exclude": [
+      "火山引擎 · 豆包实时语音方案",
+      "阿里云百炼 · Qwen 实时音视频方案"
+    ]
   }
 ]

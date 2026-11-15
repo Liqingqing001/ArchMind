@@ -1,0 +1,910 @@
+{
+  "schema_version": 1,
+  "batch_id": "maas-official-2026-11-15",
+  "checked_on": "2026-11-15",
+  "sources": [
+    {
+      "id": "volc-voice",
+      "title": "火山引擎 · 豆包实时语音方案官方资料",
+      "url": "https://docs.volcengine.com/docs/doubao-voice/end-to-endreal-time-speech-large-model-api-access-document?lang=en",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "低延迟、多模式交互"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "volc-image",
+      "title": "火山方舟 · Seedream 图片方案官方资料",
+      "url": "https://docs.volcengine.com/docs/ark/image-generation-api?lang=en",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "Doubao Seedream 5.0 pro"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "volc-video",
+      "title": "火山方舟 · Seedance 视频方案官方资料",
+      "url": "https://docs.volcengine.com/docs/ark/seedance-2-5?lang=en",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "doubao-seedance-2-5-260628"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "ali-voice",
+      "title": "阿里云百炼 · Qwen 实时音视频方案官方资料",
+      "url": "https://help.aliyun.com/zh/model-studio/realtime",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "Qwen3.8-Omni-Flash-Realtime"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "ali-image",
+      "title": "阿里云百炼 · 千问与万相图片方案官方资料",
+      "url": "https://help.aliyun.com/zh/model-studio/image-model/",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "qwen-image-3.0-pro"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "ali-video",
+      "title": "阿里云百炼 · 万相视频方案官方资料",
+      "url": "https://help.aliyun.com/zh/model-studio/wan3-video-generation-api-reference",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "API采用异步调用"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "tencent-voice",
+      "title": "腾讯云 · TRTC 实时语音客服方案官方资料",
+      "url": "https://cloud.tencent.com/document/product/647/108514",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "客户可灵活指定第三方AI模型"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "tencent-asr",
+      "title": "腾讯云 · 混元实时转写方案官方资料",
+      "url": "https://cloud.tencent.com/document/product/1093/135476",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "Hy-ASR-3.0-preview"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "tencent-image",
+      "title": "腾讯云 TokenHub · 混元图片方案官方资料",
+      "url": "https://intl.cloud.tencent.com/zh/document/product/1300/83707",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "hy-image-v3.5-preview"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "zhipu-image",
+      "title": "智谱 · GLM-Image 海报方案官方资料",
+      "url": "https://docs.bigmodel.cn/cn/guide/models/image-generation/glm-image",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "文本（最大输入 1000 字符）"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "zhipu-ocr",
+      "title": "智谱 · 文档理解与知识检索方案官方资料",
+      "url": "https://docs.bigmodel.cn/llms.txt",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "GLM-OCR"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "openai-voice",
+      "title": "OpenAI · 实时语音方案官方资料",
+      "url": "https://developers.openai.com/api/docs/models",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "GPT-Realtime-2.1"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "openai-image",
+      "title": "OpenAI · GPT Image 图片方案官方资料",
+      "url": "https://developers.openai.com/api/docs/models",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "GPT-Image-2.6 Flare"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "google-voice",
+      "title": "Google · Gemini Live 语音方案官方资料",
+      "url": "https://aistudio.google.com/docs/models",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "gemini-3.8-live"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "google-image",
+      "title": "Google · Nano Banana 图片方案官方资料",
+      "url": "https://aistudio.google.com/docs/models",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "gemini-nano-banana-2.1"
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "aws-voice",
+      "title": "AWS · Nova Sonic 语音方案官方资料",
+      "url": "https://docs.aws.amazon.com/nova/latest/nova2-userguide/using-conversational-speech.html",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "Amazon Nova 2 Sonic enables real-time conversational AI with speech input and output."
+      ],
+      "monitor_interval_hours": 6
+    },
+    {
+      "id": "anthropic-agent",
+      "title": "Anthropic · Claude 业务助手方案官方资料",
+      "url": "https://platform.claude.com/docs/en/models/overview",
+      "checked_on": "2026-11-15",
+      "excerpts": [
+        "text and image input, text output"
+      ],
+      "monitor_interval_hours": 6
+    }
+  ],
+  "entities": [
+    {
+      "name": "火山引擎 · 豆包实时语音方案",
+      "kind": "api",
+      "description": "豆包端到端实时语音大模型（Realtime API；具体版本以控制台和接口文档为准） 语音输入与语音回复，适用于连续语音交互。",
+      "source": "volc-voice",
+      "categories": [
+        [
+          "MaaS方案",
+          "实时语音对话"
+        ],
+        [
+          "AI 模型",
+          "实时语音对话"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "豆包端到端实时语音大模型（Realtime API；具体版本以控制台和接口文档为准） 语音输入与语音回复，适用于连续语音交互。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "独立 Realtime API；不能把文本 Chat Completions 的地址直接用作实时音频接口。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "本次核对官方索引与检索摘要，完整页面读取受限；未实测延迟、并发和打断效果。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：语音客服先测首包、用户打断、噪声与方言；业务操作增加身份校验与人工转接。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "火山方舟 · Seedream 图片方案",
+      "kind": "api",
+      "description": "Seedream 5.0 pro / flash / lite、4.5、4.0；调用时核对完整模型 ID。 文本和参考图片驱动图片生成与编辑；不同版本参数有差异。",
+      "source": "volc-image",
+      "categories": [
+        [
+          "MaaS方案",
+          "图片生成与编辑"
+        ],
+        [
+          "AI 模型",
+          "图像生成模型"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "Seedream 5.0 pro / flash / lite、4.5、4.0；调用时核对完整模型 ID。 文本和参考图片驱动图片生成与编辑；不同版本参数有差异。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "方舟 images/generations 图片接口。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "这是图片接口，不是通用聊天接口；组图、尺寸与可用参数按所选版本确认。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：电商商品图、海报用同一组参考图比较主体一致性、文字准确度和单位合格图片成本。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "火山方舟 · Seedance 视频方案",
+      "kind": "api",
+      "description": "Seedance 2.5（doubao-seedance-2-5-260628）；页面同时比较 2.0、2.0 fast、2.0 mini。 文生视频、首帧/首尾帧及多模态参考。",
+      "source": "volc-video",
+      "categories": [
+        [
+          "MaaS方案",
+          "视频生成"
+        ],
+        [
+          "AI 模型",
+          "视频生成模型"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "Seedance 2.5（doubao-seedance-2-5-260628）；页面同时比较 2.0、2.0 fast、2.0 mini。 文生视频、首帧/首尾帧及多模态参考。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "方舟视频生成任务接口，按任务状态获取结果。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "参考输入类型和输出格式依版本而异；未执行生成或质量测试。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：建立提交、查询、失败重试和素材存储流程；比较角色一致性、镜头控制和成片成本。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "阿里云百炼 · Qwen 实时音视频方案",
+      "kind": "api",
+      "description": "Qwen3.8-Omni-Flash-Realtime；固定模型 ID 与快照在百炼控制台核对。 实时音视频对话；输入输出模态的用量分别影响计费。",
+      "source": "ali-voice",
+      "categories": [
+        [
+          "MaaS方案",
+          "实时语音对话"
+        ],
+        [
+          "AI 模型",
+          "实时语音对话"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "Qwen3.8-Omni-Flash-Realtime；固定模型 ID 与快照在百炼控制台核对。 实时音视频对话；输入输出模态的用量分别影响计费。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "WebSocket Realtime；使用对应地域与业务空间的接口。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "北京与新加坡地址不同；不能把只输出文本的 Omni 型号当成语音输出型号。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：需要摄像头的语音助手先测视觉问答与音频打断，预算按各模态用量分别计算。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "阿里云百炼 · 千问与万相图片方案",
+      "kind": "api",
+      "description": "Qwen-Image（如 qwen-image-3.0-pro）、Wan（如 wan2.7-image-pro）、z-image-turbo。 文生图与图片编辑；z-image-turbo 在所查列表仅支持文生图。",
+      "source": "ali-image",
+      "categories": [
+        [
+          "MaaS方案",
+          "图片生成与编辑"
+        ],
+        [
+          "AI 模型",
+          "图像生成模型"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "Qwen-Image（如 qwen-image-3.0-pro）、Wan（如 wan2.7-image-pro）、z-image-turbo。 文生图与图片编辑；z-image-turbo 在所查列表仅支持文生图。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "百炼图片生成/编辑 API，参数随具体模型变化。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "不要把系列能力套给每个型号；编辑、多图输出、分辨率与地域分别确认。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：先区分纯生成、参考图编辑与高分辨率交付，做业务样本盲评后再选型号。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "阿里云百炼 · 万相视频方案",
+      "kind": "api",
+      "description": "万相 3.0；具体模型 ID 及地域在模型广场确认。 文生视频、图生视频（首帧/首尾帧）及参考生视频。",
+      "source": "ali-video",
+      "categories": [
+        [
+          "MaaS方案",
+          "视频生成"
+        ],
+        [
+          "AI 模型",
+          "视频生成模型"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "万相 3.0；具体模型 ID 及地域在模型广场确认。 文生视频、图生视频（首帧/首尾帧）及参考生视频。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "异步提交视频任务并查询结果；模型、Endpoint 与 Key 必须同地域。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "文档给出的生成时长不是端到端响应延迟；异步任务需要超时与失败处理。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：内容生产使用任务队列和成片验收；把生成时长、失败重做及存储计入方案。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "腾讯云 · TRTC 实时语音客服方案",
+      "kind": "api",
+      "description": "TRTC AI 对话编排：内置 ASR，可配置第三方 LLM 与 TTS。 实时通道结合语音识别、模型推理和语音合成。",
+      "source": "tencent-voice",
+      "categories": [
+        [
+          "MaaS方案",
+          "实时语音对话"
+        ],
+        [
+          "AI 模型",
+          "实时语音对话"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "TRTC AI 对话编排：内置 ASR，可配置第三方 LLM 与 TTS。 实时通道结合语音识别、模型推理和语音合成。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "TRTC StartAIConversation 接口；按产品要求配置 LLM 与 TTS 服务。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "这是组合方案，不能标成单一端到端语音模型；通道、ASR、LLM、TTS 成本需拆开。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：已有腾讯 RTC 的客服适合验证此路线；重点测全链路延迟、转接与工具执行一致性。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "腾讯云 · 混元实时转写方案",
+      "kind": "api",
+      "description": "Hy-ASR-3.0-preview（混元 ASR 内测版）。 实时语音转文字，支持上下文与热词。",
+      "source": "tencent-asr",
+      "categories": [
+        [
+          "MaaS方案",
+          "语音识别"
+        ],
+        [
+          "AI 模型",
+          "语音识别"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "Hy-ASR-3.0-preview（混元 ASR 内测版）。 实时语音转文字，支持上下文与热词。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "实时 ASR API；权限与并发条件按内测及计费说明确认。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "内测不是所有账号已可用；ASR 不产生对话语音回复。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：会议字幕或客服质检测字错率、专有名词和长会话稳定性；对话还需 LLM/TTS。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "腾讯云 TokenHub · 混元图片方案",
+      "kind": "api",
+      "description": "Hy-Image-3.0（hy-image-v3）、Hy-Image-3.5-preview（hy-image-v3.5-preview）。 文生图、参考生图；3.5 preview 支持多轮编辑。",
+      "source": "tencent-image",
+      "categories": [
+        [
+          "MaaS方案",
+          "图片生成与编辑"
+        ],
+        [
+          "AI 模型",
+          "图像生成模型"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "Hy-Image-3.0（hy-image-v3）、Hy-Image-3.5-preview（hy-image-v3.5-preview）。 文生图、参考生图；3.5 preview 支持多轮编辑。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "TokenHub 图像生成调用指南；不同接口与旧混元产品入口分开确认。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "preview 状态需单独评估；不要将旧平台权益或参数直接迁移到新入口。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：对比单张广告图和连续编辑任务；把账号开通、版本迁移和水印要求列入验收。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "智谱 · GLM-Image 海报方案",
+      "kind": "api",
+      "description": "GLM-Image。 文本输入、图片输出，官方列出海报和科普插画场景。",
+      "source": "zhipu-image",
+      "categories": [
+        [
+          "MaaS方案",
+          "图片生成与编辑"
+        ],
+        [
+          "AI 模型",
+          "图像生成模型"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "GLM-Image。 文本输入、图片输出，官方列出海报和科普插画场景。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "图片生成 API 返回图片 URL，需要下载保存。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "所查页输入为文本；不能据此声称支持参考图片编辑或实时语音。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：中文密集海报应检查错字、布局和事实关系；图片 URL 获取后及时归档。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "智谱 · 文档理解与知识检索方案",
+      "kind": "api",
+      "description": "GLM-OCR；官方目录还列出多模态知识处理与检索服务。 文档识别与检索是不同环节，需分别评估。",
+      "source": "zhipu-ocr",
+      "categories": [
+        [
+          "MaaS方案",
+          "文档理解"
+        ],
+        [
+          "AI 模型",
+          "文档理解"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "GLM-OCR；官方目录还列出多模态知识处理与检索服务。 文档识别与检索是不同环节，需分别评估。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "从官方目录进入 OCR 与知识检索 API 文档核对。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "目录只确认存在这些能力，不证明具体格式、吞吐或账号权限；本轮未确认实时语音产品可用性。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：企业文档场景串联解析、切片、检索与引用，测表格和扫描件，保留原页证据。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "OpenAI · 实时语音方案",
+      "kind": "api",
+      "description": "GPT-Live-1、GPT-Realtime-2.1 / mini、GPT-Realtime-Translate 等；按任务查对应页面。 实时语音对话与流式语音翻译有独立模型。",
+      "source": "openai-voice",
+      "categories": [
+        [
+          "MaaS方案",
+          "实时语音对话"
+        ],
+        [
+          "AI 模型",
+          "实时语音对话"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "GPT-Live-1、GPT-Realtime-2.1 / mini、GPT-Realtime-Translate 等；按任务查对应页面。 实时语音对话与流式语音翻译有独立模型。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "使用对应 Realtime 接入文档，不能用文本模型的能力代替音频能力。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "旧 GPT-Realtime 已进入弃用列表；账户、地区和模型生命周期需再次核对。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：自然对话、带工具推理与同声翻译分开选型；对每个候选做打断及端到端延迟测试。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "OpenAI · GPT Image 图片方案",
+      "kind": "api",
+      "description": "GPT-Image-2.6 Sunburst / Flare；目录分别定位细节创作与快速迭代。 图片生成与编辑。",
+      "source": "openai-image",
+      "categories": [
+        [
+          "MaaS方案",
+          "图片生成与编辑"
+        ],
+        [
+          "AI 模型",
+          "图像生成模型"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "GPT-Image-2.6 Sunburst / Flare；目录分别定位细节创作与快速迭代。 图片生成与编辑。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "使用图片生成指南及对应模型 API。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "模型目录中的旧版本含弃用/下线状态；未测试质量、价格与当前账号权限。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：比较详细设计稿与高频素材两类负载；不凭模型命名推断最便宜或效果最优。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "Google · Gemini Live 语音方案",
+      "kind": "api",
+      "description": "Gemini 3.8 Live / Live Extended Thinking；TTS 与 Transcribe 另外列示。 低延迟语音交互与需要更多推理的实时交互分型。",
+      "source": "google-voice",
+      "categories": [
+        [
+          "MaaS方案",
+          "实时语音对话"
+        ],
+        [
+          "AI 模型",
+          "实时语音对话"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "Gemini 3.8 Live / Live Extended Thinking；TTS 与 Transcribe 另外列示。 低延迟语音交互与需要更多推理的实时交互分型。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "Live API；以对应模型页确认接口及支持地区。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "TTS 和 Transcribe 不能独立替代双向语音对话；旧预览型号需检查迁移说明。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：区分轻量口语陪练与需要查业务系统的助手，测试推理等待和打断体验。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "Google · Nano Banana 图片方案",
+      "kind": "api",
+      "description": "Nano Banana 2.1（gemini-nano-banana-2.1）、Nano Banana Pro（gemini-3-pro-image）。 原生图片生成与编辑系列。",
+      "source": "google-image",
+      "categories": [
+        [
+          "MaaS方案",
+          "图片生成与编辑"
+        ],
+        [
+          "AI 模型",
+          "图像生成模型"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "Nano Banana 2.1（gemini-nano-banana-2.1）、Nano Banana Pro（gemini-3-pro-image）。 原生图片生成与编辑系列。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "Gemini 图片模型调用方式；核对所选模型输出模态。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "同一平台的通用视觉理解型号不等于生图型号；不同型号价格及限制另查。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：多轮改图和品牌素材分别测主体一致性、指令遵循及可接受的响应时间。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "AWS · Nova Sonic 语音方案",
+      "kind": "api",
+      "description": "Amazon Nova 2 Sonic；双向语音流、打断与工具调用。",
+      "source": "aws-voice",
+      "categories": [
+        [
+          "MaaS方案",
+          "实时语音对话"
+        ],
+        [
+          "AI 模型",
+          "实时语音对话"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "Amazon Nova 2 Sonic；双向语音流，支持打断、工具调用与检索集成。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "Amazon Bedrock 双向流接口；升级版本须另查地区和模型 ID。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "本条核对 Nova 2 Sonic 指南，不声称为最新型号；文档列示语言不包含中文，中文客服不可默认选用。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：已有 AWS 业务可验证语音工具调用链；先确认目标语言和部署地域再比较成本。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    },
+    {
+      "name": "Anthropic · Claude 业务助手方案",
+      "kind": "api",
+      "description": "Claude Opus 5.5、Sonnet 5.5、Haiku 5.5、Fable 5.2。 文字与图片输入、文字输出、工具调用。",
+      "source": "anthropic-agent",
+      "categories": [
+        [
+          "MaaS方案",
+          "文本与工具调用"
+        ],
+        [
+          "AI 模型",
+          "大语言模型"
+        ]
+      ],
+      "facts": [
+        {
+          "key": "模型与能力",
+          "value": "Claude Opus 5.5、Sonnet 5.5、Haiku 5.5、Fable 5.2。 文字与图片输入、文字输出、工具调用。",
+          "evidence": 0
+        },
+        {
+          "key": "接入方式",
+          "value": "Claude API；不同托管平台的模型 ID 独立核对。",
+          "evidence": 0
+        },
+        {
+          "key": "选型边界",
+          "value": "所查模型总览没有原生音频输出；语音客服需外接 ASR/TTS，生图需另配模型。",
+          "evidence": 0
+        },
+        {
+          "key": "方案建议（编辑归纳）",
+          "value": "编辑建议，非厂商承诺：复杂业务助手按工具成功率与人工升级率验收，工具执行前做好权限和参数校验。",
+          "evidence": 0
+        },
+        {
+          "key": "核验范围",
+          "value": "2026-11-15 官方资料核对；非 API 调用、价格锁定或性能测试。",
+          "evidence": 0
+        }
+      ]
+    }
+  ]
+}

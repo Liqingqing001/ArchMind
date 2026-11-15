@@ -9,7 +9,8 @@ const audit = JSON.parse(
 );
 const entities = new Map();
 for (const [file, hash] of Object.entries(audit.dataset_sha256)) {
-  const bytes = readFileSync(new URL(file, root));
+  // Git may check text out as CRLF on Windows; audit the canonical LF content.
+  const bytes = readFileSync(new URL(file, root), "utf8").replace(/\r\n/g, "\n");
   assert.equal(
     createHash("sha256").update(bytes).digest("hex"),
     hash,

@@ -25,7 +25,7 @@ def test_navigation_groups_models_by_capability_type_and_vendor(client,db):
     vendor=Entity(name='OpenAI',kind='vendor');db.add(vendor);db.flush()
     first=add_model(db,'A',vendor);second=add_model(db,'B',vendor)
     data=client.get('/api/knowledge/navigation').json()
-    assert [n['name'] for n in data['nodes'] if n['parent_id'] is None]==['生成类','理解类','检索与表征','工具与平台','其他知识']
+    assert [n['name'] for n in data['nodes'] if n['parent_id'] is None]==['MaaS方案','生成类','理解类','检索与表征','工具与平台','其他知识']
     factory=node(data,['生成类','大语言模型','OpenAI'])
     assert set(factory['entity_ids'])=={first.id,second.id}
     assert set(factory['direct_entity_ids'])=={first.id,second.id}

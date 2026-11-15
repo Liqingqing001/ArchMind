@@ -47,6 +47,7 @@ import "./layout.css";
 import { fieldTemplates } from "./knowledge";
 import { AgentWorkspace } from "./AgentWorkspace";
 import { ModelDownloads } from "./ModelDownloads";
+import { SourceMonitor } from "./SourceMonitor";
 
 type Row = Record<string, any>;
 type Page =
@@ -747,6 +748,7 @@ function App() {
               {page === "entities" && <KnowledgeBrowser entities={entities} navigation={navigation} kind={kind} onClearKind={()=>setKind("")} onOpen={openEntity}/>}
               {page === "sources" && (
                 <section className="panel">
+                  <SourceMonitor sources={sources} refresh={load} />
                   <div className="filter-bar">
                     <label className="search-input">
                       <Search size={17} />

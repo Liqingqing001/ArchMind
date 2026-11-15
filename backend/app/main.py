@@ -90,6 +90,14 @@ def navigation(db: DBSession = Depends(get_db)):
     return knowledge_navigation(db)
 
 
+@app.post("/api/monitoring/maas/setup")
+def setup_maas_monitoring(db: DBSession = Depends(get_db)):
+    from .maas_monitor import setup
+    result = setup(db)
+    save(db)
+    return result
+
+
 @app.get("/api/categories")
 def categories(db: DBSession = Depends(get_db)):
     return [data(r) for r in db.scalars(select(Category).order_by(Category.name))]

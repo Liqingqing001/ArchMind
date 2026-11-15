@@ -18,8 +18,8 @@ const snapshot = seed.snapshots.find(
 );
 
 test("public export contains the updated catalog with traceable excerpts and model downloads", () => {
-  assert.equal(seed.entities.filter((e) => !e.is_demo).length, 171);
-  assert.equal(seed.facts.filter((f) => f.entity_id !== atlas.id).length, 470);
+  assert.equal(seed.entities.filter((e) => !e.is_demo).length, 188);
+  assert.equal(seed.facts.filter((f) => f.entity_id !== atlas.id).length, 555);
   for (const f of seed.facts)
     assert.ok(
       seed.snapshots
