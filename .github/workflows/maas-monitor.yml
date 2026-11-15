@@ -6,6 +6,14 @@ on:
       - '.github/workflows/maas-monitor.yml'
       - 'backend/app/monitor_report.py'
       - 'backend/app/collector.py'
+      - 'backend/pyproject.toml'
+      - 'backend/data/maas-official-2026-11-15.json'
+  pull_request:
+    paths:
+      - '.github/workflows/maas-monitor.yml'
+      - 'backend/pyproject.toml'
+      - 'backend/app/monitor_report.py'
+      - 'backend/app/collector.py'
       - 'backend/data/maas-official-2026-11-15.json'
   schedule:
     - cron: '23 */6 * * *'
@@ -13,7 +21,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: official-maas-monitor
+  group: official-maas-monitor-${{ github.event_name == 'pull_request' && github.ref || 'production' }}
   cancel-in-progress: false
 jobs:
   monitor:
