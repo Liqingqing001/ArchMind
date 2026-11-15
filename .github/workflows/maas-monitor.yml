@@ -1,0 +1,48 @@
+name: Monitor official MaaS sources
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/maas-monitor.yml'
+      - 'backend/app/monitor_report.py'
+      - 'backend/app/collector.py'
+      - 'backend/data/maas-official-2026-11-15.json'
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: official-maas-monitor
+  cancel-in-progress: false
+jobs:
+  monitor:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      PYTHONUTF8: '1'
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: py -3.12 -m pip install -e .
+      - uses: actions/cache@v4
+        with:
+          path: backend/artifacts/maas-monitor/baseline.json
+          key: maas-public-baseline-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: maas-public-baseline-v1-
+      - name: Check official pages without publishing facts
+        run: py -3.12 -m app.monitor_report
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: maas-official-monitor
+          path: |
+            backend/artifacts/maas-monitor/report.json
+            backend/artifacts/maas-monitor/summary.md
+          retention-days: 30

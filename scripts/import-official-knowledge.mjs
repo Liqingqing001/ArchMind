@@ -75,7 +75,7 @@ export function importDataset(db, data) {
       }
       ids.set(e.name, row.id);
       for (const path of e.categories) db.prepare('INSERT OR IGNORE INTO entity_categories(entity_id,category_id) VALUES (?,?)').run(row.id, category(path));
-      const sourceMatches = db.prepare('SELECT * FROM sources WHERE entity_id=? AND url=? AND is_demo=0').all(row.id, source.url);
+      const sourceMatches = db.prepare("SELECT * FROM sources WHERE entity_id=? AND url=? AND is_demo=0 AND name NOT LIKE 'MaaS 官网巡检 · %'").all(row.id, source.url);
       if (sourceMatches.length > 1) throw Error(`Ambiguous source for ${e.name}`);
       let sourceRow = sourceMatches[0];
       if (!sourceRow) {

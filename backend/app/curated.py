@@ -30,7 +30,7 @@ def import_curated(db,dataset):
                 parent=category.id
             if not db.get(EntityCategory,(entity.id,parent)):
                 db.add(EntityCategory(entity_id=entity.id,category_id=parent))
-        registered=db.scalar(select(Source).where(Source.entity_id==entity.id,Source.url==source['url'],Source.is_demo.is_(False)))
+        registered=db.scalar(select(Source).where(Source.entity_id==entity.id,Source.url==source['url'],Source.is_demo.is_(False),~Source.name.startswith('MaaS 官网巡检 · ')))
         if not registered:
             registered=Source(entity_id=entity.id,name=source['title']+'（编辑核验摘录）',url=source['url'],enabled=False,is_demo=False)
             db.add(registered);db.flush()

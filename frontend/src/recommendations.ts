@@ -13,6 +13,7 @@ export function selectionContext(workflow?: Row) {
     goal = fields.goal?.value || "";
   const intent = positive(goal + "，" + (fields.requirements?.value || ""));
   const priorities = [
+    "realtime_voice",
     "video_generation",
     "image_generation",
     "audio_generation",
@@ -122,7 +123,7 @@ export function rankRecommendations(
     let matches: string[] = [],
       candidateRoutes: string[] = [],
       role = "";
-    if (kind === "model") {
+    if (kind === "model" || (kind === "api" && labels.includes("MaaS方案"))) {
       for (const cap of policy.capabilities) {
         if (!capIds.includes(cap.id)) continue;
         const matching =
@@ -191,6 +192,9 @@ export function rankRecommendations(
   group("reference", "model");
   for (const route of routes)
     group(route, route === "platform" ? "platform" : "model");
+  if (primary.id === "realtime_voice" && routes.includes("api")) {
+    group("api", "model"); group("api", "model");
+  }
   if (routes.includes("local")) group("local", "runtime");
   else if (routes.includes("api")) group("api", "application");
   if (context.needs_website && routes.includes("api"))
@@ -215,9 +219,11 @@ export function rankRecommendations(
       feature = (route === "local" ? facts.find(f => f.key === "部署方式") : null) || first(policy.feature_fields) || facts[0],
       cost = first(policy.cost_fields);
     const selected: Row[] = [];
-    for (const f of [constraint, feature, cost, ...facts]) {
+    const maas = facts.some(f => f.key === "模型与能力");
+    const candidates = maas ? [feature, first(["接入方式"]), constraint, first(["方案建议（编辑归纳）"]), ...facts] : [constraint, feature, cost, ...facts];
+    for (const f of candidates) {
       if (f && !selected.includes(f)) selected.push(f);
-      if (selected.length === 2) break;
+      if (selected.length === (maas ? 4 : 2)) break;
     }
     chosen.push(
       ...selected.map((f) => ({

@@ -2,6 +2,18 @@
   "version": 1,
   "roots": [
     {
+      "name": "MaaS方案",
+      "description": "从业务能力查官方模型、接入路线和选型边界",
+      "children": [
+        "实时语音对话",
+        "图片生成与编辑",
+        "视频生成",
+        "语音识别",
+        "文档理解",
+        "文本与工具调用"
+      ]
+    },
+    {
       "name": "生成类",
       "description": "生成文字、图片、声音或视频",
       "children": [
@@ -241,7 +253,24 @@
     "Kimi 网页版": "月之暗面",
     "v0": "Vercel",
     "Cloudflare Workers": "Cloudflare",
-    "Open WebUI": "Open WebUI"
+    "Open WebUI": "Open WebUI",
+    "火山引擎 · 豆包实时语音方案": "火山引擎",
+    "火山方舟 · Seedream 图片方案": "火山引擎",
+    "火山方舟 · Seedance 视频方案": "火山引擎",
+    "阿里云百炼 · Qwen 实时音视频方案": "阿里云",
+    "阿里云百炼 · 千问与万相图片方案": "阿里云",
+    "阿里云百炼 · 万相视频方案": "阿里云",
+    "腾讯云 · TRTC 实时语音客服方案": "腾讯云",
+    "腾讯云 · 混元实时转写方案": "腾讯云",
+    "腾讯云 TokenHub · 混元图片方案": "腾讯云",
+    "智谱 · GLM-Image 海报方案": "智谱",
+    "智谱 · 文档理解与知识检索方案": "智谱",
+    "OpenAI · 实时语音方案": "OpenAI",
+    "OpenAI · GPT Image 图片方案": "OpenAI",
+    "Google · Gemini Live 语音方案": "Google",
+    "Google · Nano Banana 图片方案": "Google",
+    "AWS · Nova Sonic 语音方案": "AWS",
+    "Anthropic · Claude 业务助手方案": "Anthropic"
   },
   "vendor_relations": [
     "开发模型",
@@ -306,6 +335,48 @@
         "工具与平台",
         "云服务与 API",
         "网站托管与函数"
+      ]
+    },
+    {
+      "category": "实时语音对话",
+      "path": [
+        "MaaS方案",
+        "实时语音对话"
+      ]
+    },
+    {
+      "category": "图片生成与编辑",
+      "path": [
+        "MaaS方案",
+        "图片生成与编辑"
+      ]
+    },
+    {
+      "category": "视频生成",
+      "path": [
+        "MaaS方案",
+        "视频生成"
+      ]
+    },
+    {
+      "category": "语音识别",
+      "path": [
+        "MaaS方案",
+        "语音识别"
+      ]
+    },
+    {
+      "category": "文档理解",
+      "path": [
+        "MaaS方案",
+        "文档理解"
+      ]
+    },
+    {
+      "category": "文本与工具调用",
+      "path": [
+        "MaaS方案",
+        "文本与工具调用"
       ]
     }
   ]

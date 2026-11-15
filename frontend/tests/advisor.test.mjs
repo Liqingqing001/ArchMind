@@ -82,8 +82,12 @@ for (const c of cases) {
           r.recommendation_route === "reference",
       ),
   );
-  for (const id of new Set(rows.map((r) => r.entity_id)))
-    assert.ok(rows.filter((r) => r.entity_id === id).length <= 2);
+  for (const id of new Set(rows.map((r) => r.entity_id))) {
+    const selected = rows.filter((r) => r.entity_id === id);
+    const maas = selected.some(r => r.key === "模型与能力");
+    assert.ok(selected.length <= (maas ? 4 : 2));
+    if (maas) assert.ok(selected.some(r => r.key === "选型边界"));
+  }
   for (const row of rows)
     assert.ok(
       data.snapshots

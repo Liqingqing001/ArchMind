@@ -1,0 +1,9 @@
+.source-monitor { display: grid; gap: 12px; padding: 20px; margin-bottom: 18px; border: 1px solid var(--border, #e6cbd4); border-radius: 16px; background: #fff8fa; }
+.source-monitor h2 { margin: 0 0 6px; font-size: 20px; }
+.source-monitor p { margin: 0; line-height: 1.6; }
+.source-monitor-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.source-monitor-stats span { padding: 10px; background: white; border-radius: 10px; font-weight: 600; }
+.source-monitor-stats b { font-size: 22px; margin-right: 8px; }
+.source-monitor button { justify-self: start; }
+.source-monitor small { line-height: 1.6; }
+@media (max-width: 700px) { .source-monitor-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

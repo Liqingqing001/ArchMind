@@ -2,6 +2,30 @@
   "version": 1,
   "capabilities": [
     {
+      "id": "realtime_voice",
+      "label": "实时语音对话",
+      "cues": [
+        "实时语音",
+        "语音对话",
+        "语音客服",
+        "语音助手",
+        "语音陪练",
+        "语音通话",
+        "双向语音",
+        "realtime",
+        "speech-to-speech"
+      ],
+      "categories": [
+        "实时语音对话"
+      ],
+      "exclude_categories": [],
+      "preferred_models": [
+        "火山引擎 · 豆包实时语音方案",
+        "阿里云百炼 · Qwen 实时音视频方案",
+        "腾讯云 · TRTC 实时语音客服方案"
+      ]
+    },
+    {
       "id": "text_generation",
       "label": "文本生成",
       "cues": [
@@ -270,6 +294,7 @@
     }
   ],
   "constraint_fields": [
+    "选型边界",
     "接入状态",
     "文档状态",
     "开放状态",
@@ -281,6 +306,7 @@
     "版本边界"
   ],
   "feature_fields": [
+    "模型与能力",
     "模型用途",
     "核心能力",
     "生成任务",

@@ -3,7 +3,7 @@ import json
 import re
 from pathlib import Path
 
-POLICY=json.loads((Path(__file__).resolve().parent.parent/'data/recommendation-policy.json').read_text())
+POLICY=json.loads((Path(__file__).resolve().parent.parent/'data/recommendation-policy.json').read_text(encoding='utf-8'))
 NEGATION=r'(?:不需要|不要|不想|不用|不做|不考虑|无需|禁止|不允许|不生成|不涉及|而不是)[^，。；;！!？?\n]*'
 
 
@@ -17,7 +17,7 @@ def selection_context(workflow):
     goal=fields.get('goal',{}).get('value','')
     intent=positive(goal+'，'+fields.get('requirements',{}).get('value',''))
     capabilities=[c for c in POLICY['capabilities'] if any(t in intent for t in c['cues'])]
-    priorities=['video_generation','image_generation','audio_generation','image_understanding','audio_understanding','video_understanding','text_understanding','text_generation','code_generation','retrieval']
+    priorities=['realtime_voice','video_generation','image_generation','audio_generation','image_understanding','audio_understanding','video_understanding','text_understanding','text_generation','code_generation','retrieval']
     capabilities.sort(key=lambda c:priorities.index(c['id']))
     delivery=fields.get('delivery',{}).get('value','')
     cleaned=positive(delivery)
@@ -56,7 +56,7 @@ def rank_recommendations(rows,entities,categories,links,workflow,prompt):
         if inactive and not named:continue
         tool=next((t for t in POLICY['platforms'] if t['name']==name),None)
         matches=[]
-        if kind=='model':
+        if kind=='model' or (kind=='api' and 'MaaS方案' in labels):
             for cap in POLICY['capabilities']:
                 if cap['id'] not in cap_ids:continue
                 matching=any(c in labels for c in cap['categories']) or cap['id']=='code_generation' and name in POLICY['exact_code_models']
@@ -83,6 +83,8 @@ def rank_recommendations(rows,entities,categories,links,workflow,prompt):
         if group:groups.append((route,group))
     group('reference','model')
     for route in routes:group(route,'platform' if route=='platform' else 'model')
+    if primary['id']=='realtime_voice' and 'api' in routes:
+        group('api','model');group('api','model')
     if 'local' in routes:group('local','runtime')
     elif 'api' in routes:group('api','application')
     if context['needs_website'] and 'api' in routes:group('api','hosting','code_generation')
@@ -97,8 +99,11 @@ def rank_recommendations(rows,entities,categories,links,workflow,prompt):
         feature=(next((f for f in facts if f['key']=='部署方式'),None) if route=='local' else None) or next((f for key in POLICY['feature_fields'] for f in facts if f['key']==key),facts[0])
         cost=next((f for key in POLICY['cost_fields'] for f in facts if f['key']==key),None)
         selected=[]
-        for f in [constraint,feature,cost,*facts]:
+        maas=any(f['key']=='模型与能力' for f in facts)
+        access=next((f for f in facts if f['key']=='接入方式'),None)
+        advice=next((f for f in facts if f['key']=='方案建议（编辑归纳）'),None)
+        for f in ([feature,access,constraint,advice,*facts] if maas else [constraint,feature,cost,*facts]):
             if f and f not in selected:selected.append(f)
-            if len(selected)==2:break
+            if len(selected)==(4 if maas else 2):break
         for f in selected:chosen.append(dict(**f,task=primary['label'],recommendation_route=route,recommendation_role=entity['role']))
     return [dict(**r,citation_id=f'K{i+1}') for i,r in enumerate(chosen[:12])]
