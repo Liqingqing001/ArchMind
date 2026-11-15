@@ -1,9 +1,9 @@
-"""Enforced consultation workflow; shared public policy with the Pages build."""
+"""Progressive consultation; a stated goal is enough to start researching."""
 import copy
 import json
 import re
 from pathlib import Path
-from .recommendations import rank_recommendations, selection_context, POLICY as RECOMMENDATIONS
+from .recommendations import rank_recommendations
 
 POLICY = json.loads((Path(__file__).resolve().parent.parent/'data/solution-policy.json').read_text(encoding='utf-8'))
 
@@ -24,7 +24,7 @@ def extraction_messages(previous, prompt, last_question=''):
     return [{'role':'system','content':POLICY['extraction_prompt']}, {'role':'user','content':json.dumps(dict(BRIEF=previous['fields'],LAST_QUESTION=last_question,USER_INPUT=prompt),ensure_ascii=False)}]
 
 
-def delivery_answer(previous, prompt):
+def delivery_answer(previous, prompt, last_question=None):
     """Keep an explicit no-preference answer when model extraction omits it."""
     for part in re.split(r'[，,。；;！!？?\n]', prompt):
         evidence = part.strip()
@@ -32,19 +32,20 @@ def delivery_answer(previous, prompt):
         if numbered and (previous['missing'] + [None, None])[0 if numbered[1] in '一1' else 1] != 'delivery':
             continue
         scoped = re.search(r'使用方式|部署方式|部署|平台选择', evidence)
-        if ('delivery' in previous['missing'][:2] or scoped) and re.fullmatch(POLICY['delivery_no_preference_pattern'], evidence):
+        asked = 'delivery' in previous['missing'][:2] if last_question is None else any(re.search(r'使用方式|部署方式|部署.*偏好|现成平台.*API|API.*自部署',q,re.I) for q in re.findall(r'[^。！？?\n]*[？?]',last_question))
+        if (asked or scoped) and re.fullmatch(POLICY['delivery_no_preference_pattern'], evidence):
             return dict(value='无偏好', evidence=evidence)
     return None
 
 
-def apply_extraction(previous, raw, prompt):
+def apply_extraction(previous, raw, prompt, last_question=None):
     try:
         parsed = json.loads(re.sub(r'\s*```$', '', re.sub(r'^```(?:json)?\s*', '', raw.strip())))
     except (ValueError, TypeError):
         raise ValueError('需求识别未返回有效 JSON，请重试；尚未生成方案。')
     if not isinstance(parsed, dict) or not isinstance(parsed.get('updates'), dict):
         raise ValueError('需求识别格式无效，请重试；尚未生成方案。')
-    delivery = delivery_answer(previous, prompt)
+    delivery = delivery_answer(previous, prompt, last_question)
     if delivery and not parsed['updates'].get('delivery'):
         parsed['updates']['delivery'] = delivery
     result = copy.deepcopy(previous)
@@ -65,7 +66,10 @@ def apply_extraction(previous, raw, prompt):
                 result['fields'].pop(key,None)
     result['scene'] = scene['id'] if scene else None
     result['missing'] = [s['id'] for s in POLICY['slots'] if s['id'] not in result['fields']]
-    result['phase'] = 'collecting' if result['missing'] else 'generated' if previous['phase']=='generated' and not changed else 'ready'
+    result['phase'] = 'generated' if result['fields'].get('goal') else 'collecting'
+    result['response_mode'] = response_mode(previous, parsed.get('intent'), prompt, changed)
+    if result['phase'] == 'collecting':
+        result['response_mode'] = 'clarification'
     title = parsed.get('title')
     if isinstance(title,str) and 0 < len(title.strip()) <= 32 and not re.search(r'[\n\r<>\[\]{}]',title):
         result['suggested_title'] = title.strip()
@@ -74,24 +78,33 @@ def apply_extraction(previous, raw, prompt):
     return result
 
 
+def response_mode(previous, intent, prompt, changed):
+    routing = POLICY['routing']
+    if re.search(routing['solution_pattern'], prompt, re.I) or intent == 'solution':
+        return 'solution'
+    fresh = re.search(routing['fresh_search_pattern'], prompt, re.I)
+    if previous['phase'] == 'generated' and not changed and not fresh:
+        if intent in ('explanation', 'clarification') or re.search(routing['explanation_pattern'], prompt, re.I):
+            return 'explanation'
+    return 'discovery'
+
+
+def answer_context(workflow):
+    return dict(mode=workflow.get('response_mode', 'solution'), missing=workflow['missing'],
+                constraints_are_partial=bool(workflow['missing']))
+
+
 def conversation_title(workflow):
     title = workflow.get('suggested_title') or workflow['fields'].get('goal',{}).get('value','')
     return re.sub(r'^(?:我想|我希望|请帮我|帮我|我要|想要|想)(?:用AI|使用AI|用 AI)?', '',title).strip(' ，。！？')[:32] or '新对话'
 
 
 def is_confirmation(previous,prompt,action=None):
-    return previous['phase']=='ready' and (action=='generate' or re.sub('[。！!？?]+$','',prompt.strip()) in POLICY['confirmations'])
+    return bool(previous['fields'].get('goal')) and (action=='generate' or previous['phase']=='ready' and re.sub('[。！!？?]+$','',prompt.strip()) in POLICY['confirmations'])
 
 
 def clarification(workflow):
-    scene = next((s for s in POLICY['scenes'] if s['id']==workflow['scene']),{})
-    capabilities = selection_context(workflow)['capabilities']
-    targeted = RECOMMENDATIONS['question_overrides'].get(capabilities[0]['id'],{}) if capabilities else {}
-    summary = '\n'.join(f"- {s['label']}：{workflow['fields'][s['id']]['value']}" for s in POLICY['slots'] if s['id'] in workflow['fields'])
-    if workflow['phase']=='ready':
-        return f'我理解的需求是：\n\n{summary}\n\n现在为你生成简版方案吗？你也可以直接修改上面的条件。'
-    questions = [scene.get('questions',{}).get(key) or targeted.get(key) or next(s['question'] for s in POLICY['slots'] if s['id']==key) for key in workflow['missing'][:2]]
-    return ('已记下你的条件。我们再确认关键条件：' if summary else '我们先把需求聊清楚。')+'\n\n'+'\n'.join(f'{i+1}. {q}' for i,q in enumerate(questions))
+    return '你想找哪类模型，或解决什么问题？例如“找一个实时语音交互模型”。说出目标就可以开始，不需要先填预算和部署方式。'
 
 
 def terms(text):

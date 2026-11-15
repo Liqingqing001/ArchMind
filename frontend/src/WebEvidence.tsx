@@ -13,7 +13,7 @@ export function WebEvidence({
     <details className="web-evidence">
       <summary>
         <Globe2 size={14} />
-        本轮联网依据 ·{" "}
+        {web.reused ? "沿用近期官网资料" : "本轮联网依据"} ·{" "}
         {citations.length
           ? `正文引用 ${citations.length} 条 · `
           : web.results.length
@@ -37,6 +37,8 @@ export function WebEvidence({
         · {web.provider}
       </p>
       <p>关键词：{web.queries.join("；")}</p>
+      {web.reused && <p>本轮未重新搜索，沿用上述时间取得的证据；新选型、价格或方案问题会重新检索。</p>}
+      {web.page_reading && <p>官网正文读取：{web.page_reading.succeeded} 篇成功{web.page_reading.failed ? `，${web.page_reading.failed} 篇未成功，保留摘要` : ""}。</p>}
       {web.results.map((w) => (
         <article key={w.citation_id}>
           <a href={w.url} target="_blank" rel="noreferrer">
@@ -51,6 +53,7 @@ export function WebEvidence({
           </small>
           <p>{w.excerpt}</p>
           {w.published_at && <small>来源提供的日期：{w.published_at}</small>}
+          {w.read_at && <small>正文读取时间：{new Date(w.read_at).toLocaleString()}</small>}
         </article>
       ))}
       <p>

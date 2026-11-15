@@ -218,8 +218,9 @@ const combined = combineSearch("tavily", q, "today", rows, []);
 assert.equal(combined.results.length, 6);
 assert.equal(
   combined.results.filter((r) => r.url.includes("batch1")).length,
-  3,
+  2,
 );
+assert.ok(combined.results.slice(0,4).every(r=>r.source_type === "official"));
 const warning = groundedResult(
   "只用了知识库[K1]",
   "stop",

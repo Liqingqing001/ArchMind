@@ -12,8 +12,8 @@ from .models import Entity, Fact, Snapshot, Source, Trace, Category, EntityCateg
 from .collector import validate_url
 from .provider_protocols import request_parts, response_text
 from .conversations import get_conversation, summary
-from .web_search import SearchConnection, search_web, disabled_search, search_warnings, POLICY as SEARCH_POLICY, request_json as search_request_json, parse_results as parse_search_results
-from .solution_flow import POLICY, terms, rank_knowledge, previous_workflow, extraction_messages, apply_extraction, is_confirmation, clarification, editorial_guide, conversation_title
+from .web_search import SearchConnection, search_web, disabled_search, search_warnings, reusable_search, POLICY as SEARCH_POLICY, request_json as search_request_json, parse_results as parse_search_results
+from .solution_flow import POLICY, terms, rank_knowledge, previous_workflow, extraction_messages, apply_extraction, is_confirmation, clarification, editorial_guide, conversation_title, answer_context
 from .recommendations import selection_context
 
 router = APIRouter(prefix="/api/agent", tags=["solution-agent"])
@@ -141,13 +141,13 @@ def complete(connection, messages, max_tokens=None):
         raise HTTPException(502, "模型未返回文本正文，请检查接口协议；推理模型可尝试增大输出上限")
 
 
-def complete_grounded(connection, messages, web, continuing=False):
+def complete_grounded(connection, messages, web, continuing=False, require_web=True):
     first = complete(connection, messages)
     repair = dict(attempted=False, adopted=False)
     web_ids = {row['citation_id'] for row in web['results']}
     def uses_web(answer):
         return bool(set(re.findall(r'\[(W\d+)\]', answer)) & web_ids)
-    if not continuing and first[1] == 'stop' and web_ids and not uses_web(first[0]):
+    if require_web and not continuing and first[1] == 'stop' and web_ids and not uses_web(first[0]):
         repair['attempted'] = True
         try:
             revised = complete(connection, [*messages,
@@ -204,6 +204,8 @@ def chat(body: ChatRequest, db=Depends(get_db)):
         raise HTTPException(409,'当前没有需要续写的已确认方案')
     if is_confirmation(previous,user,body.action) or continuing:
         workflow = {**previous,'phase':'generated'}
+        if not continuing:
+            workflow['response_mode'] = 'solution'
     else:
         extraction_input = user
         if not previous['fields']:
@@ -215,27 +217,28 @@ def chat(body: ChatRequest, db=Depends(get_db)):
             extraction = complete(body.connection,extraction_messages(previous,extraction_input,previous_turns[-1]['content'] if previous_turns else ''),max_tokens=body.connection.max_output_tokens)
             if extraction[1]=='length':
                 raise ValueError('需求识别达到输出上限，请提高输出上限后重试；尚未生成方案。')
-            workflow = apply_extraction(previous,extraction[0],extraction_input)
+            workflow = apply_extraction(previous,extraction[0],extraction_input,previous_turns[-1]['content'] if previous_turns else '')
         except ValueError as exc:
             raise HTTPException(502,str(exc))
     if workflow['phase'] != 'generated':
         result = {'answer':clarification(workflow),'citations':[],'retrieved':[],'trace_id':'','warnings':[], 'model':body.connection.model,'workflow':workflow,'finish_reason':'stop','diagnostics':{'stage':'requirements'}}
     else:
-        if continuing:
+        reuse = not continuing and bool(body.web_search and body.web_search.enabled) and reusable_search(latest.get('web_search'),workflow)
+        if continuing or reuse:
             evidence,trace_id = latest.get('retrieved',[]),latest.get('trace_id','')
         else:
             evidence,trace_id = retrieve_context(db,messages,workflow)
-        web=latest.get('web_search') or disabled_search() if continuing else search_web(body.web_search,workflow,user,[body.connection.api_key.get_secret_value()])
-        if not continuing:
+        web = (latest.get('web_search') or disabled_search()) if continuing else {**latest['web_search'],'reused':True} if reuse else search_web(body.web_search,workflow,user,[body.connection.api_key.get_secret_value()])
+        if not continuing and not reuse:
             trace=db.get(Trace,trace_id);trace.request_context={**trace.request_context,'web_search':web};db.commit()
         saved_cases = latest.get('saved_solution_cases', []) if continuing else case_references(db, workflow, body.conversation_id)
-        if not continuing:
+        if not continuing and not reuse:
             trace=db.get(Trace,trace_id);trace.request_context={**trace.request_context,'saved_solution_cases':saved_cases};db.commit()
         scene = editorial_guide(workflow)
         prompt = [{'role':'system','content':POLICY['answer_prompt']+'\n'+SEARCH_POLICY['prompt']+('\n'+POLICY['continue_prompt'] if continuing else '')}]
         prompt.extend(m.model_dump() for m in messages[:-1])
-        prompt.append({'role':'user','content':json.dumps({'BRIEF':workflow['fields'],'SELECTION_CONTEXT':selection_context(workflow),'EDITORIAL_GUIDE':scene,'SAVED_SOLUTION_CASES':saved_cases,'EVIDENCE_JSON':evidence,'WEB_EVIDENCE_JSON':web['results'],'WEB_SEARCH':{k:v for k,v in web.items() if k!='results'},'USER_INPUT':user},ensure_ascii=False)})
-        completion, grounding_repair, grounding_warnings = complete_grounded(body.connection,prompt,web,continuing)
+        prompt.append({'role':'user','content':json.dumps({'ANSWER_CONTEXT':answer_context(workflow),'BRIEF':workflow['fields'],'SELECTION_CONTEXT':selection_context(workflow),'EDITORIAL_GUIDE':scene,'SAVED_SOLUTION_CASES':saved_cases,'EVIDENCE_JSON':evidence,'WEB_EVIDENCE_JSON':web['results'],'WEB_SEARCH':{k:v for k,v in web.items() if k!='results'},'USER_INPUT':user},ensure_ascii=False)})
+        completion, grounding_repair, grounding_warnings = complete_grounded(body.connection,prompt,web,continuing,workflow.get('response_mode')!='explanation')
         answer,finish = completion
         requested = set(re.findall(r'\[([KW]\d+)\]',answer));valid = {e['citation_id'] for e in evidence+web['results']};warnings = search_warnings(web)+grounding_warnings
         if requested-valid:
@@ -243,11 +246,12 @@ def chat(body: ChatRequest, db=Depends(get_db)):
             warnings.append('模型返回了未知引用编号，已标记为待核验。')
         citations = [e for e in evidence if e['citation_id'] in requested]
         web_citations=[e for e in web['results'] if e['citation_id'] in requested]
-        if not evidence and not web['results']:
+        requires_evidence = workflow.get('response_mode') != 'explanation'
+        if requires_evidence and not evidence and not web['results']:
             warnings.append('本轮没有匹配的已发布知识，产品结论需要进一步核验。')
-        elif not citations and not web_citations:
+        elif requires_evidence and not citations and not web_citations:
             warnings.append('已检索资料，但模型没有标注有效引用，请核对来源。')
-        if web['results'] and not web_citations:
+        if requires_evidence and web['results'] and not web_citations:
             warnings.append('本轮检索到了网页，但正文未引用网页依据，不能视为已经结合联网结果；可展开下方资料核对或要求补充比较。')
         if finish=='content_filter':
             warnings.append('模型服务限制了本轮输出，请调整请求；这不是长度截断。')

@@ -15,7 +15,7 @@ export function SearchSettings({
   onClear: () => void;
   onClose: () => void;
 }) {
-  const [draft, setDraft] = useState(connection),
+  const [draft, setDraft] = useState({...connection, enabled: connection.api_key ? connection.enabled : true}),
     [testing, setTesting] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
@@ -55,7 +55,7 @@ export function SearchSettings({
             <Globe2 size={19} />
             联网检索
           </h2>
-          <p>生成方案与后续问答时，补充检索互联网资料。</p>
+          <p>从第一次选型开始，自动搜索官网并核验候选。</p>
         </div>
         <button
           className="icon-button"
@@ -83,7 +83,7 @@ export function SearchSettings({
             disabled={testing}
             onChange={(e) => setDraft({ ...draft, enabled: e.target.checked })}
           />
-          启用联网检索
+          选型与方案自动联网核验
         </label>
         <label>
           搜索服务
@@ -124,8 +124,8 @@ export function SearchSettings({
         <p className="provider-note">
           设置与 Key
           独立保存在当前浏览器，可单独清除。只把检索关键词交给所选搜索服务；检索结果会连同库内资料交给模型。每次生成最多
-          2 次搜索，测试会发起 1
-          次，以搜索服务商计费为准。澄清需求和续写不重新搜索。
+          3 次搜索，并尝试读取最多 3 篇官网正文；测试会发起 1
+          次搜索，以搜索服务商计费为准。单纯解释可复用 30 分钟内的证据，续写沿用原资料。
         </p>
         <p className="provider-note">
           {isDemo

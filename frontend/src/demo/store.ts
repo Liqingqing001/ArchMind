@@ -310,12 +310,13 @@ export function createDemoStore(initial: Row) {
       [...c.messages].reverse().find((m: Row) => m.role === "assistant")
         ?.result || {};
     const continuing = body.action === "continue";
+    const reuse = !!body.reuse_evidence && !continuing;
     if (
       continuing &&
       (previous.phase !== "generated" || latest.finish_reason !== "length")
     )
       fail("当前没有需要续写的已确认方案");
-    const retrieved = continuing
+    const retrieved = continuing || reuse
       ? latest.retrieved || []
       : workflow.phase === "generated"
         ? rankKnowledge(
@@ -336,7 +337,7 @@ export function createDemoStore(initial: Row) {
           workflow,
           c.id,
         );
-    const t = continuing
+    const t = continuing || reuse
       ? { id: latest.trace_id }
       : workflow.phase === "generated"
         ? trace(prompt, retrieved, "agent", {
@@ -373,7 +374,8 @@ export function createDemoStore(initial: Row) {
           "\n本轮：" +
           prompt;
     return {
-      web_search: continuing
+      latest_web_search: latest.web_search,
+      web_search: continuing || reuse
         ? latest.web_search || disabledSearch()
         : disabledSearch(),
       prompt,
@@ -418,11 +420,12 @@ export function createDemoStore(initial: Row) {
     const context = prepareChat(body),
       previous = context.previous;
     const workflow = isConfirmation(previous, context.prompt, body.action)
-      ? { ...previous, phase: "generated" as const }
+      ? { ...previous, phase: "generated" as const, response_mode: "solution" as const }
       : applyExtraction(
           previous,
-          previewExtraction(context.extractionInput, previous),
+          previewExtraction(context.extractionInput, previous, context.lastQuestion),
           context.extractionInput,
+          context.lastQuestion,
         );
     const ready = prepareChat(body, false, workflow),
       scene = solutionPolicy.scenes.find((s) => s.id === workflow.scene);
@@ -443,8 +446,8 @@ export function createDemoStore(initial: Row) {
         : null;
     const answer =
       workflow.phase !== "generated"
-        ? clarification(workflow)
-        : `> 交互演示：未调用大模型，以下是编辑路线建议，不是实测案例。\n\n推荐先采用「${route?.name || "小范围验证"}」。${route?.steps || "用一小批样本验证目标，再扩充。"}\n\n理由：先按已确认的预算、操作经验和使用方式验证效果。\n\n费用边界：${route?.boundary || "当前资料不足以核算价格，需核验实际用量与报价。"}\n\n下一步：先做一个小样，再决定是否扩充。${citations.length ? "\n\n可核对的资料：" + citations.map((r: Row) => `${r.entity_name} · ${r.key} [${r.citation_id}]`).join("；") : ""}`;
+        ? `> 知识库预览：尚未连接模型与搜索服务。\n\n${clarification(workflow)}`
+        : `> 知识库预览：尚未连接模型，也未联网，以下是编辑参考，不是实时生成或实测结果。\n\n可参考「${route?.name || "小范围验证"}」：${route?.steps || "当前资料不足以给出具体候选，请连接模型与搜索服务进一步核验。"}\n\n费用边界：${route?.boundary || "需核验实际用量与官方报价。"}${citations.length ? "\n\n库内资料：" + citations.map((r: Row) => `${r.entity_name} · ${r.key} [${r.citation_id}]`).join("；") : ""}`;
     return commitChat(body, {
       answer: preview?.answer || answer,
       citations:

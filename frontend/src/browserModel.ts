@@ -1,7 +1,7 @@
 import { selectionContext } from "./recommendations.ts";
 import { disabledSearch, searchPolicy, searchWarnings } from "./webSearch.ts";
 import type { WebSearch } from "./webSearch.ts";
-import { solutionPolicy, editorialGuide } from "./solutionFlow.ts";
+import { solutionPolicy, editorialGuide, answerContext } from "./solutionFlow.ts";
 import type { Workflow } from "./solutionFlow.ts";
 import type { Connection } from "./modelProviders.ts";
 export const MODEL_SETTINGS_KEY = "archmind-model-settings-v1";
@@ -331,6 +331,7 @@ export function groundedMessages(context: {
     {
       role: "user",
       content: JSON.stringify({
+        ANSWER_CONTEXT: answerContext(context.workflow),
         BRIEF: context.workflow?.fields || {},
         SELECTION_CONTEXT: selectionContext(context.workflow),
         EDITORIAL_GUIDE: editorialGuide(context.workflow),
@@ -359,6 +360,7 @@ export async function completeGroundedBrowser(
     [...answer.matchAll(/\[(W\d+)\]/g)].some((match) => webIds.has(match[1]));
   if (
     !context.continuing &&
+    context.workflow?.response_mode !== "explanation" &&
     first.finish === "stop" &&
     webIds.size &&
     !usesWeb(first.answer)
@@ -408,7 +410,7 @@ export async function completeGroundedBrowser(
 export function groundedResult(
   answer: string,
   finish: string,
-  context: { retrieved: any[]; trace_id: string; web_search?: WebSearch },
+  context: { retrieved: any[]; trace_id: string; web_search?: WebSearch; workflow?: Workflow },
   model: string,
 ) {
   const requested = new Set(
@@ -429,11 +431,12 @@ export function groundedResult(
     requested.has(r.citation_id),
   );
   const web_citations = web.results.filter((r) => requested.has(r.citation_id));
-  if (!context.retrieved.length && !web.results.length)
+  const requiresEvidence = context.workflow?.response_mode !== "explanation";
+  if (requiresEvidence && !context.retrieved.length && !web.results.length)
     warnings.push("本轮没有匹配的已发布知识，产品结论需要进一步核验。");
-  else if (!citations.length && !web_citations.length)
+  else if (requiresEvidence && !citations.length && !web_citations.length)
     warnings.push("已检索资料，但模型没有标注有效引用，请核对来源。");
-  if (web.results.length && !web_citations.length)
+  if (requiresEvidence && web.results.length && !web_citations.length)
     warnings.push(
       "本轮检索到了网页，但正文未引用网页依据，不能视为已经结合联网结果；可展开下方资料核对或要求补充比较。",
     );

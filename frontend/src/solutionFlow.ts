@@ -1,8 +1,6 @@
 import policy from "../../backend/data/solution-policy.json" with { type: "json" };
 import {
   rankRecommendations,
-  selectionContext,
-  recommendationPolicy,
   previewTitle,
 } from "./recommendations.ts";
 export { policy as solutionPolicy };
@@ -14,6 +12,7 @@ export type Workflow = {
   scene: string | null;
   missing: string[];
   suggested_title?: string;
+  response_mode?: "discovery" | "solution" | "explanation" | "clarification";
 };
 export const emptyWorkflow = (): Workflow => ({
   version: 1,
@@ -50,14 +49,15 @@ export function extractionMessages(
   ];
 }
 /** Resolve explicit delivery answers even when the model omits this slot. */
-function deliveryAnswer(previous: Workflow, prompt: string) {
+function deliveryAnswer(previous: Workflow, prompt: string, lastQuestion?: string) {
   const pattern = new RegExp(policy.delivery_no_preference_pattern);
   for (const part of prompt.split(/[，,。；;！!？?\n]/)) {
     const evidence = part.trim();
     const numbered = evidence.match(/^第([一二12])个问题/);
     if (numbered && previous.missing[/[一1]/.test(numbered[1]) ? 0 : 1] !== "delivery") continue;
     const scoped = /使用方式|部署方式|部署|平台选择/.test(evidence);
-    if ((previous.missing.slice(0, 2).includes("delivery") || scoped) && pattern.test(evidence))
+    const asked = lastQuestion === undefined ? previous.missing.slice(0,2).includes("delivery") : (lastQuestion.match(/[^。！？?\n]*[？?]/g) || []).some(q=>/使用方式|部署方式|部署.*偏好|现成平台.*API|API.*自部署/i.test(q));
+    if ((asked || scoped) && pattern.test(evidence))
       return { value: "无偏好", evidence };
   }
   return null;
@@ -66,6 +66,7 @@ export function applyExtraction(
   previous: Workflow,
   raw: string,
   prompt: string,
+  lastQuestion?: string,
 ): Workflow {
   const clean = raw
     .trim()
@@ -84,7 +85,7 @@ export function applyExtraction(
     Array.isArray(parsed.updates)
   )
     throw Error("需求识别格式无效，请重试；尚未生成方案。");
-  const delivery = deliveryAnswer(previous, prompt);
+  const delivery = deliveryAnswer(previous, prompt, lastQuestion);
   if (delivery && !parsed.updates.delivery) parsed.updates.delivery = delivery;
   const next = structuredClone(previous);
   let changed = false;
@@ -114,11 +115,10 @@ export function applyExtraction(
   next.missing = policy.slots
     .filter((s) => !next.fields[s.id])
     .map((s) => s.id);
-  next.phase = next.missing.length
-    ? "collecting"
-    : previous.phase === "generated" && !changed
-      ? "generated"
-      : "ready";
+  next.phase = next.fields.goal ? "generated" : "collecting";
+  next.response_mode = next.fields.goal
+    ? responseMode(previous, parsed.intent, prompt, changed)
+    : "clarification";
   if (
     typeof parsed.title === "string" &&
     parsed.title.trim() &&
@@ -129,6 +129,19 @@ export function applyExtraction(
   else if (changed) delete next.suggested_title;
   return next;
 }
+function responseMode(previous: Workflow, intent: unknown, prompt: string, changed: boolean): Workflow["response_mode"] {
+  const routing = policy.routing;
+  if (new RegExp(routing.solution_pattern, "i").test(prompt) || intent === "solution") return "solution";
+  const fresh = new RegExp(routing.fresh_search_pattern, "i").test(prompt);
+  if (previous.phase === "generated" && !changed && !fresh &&
+      (intent === "explanation" || intent === "clarification" || new RegExp(routing.explanation_pattern, "i").test(prompt))) return "explanation";
+  return "discovery";
+}
+export const answerContext = (workflow?: Workflow) => ({
+  mode: workflow?.response_mode || "solution",
+  missing: workflow?.missing || [],
+  constraints_are_partial: !!workflow?.missing.length,
+});
 export function conversationTitle(workflow?: Workflow, fallback = "") {
   const title =
     workflow?.suggested_title || workflow?.fields.goal?.value || fallback;
@@ -151,38 +164,13 @@ export function isConfirmation(
   action?: string,
 ) {
   return (
-    previous.phase === "ready" &&
+    !!previous.fields.goal &&
     (action === "generate" ||
-      policy.confirmations.includes(prompt.trim().replace(/[。！!？?]+$/, "")))
+      (previous.phase === "ready" && policy.confirmations.includes(prompt.trim().replace(/[。！!？?]+$/, ""))))
   );
 }
-export function clarification(workflow: Workflow) {
-  const primary = selectionContext(workflow).capabilities[0]?.id || "";
-  const targeted =
-    (
-      recommendationPolicy.question_overrides as Record<
-        string,
-        Record<string, string>
-      >
-    )[primary] || {};
-  const scene = policy.scenes.find((s) => s.id === workflow.scene),
-    summary = policy.slots
-      .filter((s) => workflow.fields[s.id])
-      .map((s) => `- ${s.label}：${workflow.fields[s.id].value}`)
-      .join("\n");
-  if (workflow.phase === "ready")
-    return `我理解的需求是：\n\n${summary}\n\n现在为你生成简版方案吗？你也可以直接修改上面的条件。`;
-  const questions = workflow.missing
-    .slice(0, 2)
-    .map(
-      (id) =>
-        (scene && "questions" in scene
-          ? (scene.questions as Record<string, string>)?.[id]
-          : null) ||
-        targeted[id] ||
-        policy.slots.find((s) => s.id === id)!.question,
-    );
-  return `${summary ? "已记下你的条件。我们再确认关键条件：" : "我们先把需求聊清楚。"}\n\n${questions.map((q, i) => `${i + 1}. ${q}`).join("\n")}`;
+export function clarification(_workflow: Workflow) {
+  return "你想找哪类模型，或解决什么问题？例如“找一个实时语音交互模型”。说出目标就可以开始，不需要先填预算和部署方式。";
 }
 export function searchTerms(text: string) {
   const terms = new Set<string>();
@@ -343,13 +331,13 @@ export function rankKnowledge(
     .map(({ score, ...r }, i) => ({ ...r, citation_id: `K${i + 1}` }));
 }
 /** Deterministic preview only; real connections use evidence-checked model extraction. */
-export function previewExtraction(prompt: string, previous: Workflow) {
+export function previewExtraction(prompt: string, previous: Workflow, lastQuestion?: string) {
   const updates: Row = {};
   const set = (id: string, value: string) =>
     (updates[id] = { value, evidence: prompt });
   if (
     (sceneFor(prompt) && /想做|改做|目标|改成/.test(prompt)) ||
-    (!previous.fields.goal && prompt.length > 4)
+    (!previous.fields.goal && prompt.length > 4 && !/^(你好|您好|谢谢|hello|hi)[！!。\s]*$/i.test(prompt))
   )
     set("goal", prompt);
   if (/预算|\d+\s*(元|块|美元|人民币)/.test(prompt))
@@ -383,7 +371,7 @@ export function previewExtraction(prompt: string, previous: Workflow) {
     if (id && id !== "goal" && !updates[id]) set(id, "暂不确定，方案须注明假设");
   }
   if (/先自己用|不知道生成多少|个人试用/.test(prompt)) set("scale", prompt);
-  const delivery = deliveryAnswer(previous, prompt);
+  const delivery = deliveryAnswer(previous, prompt, lastQuestion);
   if (delivery) updates.delivery = delivery;
   return JSON.stringify({
     updates,

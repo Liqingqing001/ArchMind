@@ -17,6 +17,7 @@ export type WebResult = {
   published_at: string | null;
   content_kind: "page_excerpt" | "search_summary";
   source_type: "official" | "web";
+  read_at?: string;
 };
 export type WebSearch = {
   status: "disabled" | "ok" | "empty" | "partial" | "error";
@@ -25,6 +26,8 @@ export type WebSearch = {
   queries: string[];
   results: WebResult[];
   errors: string[];
+  reused?: boolean;
+  page_reading?: { attempted: number; succeeded: number; failed: number };
 };
 export const disabledSearch = (): WebSearch => ({
   status: "disabled",
@@ -34,6 +37,12 @@ export const disabledSearch = (): WebSearch => ({
   results: [],
   errors: [],
 });
+export function reusableSearch(web: WebSearch | undefined, workflow: Workflow, now = Date.now()) {
+  if (workflow.response_mode !== "explanation" || !web || !["ok", "partial"].includes(web.status) || !web.results.length || !web.searched_at) return false;
+  const stamp = /(?:Z|[+-]\d\d:\d\d)$/.test(web.searched_at) ? web.searched_at : web.searched_at + "Z";
+  const age = now - Date.parse(stamp);
+  return age >= 0 && age <= policy.reuse_minutes * 60_000;
+}
 export function normalizeSearch(input: SearchConnection): SearchConnection {
   if (
     !input ||
@@ -110,6 +119,13 @@ export function searchQueries(
   const hint = policy.query_hints.find((h) =>
     h.cues.some((c) => goal.toLowerCase().includes(c)),
   );
+  if (hint && "queries" in hint && hint.queries) {
+    const detail = redact(workflow.fields.requirements?.value || "", secrets)
+      .replace(/https?:\/\/\S+|[\w.+-]+@[\w.-]+|(?:\+?86)?1[3-9]\d{9}/g, " ").replace(/\s+/g, " ").trim().slice(0, 35);
+    const follow = current === goal || /^(?:生成|确认|可以|好的|好|开始|现在生成|请续写)/.test(current) ? "" : current.slice(0, 35);
+    const subject = [...new Set([goal.slice(0,65), follow, detail].filter(Boolean))].join(" ");
+    return hint.queries.map(q => q.replace("{goal}", subject).slice(0,300)).slice(0,policy.max_queries);
+  }
   const query =
     hint && "discovery" in hint
       ? goal + " " + hint.discovery
@@ -122,7 +138,7 @@ export function searchQueries(
   return [
     ...new Set([
       query,
-      goal + " " + (follow || hint?.details || "部署 计费 使用限制 官方"),
+      goal + " " + (follow || (hint && "details" in hint && hint.details) || "部署 计费 使用限制 官方"),
     ]),
   ]
     .map((q) => q.trim().slice(0, 190))
@@ -177,6 +193,7 @@ export function searchRequest(connection: SearchConnection, query: string) {
             include_answer: false,
             include_raw_content: "text",
             auto_parameters: false,
+            ...(query.includes("site:") ? { include_domains: [...query.matchAll(/site:([a-z0-9.-]+)/g)].map(m=>m[1]) } : {}),
           }
         : { query, freshness: "noLimit", summary: true, count: 4 },
   };
@@ -211,9 +228,9 @@ export function parseSearchResults(
     const text =
       raw && typeof summary === "string" && summary.trim()
         ? "搜索摘要：" +
-          summary.slice(0, 800) +
+          summary.slice(0, 600) +
           "\n页面摘录：" +
-          raw.slice(0, 800)
+          raw.slice(0, policy.excerpt_chars - 620)
         : raw || summary;
     if (typeof text !== "string" || !text.trim()) continue;
     const host = new URL(url).hostname;
@@ -265,6 +282,7 @@ export function combineSearch(
       if (row && !unique.has(row.url)) unique.set(row.url, row);
     }
   const results = [...unique.values()]
+    .sort((a,b) => Number(b.source_type === "official") - Number(a.source_type === "official"))
     .slice(0, policy.max_results)
     .map((r, i) => ({ ...r, citation_id: `W${i + 1}` }));
   return {
@@ -363,7 +381,7 @@ export async function searchWeb(
       ),
     ),
   );
-  return combineSearch(
+  const web = combineSearch(
     c.provider,
     queries,
     at,
@@ -374,9 +392,49 @@ export async function searchWeb(
         : [],
     ),
   );
+  if (queries.some(q=>q.includes("site:"))) {
+    const targets = web.results.filter(r=>r.source_type === "official" && r.content_kind === "search_summary").slice(0,3);
+    const reads = await Promise.allSettled(targets.map(row=>readOfficialPage(row,allSecrets,fetcher)));
+    reads.forEach((read,i)=>{ if(read.status === "fulfilled") Object.assign(targets[i],read.value); });
+    const failed = reads.filter(r=>r.status === "rejected").length;
+    web.page_reading = {attempted: targets.length, succeeded: targets.length-failed, failed};
+  }
+  return web;
+}
+/** Public pages only, with no model/search credentials, cookies, or redirects. */
+export async function readOfficialPage(row: WebResult, secrets: string[], fetcher: typeof fetch = fetch): Promise<WebResult> {
+  const url = safeWebUrl(row.url,secrets);
+  const host = url && new URL(url).hostname;
+  if (!url || !host || !policy.official_domains.some(d=>host === d || host.endsWith("."+d))) throw Error("非官网页面不自动读取");
+  const controller = new AbortController();
+  const timer = setTimeout(()=>controller.abort(),12_000);
+  try {
+    const response = await fetcher(url,{method:"GET",mode:"cors",credentials:"omit",redirect:"error",referrerPolicy:"no-referrer",signal:controller.signal});
+    if (!response.ok || !/text\//i.test(response.headers.get("content-type") || "")) throw Error("官网正文不可读取");
+    const reader = response.body?.getReader();
+    if (!reader) throw Error("没有正文");
+    const decoder = new TextDecoder();
+    let raw="",size=0;
+    try {
+      while(true) {
+        const {done,value}=await reader.read(); if(done) break;
+        size+=value.length; if(size>2*1024*1024) { controller.abort(); throw Error("官网页面过大"); }
+        raw+=decoder.decode(value,{stream:true});
+      }
+      raw+=decoder.decode();
+    } finally { reader.releaseLock(); }
+    if (/html/i.test(response.headers.get("content-type") || "")) {
+      const doc = new DOMParser().parseFromString(raw,"text/html");
+      doc.querySelectorAll("script,style,nav,footer,noscript,iframe").forEach(el=>el.remove());
+      raw=doc.body?.textContent || "";
+    }
+    const content=raw.split("\n").map(l=>l.trim()).filter(Boolean).join("\n");
+    if(content.length<120) throw Error("官网正文不足");
+    return {...row,excerpt:redact(content,secrets).slice(0,policy.excerpt_chars),content_kind:"page_excerpt",read_at:new Date().toISOString()};
+  } finally { clearTimeout(timer); }
 }
 export function searchWarnings(web: WebSearch) {
-  return web.status === "error"
+  const warnings = web.status === "disabled" ? ["尚未启用联网检索，本轮仅参考库内资料，未核验最新能力与价格；可在对话顶部连接搜索服务。"] : web.status === "error"
     ? [
         "联网检索失败，本轮仅使用库内资料；没有取得实时网页证据。",
         ...web.errors,
@@ -386,6 +444,10 @@ export function searchWarnings(web: WebSearch) {
       : web.status === "empty"
         ? ["本轮联网未找到可用网页，不代表相关产品不存在。"]
         : [];
+  if (web.results.length && !web.results.some(r=>r.source_type === "official")) warnings.push("本轮未取得官网依据，候选能力与价格仍待官方核验。");
+  if (web.results.length && web.results.every(r=>r.content_kind === "search_summary")) warnings.push("当前取得的是搜索摘要，尚未读取官网正文；不能据此确认完整参数或价格。");
+  if (web.page_reading?.failed) warnings.push("部分官网正文读取失败，已保留搜索摘要；这些条目的完整参数仍待核验。");
+  return warnings;
 }
 
 export async function testBrowserSearch(

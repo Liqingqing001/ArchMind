@@ -193,6 +193,9 @@
 
 .web-search-switch {display:flex;align-items:center;gap:7px;border:1px solid #e5c7d5;border-radius:9px;background:#fffafa;color:#a27b90;padding:9px 12px;font-size:11px;}
 .web-search-switch.enabled {color:#558b76;border-color:#bad6c9;}
+.research-onboarding {display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 24px;background:#fff7fa;border-bottom:1px solid #ead3dd;color:#704758;font-size:13px;line-height:1.6;flex:none;}
+.research-onboarding>div {display:flex;gap:12px;flex:none;}
+@media(max-width:600px){.research-onboarding{padding:9px 14px;flex-wrap:wrap;font-size:12px;}}
 .model-settings-dialog .search-enable {display:flex;flex-direction:row;align-items:center;gap:10px;}
 .search-enable input {width:auto;}
 .web-evidence {margin-top:16px;border-top:1px solid #e7cedb;padding-top:12px;font-size:12px;color:#9e7b8e;}
