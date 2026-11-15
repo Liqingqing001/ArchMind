@@ -1,11 +1,13 @@
+import generationPolicy from "../../backend/data/generation-policy.json" with { type: "json" };
 export type Connection = {
   base_url: string; api_key: string; model: string;
   protocol: "chat_completions" | "responses" | "anthropic";
   token_parameter: "max_tokens" | "max_completion_tokens";
   max_output_tokens: number;
+  auto_continue?: boolean;
 };
 type Preset = Omit<Connection, "api_key"> & { note?: string; docs: string };
-const compatible = { protocol: "chat_completions", token_parameter: "max_tokens", max_output_tokens: 2400 } as const;
+const compatible = { protocol: "chat_completions", token_parameter: "max_tokens", max_output_tokens: generationPolicy.default_output_tokens, auto_continue: true } as const;
 export const presets: Record<string, Preset> = {
   DeepSeek: { ...compatible, base_url: "https://api.deepseek.com", model: "deepseek-flash", docs: "https://api-docs.deepseek.com/" },
   OpenAI: { ...compatible, protocol: "responses", base_url: "https://api.openai.com/v1", model: "", docs: "https://developers.openai.com/api/docs/guides/text" },

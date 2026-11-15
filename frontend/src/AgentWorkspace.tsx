@@ -188,6 +188,9 @@ function Reply({
                 {turn.result.web_search?.results.length || 0} 条网页
               </span>
             )}
+            {!!turn.result.diagnostics?.automatic_continuation?.attempts && (
+              <span>{turn.result.diagnostics.automatic_continuation.completed && turn.result.diagnostics.automatic_continuation.segments > 1 ? "已自动补完" : "已尝试自动补写"} · 合并 {turn.result.diagnostics.automatic_continuation.segments} 段</span>
+            )}
           </div>
           {copyError && <p role="status">{copyError}</p>}
           {eligibleSolution(turn) && (
@@ -270,20 +273,23 @@ function Reply({
                     : turn.result.finish_reason === "content_filter"
                       ? "服务商限制输出"
                       : "正常结束"}{" "}
-                  · 输出上限：{turn.result.diagnostics.output_limit || "未记录"}{" "}
+                  · 单次上限：{turn.result.diagnostics.output_limit || "未记录"}{" "}
                   tokens
                 </p>
+                {turn.result.diagnostics.automatic_continuation && (
+                  <p>自动补写：{turn.result.diagnostics.automatic_continuation.enabled ? "开启" : "关闭"} · 本轮尝试 {turn.result.diagnostics.automatic_continuation.attempts} 次 · 合并 {turn.result.diagnostics.automatic_continuation.segments} 段 · 生成调用 {turn.result.diagnostics.model_calls} 次</p>
+                )}
                 {turn.result.grounding_repair?.attempted && (
                   <p>
                     网页整合追加修订：
                     {turn.result.grounding_repair.adopted
                       ? "已采用修订方案"
                       : "未成功，保留首稿"}
-                    （额外一次模型调用）
+                    （计入下方累计用量）
                   </p>
                 )}
                 <p>
-                  服务商用量：
+                  已返回用量累计：
                   {Object.entries(turn.result.diagnostics.usage || {})
                     .map(([key, value]) => `${key}: ${value}`)
                     .join(" · ") || "未返回"}
@@ -959,7 +965,7 @@ export function AgentWorkspace({
                     </article>
                     <div className="chat-progress" role="status">
                       <Loader2 className="spin" size={18} />
-                      {hasConnection && searchConnection.enabled ? "正在检索资料、整理回答…" : "正在整理回答…"}<span>{elapsed}s</span>
+                      {hasConnection && connection.auto_continue !== false ? "正在整理回答，截断时会自动补完…" : hasConnection && searchConnection.enabled ? "正在检索资料、整理回答…" : "正在整理回答…"}<span>{elapsed}s</span>
                     </div>
                   </>
                 )}

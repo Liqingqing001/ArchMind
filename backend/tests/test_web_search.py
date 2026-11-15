@@ -85,7 +85,8 @@ def test_chat_combines_web_with_facts_freezes_citations_and_never_publishes_web(
     first=request(client,'生成方案',conversation_id=c.id,revision=0,action='generate',web_search={'provider':'tavily','api_key':KEY,'enabled':True}).json()
     assert first['web_citations'][0]['citation_id']=='W1' and first['citations']
     assert '[W999]' not in first['answer']
-    assert json.loads(prompts[-1][-1]['content'])['WEB_EVIDENCE_JSON']
+    assert json.loads(prompts[0][-1]['content'])['WEB_EVIDENCE_JSON']
+    assert prompts[-1][:-2]==prompts[0]  # Automatic parts retain the original evidence prompt.
     trace=db.get(Trace,first['trace_id']);assert trace.request_context['web_search']['results']==first['web_search']['results']
     assert db.scalar(select(func.count()).select_from(Fact))==before
     assert KEY not in json.dumps(first)+json.dumps(trace.request_context)

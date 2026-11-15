@@ -37,7 +37,9 @@ export function ModelSettings({ connection, provider, onSave, onClose, onClear }
         <label>接口地址<input type="url" required disabled={testing} value={draft.base_url} onChange={e => update({ base_url: e.target.value })} placeholder="https://your-provider.example/v1" /><small>接受 Base URL 或完整接口地址，自动处理末尾斜杠。</small></label>
         <label>接口协议<select disabled={testing} value={draft.protocol} onChange={e => update({ protocol: e.target.value as Connection["protocol"] })}><option value="chat_completions">OpenAI 兼容 · Chat Completions</option><option value="responses">OpenAI · Responses</option><option value="anthropic">Claude · Messages</option></select></label>
         {draft.protocol === "chat_completions" && <label>长度参数<select disabled={testing} value={draft.token_parameter} onChange={e => update({ token_parameter: e.target.value as Connection["token_parameter"] })}><option value="max_tokens">max_tokens</option><option value="max_completion_tokens">max_completion_tokens</option></select></label>}
-        <label>输出上限（tokens）<input type="number" min={256} max={8192} required disabled={testing} value={draft.max_output_tokens} onChange={e => update({ max_output_tokens: Number(e.target.value) })} /></label>
+        <label>单次输出上限（tokens）<input type="number" min={256} max={8192} required disabled={testing} value={draft.max_output_tokens} onChange={e => update({ max_output_tokens: Number(e.target.value) })} /></label>
+        <label className="search-enable"><input type="checkbox" checked={draft.auto_continue !== false} disabled={testing} onChange={e=>update({auto_continue:e.target.checked})} />截断时自动补完（最多两次）</label>
+        <p className="provider-note">选型约500～800字，完整方案约800～1200字。只有达到长度上限时才补写，并合并为一条回复；每次补写最多1200 tokens，按服务商规则计费。已有单次上限保持不变。</p>
       </div></details>
       <p className="provider-note">{isDemo ? "API Key 与设置明文保存在此浏览器，可随时清除。发送时，当前对话与相关知识直接交给你指定的服务商，不经过 ArchMind 服务器；服务商需允许浏览器跨域访问（CORS）。" : "API Key 与设置保存在此浏览器，可随时清除。发送时配置交给本项目后端调用所选模型；密钥不写入数据库和对话历史。"}</p>
       {presets[selected].docs && <a className="provider-docs" href={presets[selected].docs} target="_blank" rel="noreferrer">查看服务商接入文档 ↗</a>}

@@ -1,0 +1,9 @@
+{
+  "default_output_tokens": 3600,
+  "max_continuations": 2,
+  "continuation_tokens": 1200,
+  "stop_after_chars": 4000,
+  "overlap_chars": 1200,
+  "min_overlap_chars": 12,
+  "continuation_prompt": "上一段因输出长度限制中断。只从已写内容的末尾断点继续，补完半句话、未闭合链接、表格或代码块；不要重复标题、开头、表头或已有段落，不重写整篇。不展开新话题，沿用原资料与[K]/[W]编号。优先补齐结论、限制和必要来源，再用简短一句收尾。本段尽量不超过350字；这是最后一次自动补写时必须优先收尾。"
+}
